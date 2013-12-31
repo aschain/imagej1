@@ -71,6 +71,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 	private boolean customRoi;
 	private boolean drawNames;
 	private AtomicBoolean paintPending;
+	private boolean scaleToFit;
 
 		
 	public ImageCanvas(ImagePlus imp) {
@@ -615,7 +616,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 		imp.setTitle(imp.getTitle());
 	}
 
-	/** Enlarge the canvas if the user enlarges the window. */
+	/** Resizes the canvas when the user resizes the window. */
 	void resizeCanvas(int width, int height) {
 		ImageWindow win = imp.getWindow();
 		//IJ.log("resizeCanvas: "+srcRect+" "+imageWidth+"  "+imageHeight+" "+width+"  "+height+" "+dstWidth+"  "+dstHeight+" "+win.maxBounds);
@@ -624,13 +625,14 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 				resetMaxBounds(); // Works around problem that prevented window from being larger than maximized size
 			resetMaxBoundsCount++;
 		}
-		if (IJ.altKeyDown())
+		if (scaleToFit || IJ.altKeyDown())
 			{fitToWindow(); return;}
-		if (srcRect.width<imageWidth || srcRect.height<imageHeight) {
-			if (width>imageWidth*magnification)
-				width = (int)(imageWidth*magnification);
-			if (height>imageHeight*magnification)
-				height = (int)(imageHeight*magnification);
+		if (width>imageWidth*magnification)
+			width = (int)(imageWidth*magnification);
+		if (height>imageHeight*magnification)
+			height = (int)(imageHeight*magnification);
+		Dimension size = getSize();
+        if (srcRect.width<imageWidth || srcRect.height<imageHeight || width!=size.width || height!=size.height) {
 			setDrawingSize(width, height);
 			srcRect.width = (int)(dstWidth/magnification);
 			srcRect.height = (int)(dstHeight/magnification);
@@ -805,7 +807,6 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 			setMaxBounds();
 			//IJ.log(newDstWidth+" "+dstWidth+" "+newDstHeight+" "+dstHeight);
 			if (newDstWidth<dstWidth || newDstHeight<dstHeight) {
-				//IJ.log("pack");
 				setDrawingSize(newDstWidth, newDstHeight);
 				imp.getWindow().pack();
 			} else
@@ -825,14 +826,14 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 			if (r.x+w>imageWidth) r.x = imageWidth-w;
 			if (r.y+h>imageHeight) r.y = imageHeight-h;
 			srcRect = r;
+			setMagnification(newMag);
 		} else {
 			srcRect = new Rectangle(0, 0, imageWidth, imageHeight);
 			setDrawingSize((int)(imageWidth*newMag), (int)(imageHeight*newMag));
-			//setDrawingSize(dstWidth/2, dstHeight/2);
+			setMagnification(newMag);
 			imp.getWindow().pack();
 		}
 		//IJ.write(newMag + " " + srcRect.x+" "+srcRect.y+" "+srcRect.width+" "+srcRect.height+" "+dstWidth + " " + dstHeight);
-		setMagnification(newMag);
 		//IJ.write(srcRect.x + " " + srcRect.width + " " + dstWidth);
 		setMaxBounds();
 		repaint();
@@ -1533,6 +1534,14 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 		PlugInTool tool = Toolbar.getPlugInTool();
 		if (tool!=null)
 			tool.mouseClicked(imp, e);
+	}
+	
+	public void setScaleToFit(boolean scaleToFit) {
+		this.scaleToFit = scaleToFit;
+	}
+
+	public boolean getScaleToFit() {
+		return scaleToFit;
 	}
 
 }

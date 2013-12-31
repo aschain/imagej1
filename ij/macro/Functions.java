@@ -2646,6 +2646,10 @@ public class Functions implements MacroConstants, Measurements {
 			wm.setCaseSensitive(false);
 			ImagePlus currentImp = WindowManager.getCurrentImage();               
 			int[] ids = WindowManager.getIDList();
+			if (ids==null) {
+				resetImage();
+				return;
+			}
 			for (int img = ids.length-1; img >=0; img--) {
 				int id = ids[img];              
 				ImagePlus imp = WindowManager.getImage(id);
@@ -2740,9 +2744,8 @@ public class Functions implements MacroConstants, Measurements {
 			roiManager = null;
 			for (int i=0; i<v.size(); i++) {
 				imp2 = (ImagePlus)v.elementAt(i);
-				if (imp2!=null && imp2!=cImp) {
+				if (imp2!=null && imp2!=cImp)
 					displayBatchModeImage(imp2);
-				}
 			}
 			displayBatchModeImage(cImp);
 		}
