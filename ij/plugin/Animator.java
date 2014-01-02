@@ -9,6 +9,7 @@ public class Animator implements PlugIn {
 
 	private static double animationRate = Prefs.getDouble(Prefs.FPS, 7.0);
 	private static int firstFrame=0, lastFrame=0;
+	public static int csfod=0;
 	private ImagePlus imp;
 	private StackWindow swin;
 	private int slice;
@@ -58,18 +59,12 @@ public class Animator implements PlugIn {
 		}
 			
 		if (arg.equals("next")) {
-			if (Prefs.reverseNextPreviousOrder)
-				changeSlice(1);
-			else
-				nextSlice();
+			changeSlice(1);
 			return;
 		}
 		
 		if (arg.equals("previous")) {
-			if (Prefs.reverseNextPreviousOrder)
-				changeSlice(-1);
-			else
-				previousSlice();
+			changeSlice(-1);
 			return;
 		}
 		
@@ -252,71 +247,12 @@ public class Animator implements PlugIn {
 			startAnimation();
 	}
 	
-	void nextSlice() {
-		if (!imp.lock())
-			return;
-		boolean hyperstack = imp.isDisplayedHyperStack();
-		int channels = imp.getNChannels();
-		int slices = imp.getNSlices();
-		int frames = imp.getNFrames();
-		if (hyperstack && channels>1 && !((slices>1||frames>1)&&(IJ.controlKeyDown()||IJ.spaceBarDown()||IJ.altKeyDown()))) {
-			int c = imp.getChannel() + 1;
-			if (c>channels) c = channels;
-			swin.setPosition(c, imp.getSlice(), imp.getFrame());
-		} else if (hyperstack && slices>1 && !(frames>1&&IJ.altKeyDown())) {
-			int z = imp.getSlice() + 1;
-			if (z>slices) z = slices;
-			swin.setPosition(imp.getChannel(), z, imp.getFrame());
-		} else if (hyperstack && frames>1) {
-			int t = imp.getFrame() + 1;
-			if (t>frames) t = frames;
-			swin.setPosition(imp.getChannel(), imp.getSlice(), t);
-		} else {
-			if (IJ.altKeyDown())
-				slice += 10;
-			else
-				slice++;
-			if (slice>nSlices)
-				slice = nSlices;
-			swin.showSlice(slice);
-		}
-		imp.updateStatusbarValue();
-		imp.unlock();
-	}	
-	
-	void previousSlice() {
-		if (!imp.lock())
-			return;
-		boolean hyperstack = imp.isDisplayedHyperStack();
-		int channels = imp.getNChannels();
-		int slices = imp.getNSlices();
-		int frames = imp.getNFrames();
-		if (hyperstack && channels>1 && !((slices>1||frames>1)&&(IJ.controlKeyDown()||IJ.spaceBarDown()||IJ.altKeyDown()))) {
-			int c = imp.getChannel() - 1;
-			if (c<1) c = 1;
-			swin.setPosition(c, imp.getSlice(), imp.getFrame());
-		} else if (hyperstack && slices>1 && !(frames>1&&IJ.altKeyDown())) {
-			int z = imp.getSlice() - 1;
-			if (z<1) z = 1;
-			swin.setPosition(imp.getChannel(), z, imp.getFrame());
-		} else if (hyperstack && frames>1) {
-			int t = imp.getFrame() - 1;
-			if (t<1) t = 1;
-			swin.setPosition(imp.getChannel(), imp.getSlice(), t);
-		} else {
-			if (IJ.altKeyDown())
-				slice -= 10;
-			else
-				slice--;
-			if (slice<1)
-				slice = 1;
-			swin.showSlice(slice);
-		}
-		imp.updateStatusbarValue();
-		imp.unlock();
-	}
 
 	void changeSlice(int pn) {
+		int npo = 1, csfo=1;
+		if (csfod>2) csfod=0;
+		if (csfod<0) csfod=2;
+		if (Prefs.reverseNextPreviousOrder) {npo = -1; csfo=3;}
 		if (!imp.lock())
 			return;
 		boolean hyperstack = imp.isDisplayedHyperStack();
@@ -327,18 +263,41 @@ public class Animator implements PlugIn {
 			{stopAnimation(); return;} //if only one dimension, stop animating
 		if(hyperstack){
 			int c=imp.getChannel(); int z=imp.getSlice(); int t=imp.getFrame();
-			if (frames>1 && !((slices>1||channels>1)&&(IJ.controlKeyDown()||IJ.spaceBarDown()||IJ.altKeyDown()) || swin.getAnimate())){
-				t += pn;
-				if (t>frames) t = frames;
-				if (t<1) t = 1;
-			} else if (slices>1 && !(channels>1&& (IJ.altKeyDown() || IJ.spaceBarDown()) || ((swin.getAnimate()|| IJ.controlKeyDown()) && frames==1)) ) {
-				z += pn;
-				if (z>slices) z = slices;
-				if (z<1) z = 1;
-			} else if (channels>1) {
+			csfo+=csfod*npo;
+			if (csfo>3) csfo=csfo%3; if (csfo<1) csfo= csfo%3+3;
+			if(frames==1 || (swin.getAnimate() && frames>1)){
+				if(csfo==3) csfo+=npo;
+				if(IJ.controlKeyDown() || IJ.spaceBarDown()||IJ.altKeyDown() ) csfo+=npo;
+				if(csfo==3) csfo+=npo;
+				if(channels==1) csfo=2;
+				if(slices==1 || (frames==1 && swin.getAnimate())) csfo=1;
+			} else if(slices==1){
+				if(csfo==2) csfo+=npo;
+				if(IJ.controlKeyDown() || IJ.spaceBarDown()||IJ.altKeyDown() ) csfo+=npo;
+				if(csfo==2) csfo+=npo;
+				if(frames==1)csfo=1;
+			} else if(channels==1){
+				if(csfo==1)csfo+=npo;
+				if(IJ.controlKeyDown() || IJ.spaceBarDown()||IJ.altKeyDown() ) csfo+=npo;
+				if(csfo==1)csfo+=npo;
+			}else{
+				if ( IJ.controlKeyDown() ) csfo += npo;
+				else if (IJ.spaceBarDown()||IJ.altKeyDown()) csfo += npo*2;
+			}
+			if (csfo>3) csfo=csfo%3; if (csfo<1) csfo= csfo%3+3;
+			
+			if (csfo==1 && channels>1){
 				c += pn;
 				if (c>channels) c = channels;
 				if (c<1) c = 1;
+			} else if (csfo==2&& slices>1) {
+				z += pn;
+				if (z>slices) z = slices;
+				if (z<1) z = 1;
+			} else if(frames>1){
+				t += pn;
+				if (t>frames) t = frames;
+				if (t<1) t = 1;
 			}
 			swin.setPosition(c, z, t);
 		} else {
