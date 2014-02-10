@@ -16,10 +16,10 @@ import ij.measure.*;
 	Bob Dougherty, OptiNav, Inc., 4/14/2002
 	Based largely on HistogramWindow.java by Wayne Rasband.
 	July 2002: Modified by Daniel Marsh and renamed CalibrationBar.
-	January 2013: Renamed ColorBar; displays calibration bar as an overlay.
+	January 2013: Displays calibration bar as an overlay.
 */
 
-public class ColorBar implements PlugIn {
+public class CalibrationBar implements PlugIn {
 	final static int BAR_LENGTH = 128;
 	final static int BAR_THICKNESS = 12;
 	final static int XMARGIN = 10;
@@ -72,8 +72,8 @@ public class ColorBar implements PlugIn {
 
 	public void run(String arg) {
 		imp = IJ.getImage();
-		if (imp.getBitDepth()==24) {
-			IJ.error("RGB images are not supported");
+		if (imp.getBitDepth()==24 || imp.getCompositeMode()==IJ.COMPOSITE) {
+			IJ.error("Calibration Bar", "RGB and composite images are not supported");
 			return;
 		}
 		if (imp.getRoi()!=null)
@@ -204,6 +204,10 @@ public class ColorBar implements PlugIn {
 		}
 		*/
 		overlay.setIsCalibrationBar(true);
+		if (imp.getCompositeMode()>0) {
+			for (int i=0; i<overlay.size(); i++)
+				overlay.get(i).setPosition(imp.getC(), 0, 0);
+		}
 		imp.setOverlay(overlay);
 	}
 
@@ -281,7 +285,6 @@ public class ColorBar implements PlugIn {
 			font = new Font("SansSerif", fontType, 9);
 		else
 			font = new Font("SansSerif", fontType, (int)( fontSize*zoom));
-		TextRoi.setFont("SansSerif", font.getSize(), font.getStyle(), true);
 		int maxLength = 0;
 
 		//Blank offscreen image for font metrics
@@ -311,7 +314,7 @@ public class ColorBar implements PlugIn {
 					decimalPlaces = 2;
 			}
 			if (overlay!=null) {
-				TextRoi label = new TextRoi(d2s(grayLabel), x + 5, yLabel + fontHeight/2);
+				TextRoi label = new TextRoi(d2s(grayLabel), x + 5, yLabel + fontHeight/2, font);
 				label.setStrokeColor(c);
 				overlay.add(label);
 			}

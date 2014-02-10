@@ -118,12 +118,12 @@ public class FileOpener {
         		if (planar)
         			imp.getProcessor().resetMinAndMax();
 				imp.setFileInfo(fi);
-				int mode = CompositeImage.COMPOSITE;
+				int mode = IJ.COMPOSITE;
 				if (fi.description!=null) {
 					if (fi.description.indexOf("mode=color")!=-1)
-					mode = CompositeImage.COLOR;
+					mode = IJ.COLOR;
 					else if (fi.description.indexOf("mode=gray")!=-1)
-					mode = CompositeImage.GRAYSCALE;
+					mode = IJ.GRAYSCALE;
 				}
         		imp = new CompositeImage(imp, mode);
         		if (!planar && fi.displayRanges==null) {
@@ -535,8 +535,9 @@ public class FileOpener {
 		n = getNumber(props,"images");
 		if (n!=null && n.doubleValue()>1.0)
 		fi.nImages = (int)n.doubleValue();
-		double spacing = getDouble(props,"spacing");
-		if (spacing!=0.0) {
+		n = getNumber(props, "spacing");
+		if (n!=null) {
+			double spacing = n.doubleValue();
 			if (spacing<0) spacing = -spacing;
 			fi.pixelDepth = spacing;
 		}

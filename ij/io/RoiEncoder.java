@@ -15,7 +15,7 @@ import java.awt.geom.*;
 public class RoiEncoder {
 	static final int HEADER_SIZE = 64;
 	static final int HEADER2_SIZE = 64;
-	static final int VERSION = 224; // changed to 224 : roi properties
+	static final int VERSION = 225; // changed to 225 : TextRoi angle saved
 	private String path;
 	private OutputStream f;
 	private final int polygon=0, rect=1, oval=2, line=3, freeline=4, polyline=5, noRoi=6, freehand=7, 
@@ -34,6 +34,17 @@ public class RoiEncoder {
 	/** Creates an RoiEncoder using the specified OutputStream. */
 	public RoiEncoder(OutputStream f) {
 		this.f = f;
+	}
+	
+	/** Saves the specified ROI as a file, returning 'true' if successful. */
+	public static boolean save(Roi roi, String path) {
+		RoiEncoder re = new RoiEncoder(path);
+		try {
+			re.write(roi);
+		} catch (IOException e) {
+			return false;
+		}
+		return true;
 	}
 
 	/** Save the Roi to the file of stream. */
@@ -64,6 +75,9 @@ public class RoiEncoder {
 	}
 
 	void write(Roi roi, OutputStream f) throws IOException {
+		Rectangle r = roi.getBounds();
+		if (r.width>65535||r.height>65535||r.x>65535||r.y>65535)
+			roi.enableSubPixelResolution();
 		int roiType = roi.getType();
 		int type = rect;
 		int options = 0;
@@ -102,7 +116,6 @@ public class RoiEncoder {
 		int[] x=null, y=null;
 		float[] xf=null, yf=null;
 		int floatSize = 0;
-		Rectangle r = roi.getBounds();
 		if (roi instanceof PolygonRoi) {
 			PolygonRoi proi = (PolygonRoi)roi;
 			Polygon p = proi.getNonSplineCoordinates();
@@ -287,11 +300,14 @@ public class RoiEncoder {
 		Font font = roi.getCurrentFont();
 		String fontName = font.getName();
 		int size = font.getSize();
-		int style = font.getStyle() + roi.getJustification()*256;
+		int drawStringMode = roi.getDrawStringMode()?1024:0;
+		int style = font.getStyle() + roi.getJustification()*256+drawStringMode;
 		String text = roi.getText();
+		float angle = (float)roi.getAngle();
+		int angleLength = 4;
 		int fontNameLength = fontName.length();
 		int textLength = text.length();
-		int textRoiDataLength = 16+fontNameLength*2+textLength*2;
+		int textRoiDataLength = 16+fontNameLength*2+textLength*2 + angleLength;
 		byte[] data2 = new byte[HEADER_SIZE+HEADER2_SIZE+textRoiDataLength+roiNameSize];
 		System.arraycopy(data, 0, data2, 0, HEADER_SIZE);
 		data = data2;
@@ -306,6 +322,7 @@ public class RoiEncoder {
 			putShort(HEADER_SIZE+16+fontNameLength*2+i*2, text.charAt(i));
 		int hdr2Offset = HEADER_SIZE+textRoiDataLength;
 		//ij.IJ.log("saveTextRoi: "+HEADER_SIZE+"  "+textRoiDataLength+"  "+fontNameLength+"  "+textLength);
+		putFloat(hdr2Offset-angleLength, angle);
 		putHeader2(roi, hdr2Offset);
 	}
 	
