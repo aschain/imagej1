@@ -192,19 +192,18 @@ public class Concatenator implements PlugIn, ItemListener{
         for (int i=0;i<n;i++) {
             ImageStack stack = images[i].getStack();
             slices = images[i].getNSlices();
+            frames = images[i].getNFrames();
             if (concatSlices) {
-                slices = images[i].getNSlices();
                 slices2 += slices;
                 frames2 = frames;
             } else {
-                frames = images[i].getNFrames();
                 frames2 += frames;
                 slices2 = slices;
             }
             for (int f=1; f<=frames; f++) {
                 for (int s=1; s<=slices; s++) {
                     for (int c=1; c<=channels; c++) {
-                        int index = (f-1)*channels*s + (s-1)*channels + c;
+                        int index = (f-1)*channels*slices + (s-1)*channels + c;
                         ImageProcessor ip = stack.getProcessor(index);
                         if (keep)
                             ip = ip.duplicate();
