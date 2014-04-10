@@ -76,8 +76,8 @@ public class ImageJ extends Frame implements ActionListener,
 	MouseListener, KeyListener, WindowListener, ItemListener, Runnable {
 
 	/** Plugins should call IJ.getVersion() or IJ.getFullVersion() to get the version string. */
-	public static final String VERSION = "1.48s";
-	public static final String BUILD = "27"; 
+	public static final String VERSION = "1.48u";
+	public static final String BUILD = ""; 
 	public static Color backgroundColor = new Color(237,237,237);
 	/** SansSerif, 12-point, plain font. */
 	public static final Font SansSerif12 = new Font("SansSerif", Font.PLAIN, 12);
@@ -253,11 +253,10 @@ public class ImageJ extends Frame implements ActionListener,
 	}
 	
 	public Point getPreferredLocation() {
-		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-		Rectangle maxBounds = ge.getMaximumWindowBounds();
+		Rectangle maxBounds = GUI.getMaxWindowBounds();
 		int ijX = Prefs.getInt(IJ_X,-99);
 		int ijY = Prefs.getInt(IJ_Y,-99);
-		if (ijX>=0 && ijY>0 && ijX<(maxBounds.x+maxBounds.width-75))
+		if (ijX>=maxBounds.x && ijY>=maxBounds.y && ijX<(maxBounds.x+maxBounds.width-75))
 			return new Point(ijX, ijY);
 		Dimension tbsize = toolbar.getPreferredSize();
 		int ijWidth = tbsize.width+10;
@@ -771,26 +770,29 @@ public class ImageJ extends Frame implements ActionListener,
 	}
 	
 	void saveWindowLocations() {
-		Frame frame = WindowManager.getFrame("B&C");
-		if (frame!=null)
-			Prefs.saveLocation(ContrastAdjuster.LOC_KEY, frame.getLocation());
-		frame = WindowManager.getFrame("Threshold");
-		if (frame!=null)
-			Prefs.saveLocation(ThresholdAdjuster.LOC_KEY, frame.getLocation());
-		frame = WindowManager.getFrame("Results");
-		if (frame!=null) {
-			Prefs.saveLocation(TextWindow.LOC_KEY, frame.getLocation());
-			Dimension d = frame.getSize();
+		Window win = WindowManager.getWindow("B&C");
+		if (win!=null)
+			Prefs.saveLocation(ContrastAdjuster.LOC_KEY, win.getLocation());
+		win = WindowManager.getWindow("Threshold");
+		if (win!=null)
+			Prefs.saveLocation(ThresholdAdjuster.LOC_KEY, win.getLocation());
+		win = WindowManager.getWindow("Results");
+		if (win!=null) {
+			Prefs.saveLocation(TextWindow.LOC_KEY, win.getLocation());
+			Dimension d = win.getSize();
 			Prefs.set(TextWindow.WIDTH_KEY, d.width);
 			Prefs.set(TextWindow.HEIGHT_KEY, d.height);
 		}
-		frame = WindowManager.getFrame("Log");
-		if (frame!=null) {
-			Prefs.saveLocation(TextWindow.LOG_LOC_KEY, frame.getLocation());
-			Dimension d = frame.getSize();
+		win = WindowManager.getWindow("Log");
+		if (win!=null) {
+			Prefs.saveLocation(TextWindow.LOG_LOC_KEY, win.getLocation());
+			Dimension d = win.getSize();
 			Prefs.set(TextWindow.LOG_WIDTH_KEY, d.width);
 			Prefs.set(TextWindow.LOG_HEIGHT_KEY, d.height);
 		}
+		win = WindowManager.getWindow("ROI Manager");
+		if (win!=null)
+			Prefs.saveLocation(RoiManager.LOC_KEY, win.getLocation());
 	}
 	
 	public static String getCommandName() {

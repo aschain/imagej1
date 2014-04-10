@@ -16,6 +16,7 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 
 	public static final int MIN_WIDTH = 128;
 	public static final int MIN_HEIGHT = 32;
+	private static final String LOC_KEY = "image.loc";
 	
 	protected ImagePlus imp;
 	protected ImageJ ij;
@@ -28,6 +29,7 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 	Rectangle maxWindowBounds; // largest possible window on this screen
 	Rectangle maxBounds; // Size of this window after it is maximized
 	long setMaxBoundsTime;
+	private boolean firstSmallWindow;
 
 	private static final int XINC = 8;
 	private static final int YINC = 12;
@@ -120,13 +122,12 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 				if (img!=null) 
 					try {setIconImage(img);} catch (Exception e) {}
 			}
-			if (centerOnScreen) {
-				GUI.center(this);
-				centerOnScreen = false;
-			} else if (nextLocation!=null) {
+			if (nextLocation!=null)
 				setLocation(nextLocation);
-				nextLocation = null;
-			}
+			else if (centerOnScreen && nextLocation==null)
+				GUI.center(this);
+			nextLocation = null;
+			centerOnScreen = false;
 			if (Interpreter.isBatchMode() || (IJ.getInstance()==null&&this instanceof HistogramWindow)) {
 				WindowManager.setTempCurrentImage(imp);
 				Interpreter.addBatchModeImage(imp);
@@ -145,10 +146,20 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 			xbase = -1;
 		if (xbase==-1) {
 			count = 0;
-			xbase = maxWindow.x + 5;
-			if (width*2<=maxWindow.width)
-				xbase = maxWindow.x+maxWindow.width/2-width/2;
-			ybase = maxWindow.y;
+			xbase = maxWindow.x + (maxWindow.width>1800?24:12);
+			if (width*2<=maxWindow.width) {
+				Point loc = Prefs.getLocation(LOC_KEY);
+				if (loc!=null && loc.x+width<maxWindow.width && loc.y+height<maxWindow.height) {
+					xbase = loc.x;
+					ybase = loc.y;
+				} else {
+					xbase = maxWindow.x+maxWindow.width/2-width/2;
+					ybase = maxWindow.y;
+				}
+				firstSmallWindow = true;
+				if (IJ.debugMode) IJ.log("ImageWindow.xbase: "+xbase+" "+loc);
+			} else
+				ybase = maxWindow.y;
 			xloc = xbase;
 			yloc = ybase;
 		}
@@ -165,7 +176,7 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 		int sliderHeight = (this instanceof StackWindow)?20:0;
 		int screenHeight = maxWindow.y+maxWindow.height-sliderHeight;
 		double mag = 1;
-		while (xbase+XINC*4+width*mag>maxWindow.x+maxWindow.width || ybase+height*mag>=screenHeight) {
+		while (xbase+width*mag>maxWindow.x+maxWindow.width || ybase+height*mag>=screenHeight) {
 			//IJ.log(mag+"  "+xbase+"  "+width*mag+"  "+maxWindow.width);
 			double mag2 = ImageCanvas.getLowerZoomLevel(mag);
 			if (mag2==mag) break;
@@ -191,7 +202,6 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 					
 	Rectangle getMaxWindow(int xloc, int yloc) {
 		Rectangle bounds = GUI.getMaxWindowBounds();
-		if (IJ.debugMode) IJ.log("getMaxWindow: "+bounds+"  "+xloc+","+yloc);
 		if (xloc>bounds.x+bounds.width || yloc>bounds.y+bounds.height) {
 			Rectangle bounds2 = getSecondaryMonitorBounds(xloc, yloc);
 			if (bounds2!=null) return bounds2;
@@ -212,9 +222,11 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 			GraphicsDevice gd = gs[j];
 			GraphicsConfiguration[] gc = gd.getConfigurations();
 			for (int i=0; i<gc.length; i++) {
-				bounds = gc[i].getBounds();
-				if (bounds!=null && bounds.contains(xloc, yloc))
+				Rectangle bounds2 = gc[i].getBounds();
+				if (bounds2!=null && bounds2.contains(xloc, yloc)) {
+					bounds = bounds2;
 					break;
+				}
 			}
 		}		
 		if (IJ.debugMode) IJ.log("getSecondaryMonitorBounds: "+bounds);
@@ -364,6 +376,8 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 		closed = true;
 		if (WindowManager.getWindowCount()==0)
 			{xloc = 0; yloc = 0;}
+		if (firstSmallWindow)
+			Prefs.saveLocation(LOC_KEY, getLocation());
 		WindowManager.removeWindow(this);
 		//setVisible(false);
 		if (ij!=null && ij.quitting())  // this may help avoid thread deadlocks
@@ -426,8 +440,7 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 		double width = imp.getWidth();
 		double height = imp.getHeight();
 		double iAspectRatio = width/height;
-		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-		Rectangle maxWindow = ge.getMaximumWindowBounds();
+		Rectangle maxWindow = GUI.getMaxWindowBounds();
 		maxWindowBounds = maxWindow;
 		if (iAspectRatio/((double)maxWindow.width/maxWindow.height)>0.75) {
 			maxWindow.y += 22;  // uncover ImageJ menu bar
@@ -472,19 +485,10 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 	public Component add(Component comp) {
 		comp = super.add(comp);
 		maxBounds = getMaximumBounds();
-		//if (!IJ.isLinux()) {
-			setMaximizedBounds(maxBounds);
-			setMaxBoundsTime = System.currentTimeMillis();
-		//}
+		setMaximizedBounds(maxBounds);
+		setMaxBoundsTime = System.currentTimeMillis();
 		return comp;
 	}
-	
-	//public void setMaximizedBounds(Rectangle r) {
-	//	super.setMaximizedBounds(r);
-	//	IJ.log("setMaximizedBounds: "+r+" "+getMaximizedBounds());
-	//	if (getMaximizedBounds().x==0)
-	//		throw new IllegalArgumentException("");
-	//}
 	
 	public void maximize() {
 		if (maxBounds==null)

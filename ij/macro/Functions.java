@@ -755,6 +755,7 @@ public class Functions implements MacroConstants, Measurements {
 		if (previousRoi!=null && roi!=null)
 			updateRoi(roi);
 		resetImage();
+		IJ.setKeyUp(IJ.ALL_KEYS);
 	}
 	
 	ImagePlus getImage() {
@@ -1445,7 +1446,7 @@ public class Functions implements MacroConstants, Measurements {
 				return log!=null?log:"";
 			} else if (key.indexOf(".")==-1) {
 				ImagePlus imp = getImage();
-				String value = imp.getProp(key);
+				String value = imp.getStringProperty(key);
 				if (value!=null) return value;
 			} else if (lowercaseKey.equals("micrometer.abbreviation"))
 				return "\u00B5m";
@@ -2427,11 +2428,9 @@ public class Functions implements MacroConstants, Measurements {
 			} else
 				IJ.open(path);
 			if (path!=null&&!path.equals("")) {
-				int index = path.lastIndexOf('/');
-				if (index==-1)
-					index = path.lastIndexOf('\\');
-				String name = index>=0&&index<path.length()?path.substring(index+1):path;
-				OpenDialog.setLastName(name);
+				File f = new File(path);
+				OpenDialog.setLastDirectory(f.getParent()+File.separator);
+				OpenDialog.setLastName(f.getName());
 			}
 		}
 		resetImage();

@@ -1076,35 +1076,14 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 			getLocalCalibration().setImage(this);
 		}
     }
-
-	/** Adds a key-value pair to this image's properties. The key
-		is removed from the properties table if value is null. */
-	public void setProperty(String key, Object value) {
-		if (properties==null)
-			properties = new Properties();
-		if (value==null)
-			properties.remove(key);
-		else
-			properties.put(key, value);
-	}
 		
-	/** Returns the property associated with 'key'. May return null. */
-	public Object getProperty(String key) {
-		if (properties==null)
-			return null;
-		else
-			return properties.get(key);
-	}
-	
-	/** Returns this image's Properties. May return null. */
-	public Properties getProperties() {
-			return properties;
-	}
-		
-	/** Returns the value from the "Info" property string associated 
-		with 'key', or null if the key is not found. Works with
-		DICOM tags and Bio-Formats metadata. */
-	public String getProp(String key) {
+ 	/** Returns the string value from the "Info" property string  
+	 * associated with 'key', or null if the key is not found. 
+	 * Works with DICOM tags and Bio-Formats metadata.
+	 * @see #getNumericProperty
+	 * @see #getInfoProperty
+	*/
+	public String getStringProperty(String key) {
 		if (key==null)
 			return null;
 		if (key.length()==9 && key.matches("[0-9]{4},[0-9]{4}")) // DICOM tag?
@@ -1113,7 +1092,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 			ImageStack stack = getStack();
 			String label = stack.getSliceLabel(getCurrentSlice());
 			if (label!=null && label.indexOf('\n')>0) {
-				String value = getProp(key, label);
+				String value = getStringProperty(key, label);
 				if (value!=null)
 					return value;
 			}
@@ -1122,10 +1101,29 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 		if (obj==null || !(obj instanceof String))
 			return null;
 		String info = (String)obj;
-		return getProp(key, info);
+		return getStringProperty(key, info);
 	}
 	
-	private String getProp(String key, String info) {
+	/** Returns the numeric value from the "Info" property string  
+	 * associated with 'key', or NaN if the key is not found or the
+	 * value associated with the key is not numeric. Works with
+	 * DICOM tags and Bio-Formats metadata.
+	 * @see #getStringProperty
+	 * @see #getInfoProperty
+	*/
+	public double getNumericProperty(String key) {
+		return Tools.parseDouble(getStringProperty(key));
+	}
+
+	/**
+	 * @deprecated
+	 * @see #getStringProperty
+	*/
+	public String getProp(String key) {
+		return getStringProperty(key);
+	}
+	
+	private String getStringProperty(String key, String info) {
 		int index1 = -1;
 		index1 = findKey(info, key+": "); // standard 'key: value' pair?
 		if (index1<0) // Bio-Formats metadata?
@@ -1168,6 +1166,33 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 		return info;
 	}
 
+	/** Returns the property associated with 'key', or null if it is not found.
+	 * @see #getStringProperty
+	 * @see #getNumericProperty
+	 * @see #getInfoProperty
+	*/
+	public Object getProperty(String key) {
+		if (properties==null)
+			return null;
+		else
+			return properties.get(key);
+	}
+	
+	/** Adds a key-value pair to this image's properties. The key
+		is removed from the properties table if value is null. */
+	public void setProperty(String key, Object value) {
+		if (properties==null)
+			properties = new Properties();
+		if (value==null)
+			properties.remove(key);
+		else
+			properties.put(key, value);
+	}
+		
+	/** Returns this image's Properties. May return null. */
+	public Properties getProperties() {
+			return properties;
+	}
 	/** Creates a LookUpTable object that corresponds to this image. */
     public LookUpTable createLut() {
 		ImageProcessor ip2 = getProcessor();

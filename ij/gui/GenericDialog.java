@@ -1211,11 +1211,16 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
   		return theLabel;
   	}
 
-    /** Returns a reference to the Preview Checkbox. */
+    /** Returns a reference to the Preview checkbox. */
     public Checkbox getPreviewCheckbox() {
         return previewCheckbox;
     }
     
+    /** Returns 'true' if this dialog has a "Preview" checkbox and it is enabled. */
+    public boolean isPreviewActive() {
+        return previewCheckbox!=null && previewCheckbox.getState();
+    }
+
 	/** Returns references to the "OK" ("Yes"), "Cancel", 
 		and if present, "No" buttons as an array. */
 	public Button[] getButtons() {
@@ -1236,9 +1241,15 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
         }
     }
     
-    /** Display dialog centered on the primary screen? */
+    /** Display dialog centered on the primary screen. */
     public void centerDialog(boolean b) {
     	centerDialog = b;
+    }
+
+    /* Display the dialog at the specified location. */
+    public void setLocation(int x, int y) {
+    	super.setLocation(x, y);
+    	centerDialog = false;
     }
 
     protected void setup() {
