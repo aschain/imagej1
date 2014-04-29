@@ -101,6 +101,7 @@ public class Functions implements MacroConstants, Measurements {
 			case SET_BACKGROUND: setBackgroundColor(); break;
 			case SET_COLOR: setColor(); break;
 			case MAKE_LINE: makeLine(); break;
+			case MAKE_ARROW: makeArrow(); break;
 			case MAKE_OVAL: makeOval(); break;
 			case MAKE_RECTANGLE: makeRectangle(); break;
 			case DUMP: interp.dump(); break;
@@ -720,6 +721,20 @@ public class Functions implements MacroConstants, Measurements {
 			getImage().setRoi(new PolygonRoi(x, y, n, Roi.POLYLINE));
 		}
 		resetImage(); 
+	}
+
+	void makeArrow() {
+		String options = "";
+		double x1 = getFirstArg();
+		double y1 = getNextArg();
+		double x2 = getNextArg();
+		double y2 = getNextArg();
+		if (interp.nextToken()==',')
+			options = getNextString();
+		interp.getRightParen();
+		Arrow arrow = new Arrow(x1, y1, x2, y2);
+		arrow.setStyle(options);
+		getImage().setRoi(arrow);
 	}
 
 	void makeOval() {
@@ -3897,6 +3912,8 @@ public class Functions implements MacroConstants, Measurements {
 			Analyzer.setMeasurement(LABELS, state);
 		else if (arg1.startsWith("limit to"))
 			Analyzer.setMeasurement(LIMIT, state);
+		else if (arg1.startsWith("add to"))
+			Analyzer.setMeasurement(ADD_TO_OVERLAY, state);
 		else if (arg1.equals("area"))
 			Analyzer.setMeasurement(AREA, state);
 		else if (arg1.equals("mean"))
@@ -4346,6 +4363,8 @@ public class Functions implements MacroConstants, Measurements {
 			setActiveChannels(imp, getStringArg());
 		else if (name.equals("getActiveChannels"))
 			getActiveChannels(imp);
+		else if (name.equals("toggleChannel"))
+			toggleChannel(imp, (int)getArg());
 		else if (name.equals("swap"))
 			swapStackImages(imp);
 		else if (name.equals("getStatistics"))
@@ -4433,6 +4452,19 @@ public class Functions implements MacroConstants, Measurements {
 		}
 		Variable channels = getVariableArg();
 		channels.setString(new String(chars));
+	}
+
+	void toggleChannel(ImagePlus imp, int channel) {
+		if (!imp.isComposite())
+			interp.error("Composite image required");
+		if (channel<1 || channel>imp.getNChannels())
+			interp.error("Invalid channel: "+channel);
+		if (((CompositeImage)imp).getMode()!=IJ.COMPOSITE)
+			((CompositeImage)imp).setMode(IJ.COMPOSITE);
+		boolean[] active = ((CompositeImage)imp).getActiveChannels();
+		active[channel-1] = active[channel-1]?false:true;
+		imp.updateAndDraw();
+		Channels.updateChannels();
 	}
 
 	void setDisplayMode(ImagePlus imp, String mode) {
@@ -5369,6 +5401,8 @@ public class Functions implements MacroConstants, Measurements {
 			return hideOverlay(imp);
 		else if (name.equals("remove"))
 			return removeOverlay(imp);
+		else if (name.equals("clear"))
+			return clearOverlay(imp);
 		else if (name.equals("paste")) {
 			interp.getParens();
 			if (overlayClipboard==null)
@@ -5611,7 +5645,7 @@ public class Functions implements MacroConstants, Measurements {
 
 	void addRoi(ImagePlus imp, Roi roi){
 		Overlay overlay = imp.getOverlay();
-		if (overlay==null) {
+		if (overlay==null || overlay.size()==0) {
 			if (offscreenOverlay==null)
 				offscreenOverlay = new Overlay();
 			overlay = offscreenOverlay;
@@ -5629,13 +5663,13 @@ public class Functions implements MacroConstants, Measurements {
 			imp.setOverlay(offscreenOverlay);
 			offscreenOverlay = null;
 		} else
-			IJ.run(imp, "Show Overlay", "");
+			imp.setHideOverlay(false);
 		return Double.NaN;
 	}
 	
 	double hideOverlay(ImagePlus imp) {
 		interp.getParens();
-		IJ.run(imp, "Hide Overlay", "");
+		imp.setHideOverlay(true);
 		return Double.NaN;
 	}
 
@@ -5646,6 +5680,15 @@ public class Functions implements MacroConstants, Measurements {
 		return Double.NaN;
 	}
 	
+	double clearOverlay(ImagePlus imp) {
+		interp.getParens();
+		offscreenOverlay = null;
+		Overlay overlay = imp.getOverlay();
+		if (overlay!=null)
+			overlay.clear();
+		return Double.NaN;
+	}
+
 	final double selectionContains() {
 		int x = (int)Math.round(getFirstArg());
 		int y = (int)Math.round(getLastArg());

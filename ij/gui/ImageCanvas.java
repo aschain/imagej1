@@ -262,6 +262,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 		for (int i=0; i<n; i++) {
 			if (overlay==null) break;
 			Roi roi = overlay.get(i);
+			if (roi==null) break;
 			if (hyperstack) {
 				int c = roi.getCPosition();
 				int z = roi.getZPosition();
@@ -1479,6 +1480,8 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 				if (!IJ.altKeyDown() && roi.getType()==Roi.COMPOSITE
 				&& roi.getBounds().width==imp.getWidth() && roi.getBounds().height==imp.getHeight())
 					return false;
+				if (Toolbar.getToolId()==Toolbar.OVAL && Toolbar.getBrushSize()>0)
+					Toolbar.getInstance().setTool(Toolbar.RECTANGLE);
 				roi.setImage(null);
 				imp.setRoi(roi);
 				roi.handleMouseDown(sx, sy);
