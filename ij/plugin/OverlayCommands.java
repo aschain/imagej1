@@ -98,6 +98,9 @@ public class OverlayCommands implements PlugIn {
 		if (IJ.altKeyDown() || (IJ.macroRunning() && Macro.getOptions()!=null)) {
 			RoiProperties rp = new RoiProperties("Add to Overlay", roi);
 			if (!rp.showDialog()) return;
+			defaultRoi.setStrokeColor(roi.getStrokeColor());
+			defaultRoi.setStrokeWidth(roi.getStrokeWidth());
+			defaultRoi.setFillColor(roi.getFillColor());
 		}
 		String name = roi.getName();
 		boolean newOverlay = name!=null && name.equals("new-overlay");
