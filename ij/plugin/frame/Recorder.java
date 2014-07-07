@@ -196,7 +196,6 @@ public class Recorder extends PlugInFrame implements PlugIn, ActionListener, Ima
 
 	public static void record(String method, String args, int a1, int a2) {
 		if (textArea==null) return;
-		method = "//"+method;
 		textArea.append(method+"(\""+args+"\", "+a1+", "+a2+");\n");
 	}
 
@@ -269,6 +268,8 @@ public class Recorder extends PlugInFrame implements PlugIn, ActionListener, Ima
 				call = call.replace("[", "new int[]{");
 				call = call.replace("])", "})");
 			}
+			if (javaMode() && call.startsWith("rt = "))
+				call = "ResultTable " + call;
 			textArea.append(call+"\n");
 			commandName = null;
  		}
@@ -607,7 +608,7 @@ public class Recorder extends PlugInFrame implements PlugIn, ActionListener, Ima
 			}
 			if (text.contains("overlay.add"))
 				text = (java?"Overlay ":"") + "overlay = new Overlay();\n" + text;
-			if ((text.contains("imp.")||text.contains("overlay.add")) && !text.contains("IJ.openImage") && !text.contains("IJ.createImage"))
+			if ((text.contains("imp.")||text.contains("(imp")||text.contains("overlay.add")) && !text.contains("IJ.openImage") && !text.contains("IJ.createImage"))
 				text = (java?"ImagePlus ":"") + "imp = IJ.getImage();\n" + text;
 			if (text.contains("overlay.add"))
 				text = text + "imp.setOverlay(overlay);\n";

@@ -1525,6 +1525,8 @@ public class Functions implements MacroConstants, Measurements {
 				return ThresholdAdjuster.getMode();
 			} else if (lowercaseKey.equals("window.type")) {
 				return getWindowType();
+			} else if (lowercaseKey.equals("window.title")||lowercaseKey.equals("window.name")) {
+				return getWindowTitle();
 			} else {
 				String value = "";
 				try {value = System.getProperty(key);}
@@ -1534,7 +1536,20 @@ public class Functions implements MacroConstants, Measurements {
 			return "";
 	}
 	
-	String getWindowType() {
+	private String getWindowTitle() {
+		Window win = WindowManager.getActiveWindow();
+		if (IJ.debugMode) IJ.log("getWindowTitle: "+win);
+		if (win==null)
+			return "";
+		else if (win instanceof Frame)
+			return ((Frame)win).getTitle();
+		else if (win instanceof Dialog)
+			return ((Dialog)win).getTitle();
+		else
+			return "";
+	}
+
+	private String getWindowType() {
 		Window win = WindowManager.getActiveWindow();
 		if (win==null)
 			return "";
@@ -2465,6 +2480,7 @@ public class Functions implements MacroConstants, Measurements {
 		String color = null;
 		double lineWidth = 1.0;
 		int index=0;
+		double dx=0.0, dy=0.0;
 		double countOrIndex=Double.NaN;
 		boolean twoArgCommand = cmd.equals("open")||cmd.equals("save")||cmd.equals("rename")
 			||cmd.equals("set color")||cmd.equals("set fill color")||cmd.equals("set line width")
@@ -2492,6 +2508,9 @@ public class Functions implements MacroConstants, Measurements {
 				index = (int)interp.getExpression();
 				interp.getRightParen();
 			}
+		} else if (cmd.equals("translate")) {
+			dx = getNextArg();
+			dy = getLastArg();
 		} else
 			interp.getRightParen();
 		if (RoiManager.getInstance()==null&&roiManager==null) {
@@ -2521,7 +2540,10 @@ public class Functions implements MacroConstants, Measurements {
 			countOrIndex = rm.getCount();
 		else if (cmd.equals("index"))
 			countOrIndex = rm.getSelectedIndex();
-		else {
+		else if (cmd.equals("translate")) {
+			rm.translate(dx, dy);
+			return Double.NaN;
+		} else {
 			if (!rm.runCommand(cmd))
 				interp.error("Invalid ROI Manager command");
 		}
@@ -5360,6 +5382,8 @@ public class Functions implements MacroConstants, Measurements {
 			{interp.getParens(); IJ.redirectErrorMessages(); return null;}
 		else if (name.equals("renameResults"))
 			renameResults();
+		else if (name.equals("getFullVersion"))
+			{interp.getParens(); return ""+IJ.getFullVersion();}
 		else
 			interp.error("Unrecognized IJ function name");
 		return null;
@@ -5372,6 +5396,12 @@ public class Functions implements MacroConstants, Measurements {
 			interp.getRightParen();
 		else
 			arg2 = getLastString();
+		if (resultsPending) {
+			ResultsTable rt = Analyzer.getResultsTable();
+			if (rt!=null && rt.getCounter()>0)
+				rt.show("Results");
+			resultsPending = false;
+		}
 		if (arg2!=null)
 			IJ.renameResults(arg1, arg2);
 		else

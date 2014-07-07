@@ -5,6 +5,7 @@ import ij.process.*;
 import ij.plugin.frame.*;
 import ij.plugin.DICOM;
 import ij.plugin.AVI_Reader;
+import ij.plugin.GIF_Reader;
 import ij.plugin.SimpleCommands;
 import ij.plugin.HyperStackConverter;
 import ij.plugin.PluginInstaller;
@@ -291,8 +292,11 @@ public class Opener {
 					return imp;
 				} else
 					return null;
-			case JPEG: case GIF:
+			case JPEG:
 				imp = openJpegOrGif(directory, name);
+				if (imp!=null&&imp.getWidth()!=0) return imp; else return null;
+			case GIF:
+				imp = (ImagePlus)IJ.runPlugIn("ij.plugin.GIF_Reader", path);
 				if (imp!=null&&imp.getWidth()!=0) return imp; else return null;
 			case PNG: 
 				imp = openUsingImageIO(directory+name);
@@ -421,6 +425,8 @@ public class Opener {
 		File file = new File(ijDir + "samples", url.substring(slash+1));
 		if (!file.exists())
 			return null;
+		if (url.endsWith(".gif"))  // ij.plugin.GIF_Reader does not correctly handle inverting LUTs
+			return openJpegOrGif(file.getParent()+File.separator, file.getName());
 		return IJ.openImage(file.getPath());
 	}
 
@@ -683,10 +689,8 @@ public class Opener {
 						IJ.showProgress(1.0);
 						return null;
 					}
-					if (info[i].compression>=FileInfo.LZW) {
-						fi.stripOffsets = info[i].stripOffsets;
-						fi.stripLengths = info[i].stripLengths;
-					}
+					fi.stripOffsets = info[i].stripOffsets;
+					fi.stripLengths = info[i].stripLengths;
 					int bpp = info[i].getBytesPerPixel();
 					if (info[i].samplesPerPixel>1 && !(bpp==3||bpp==4||bpp==6)) {
 						nChannels = fi.samplesPerPixel;
@@ -768,8 +772,9 @@ public class Opener {
 		TiffDecoder td = new TiffDecoder(directory, name);
 		if (IJ.debugMode) td.enableDebugging();
 		FileInfo[] info=null;
-		try {info = td.getTiffInfo();}
-		catch (IOException e) {
+		try {
+			info = td.getTiffInfo();
+		} catch (IOException e) {
 			String msg = e.getMessage();
 			if (msg==null||msg.equals("")) msg = ""+e;
 			IJ.error("Open TIFF", msg);
@@ -1204,7 +1209,7 @@ public class Opener {
 				return null;
 			else {
 				InputStream is = new FileInputStream(f);
-				if (fi.compression>=FileInfo.LZW)
+				if (fi.compression>=FileInfo.LZW || (fi.stripOffsets!=null&&fi.stripOffsets.length>1))
 					is = new RandomAccessStream(is);
 				return is;
 			}

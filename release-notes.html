@@ -5,20 +5,30 @@
 </head>
 <body>
 
-<li> <u>1.49b 20 May 2014</u>
+<li> <u>1.49d 7 July 2014</u>
 <ul>
-<li> Thanks to Kenneth Sloan, the width and color of the
-paintbrush tool can be set using macros
-(<a href="macros/BrushToolMacros.txt">example</a>).
-<li> The Gel Analyzer now labels each lane with a white number
-on a black background.
-<li> Thanks to Christopher Coulon, fixed a bug that caused
-<i>Image&gt;Overlay&gt;Flatten</i> to not transfer metadata
-to the output image.
-<li> Thanks to Jeremy Walker, fixed a v1.47o regression that caused 
-the getResult() macro function to not be able retrieve numbers added
-to the results table as strings using setResult().
-
+<li> Thanks to Alan Brooks, non-uniform x and y units are now used
+in the image subtitle
+(<a href="macros/js/NonUniformUnits.js">example</a>) and by the
+<i>Show Info</i>, <i>Specify</i>, <i>Rotate Right</i>, <i>Rotate Left</i>
+and <i>Surface Plot</i> commands.
+<li> Added a "Translate" command to the ROI Manager.
+<li> <i>Plugins&gt;Install</i> now installs tools with names ending in "Tool.txt",
+"Tool.ijm" and Tool.class" in the toolbar and saves a copy of the tool in
+the plugins/Tools folder.
+<li> Thanks to Neil Fazel, the Overlay.drawString() macro function supports multiline strings.
+<li> Thanks to Michael Schmid, added the getInfo("window.title") macro function.
+<li> Thanks to Michael Schmid, added the FHT#transform1D() and 
+FHT#inverseTransform1D()methods
+(<a href="plugins/examples/Dynamic_Power_Spectrum.java">example</a).
+<li> Thanks to David Gauntt, fixed bugs that could cause the DicomDecoder#getFileInfo()
+method to hang when attempting to open non-DICOM files.
+<li> Fixed a bug that caused <i>Help&gt;Refresh Menus</i> and <i>Plugins&gt;Install</i>
+to delete macros installed in the <i>Plugins&gt;Macros</i> menu.
+<li> Thanks to Jan Brocher, fixed a bug that caused RoiManager methods called from
+plugins to be recorded.
+<li> Thanks to Andrew Porter, fixed a v1.49 regression that caused some imported 
+TIFF stacks to open incorrectly.
 </ul> 
 
 <a href="http://imagej.nih.gov/ij">Home</a>
