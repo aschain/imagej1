@@ -66,7 +66,7 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 	private boolean appendResults;
 	private ResultsTable mmResults;
 	private int imageID;
-	private boolean recordingEnabled;
+	private boolean allowRecording;
 		
 	public RoiManager() {
 		super("ROI Manager");
@@ -181,7 +181,7 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 		if (label==null)
 			return;
 		String command = label;
-		recordingEnabled = true;
+		allowRecording = true;
 		if (command.equals("Add [t]"))
 			runCommand("add");
 		else if (command.equals("Update"))
@@ -244,7 +244,7 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 			options();
 		else if (command.equals("\"Show All\" Color..."))
 			setShowAllColor();
-		recordingEnabled = false;
+		allowRecording = false;
 	}
 	
 	private void interpolateRois() {
@@ -2036,6 +2036,11 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 		if (mm) list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 	}
 	
+	public void selectAndMakeVisible(ImagePlus imp, int index) {
+		select(imp, index);
+		list.ensureIndexIsVisible(index);
+	}
+	
 	public void select(int index, boolean shiftKeyDown, boolean altKeyDown) {
 		if (!(shiftKeyDown||altKeyDown))
 			select(index);
@@ -2212,7 +2217,11 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 	}
 	
 	private boolean record() {
-		return Recorder.record && recordingEnabled && !IJ.isMacro();
+		return Recorder.record && allowRecording && !IJ.isMacro();
+	}
+
+	public void allowRecording(boolean allow) {
+		this.allowRecording = allow;
 	}
 
 	public void mouseReleased (MouseEvent e) {}
