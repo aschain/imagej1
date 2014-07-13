@@ -2,4 +2,4 @@
 *.class
 *.jar
 *~
-./build
+/build/
