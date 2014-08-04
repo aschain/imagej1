@@ -87,6 +87,8 @@ import java.util.Comparator;
 	
 	/** Converts carriage returns to line feeds. */
 	public static String fixNewLines(String s) {
+		if (s==null)
+			return null;
 		char[] chars = s.toCharArray();
 		for (int i=0; i<chars.length; i++)
 			{if (chars[i]=='\r') chars[i] = '\n';}
@@ -126,7 +128,7 @@ import java.util.Comparator;
 	/** Returns the number of decimal places needed to display a 
 		number, or -2 if exponential notation should be used. */
 	public static int getDecimalPlaces(double n) {
-		if ((int)n==n)
+		if ((int)n==n || Double.isNaN(n))
 			return 0;
 		String s = ""+n;
 		if (s.contains("E"))
@@ -147,7 +149,6 @@ import java.util.Comparator;
 			return 0;
 		int digits = getDecimalPlaces(n1);
 		int digits2 = getDecimalPlaces(n2);
-		if (digits<=0 || digits2<=0)
 		if (digits==0)
 			return digits2;
 		if (digits2==0)
