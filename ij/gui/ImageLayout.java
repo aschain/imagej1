@@ -16,6 +16,13 @@ public class ImageLayout implements LayoutManager {
 		this.hgap = 5;
 		this.vgap = 5;
     }
+    
+    /**Creates a new ImageLayout with defined hgap and vgap. Here so that ImageWindow can define them. */
+    public ImageLayout(ImageCanvas ic, int newhgap, int newvgap) {
+    	this.ic = ic;
+		this.hgap = newhgap;
+		this.vgap = newvgap;
+    }
 
     /** Not used by this class. */
     public void addLayoutComponent(String name, Component comp) {

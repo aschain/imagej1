@@ -16,6 +16,8 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 
 	public static final int MIN_WIDTH = 128;
 	public static final int MIN_HEIGHT = 32;
+	public static final int HGAP = 5;
+	public static final int VGAP = 5;
 	private static final String LOC_KEY = "image.loc";
 	
 	protected ImagePlus imp;
@@ -30,6 +32,7 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 	Rectangle maxBounds; // Size of this window after it is maximized
 	long setMaxBoundsTime;
 	private boolean firstSmallWindow;
+	public int sliderHeight = 0;
 
 	private static final int XINC = 12;
 	private static final int YINC = 16;
@@ -78,7 +81,7 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 			{ic=new ImageCanvas(imp); newCanvas=true;}
 		this.ic = ic;
 		ImageWindow previousWindow = imp.getWindow();
-		setLayout(new ImageLayout(ic));
+		setLayout(new ImageLayout(ic, HGAP, VGAP));
 		add(ic);
  		addFocusListener(this);
  		addWindowListener(this);
@@ -173,7 +176,7 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 			yloc = ybase;
 		}
 
-		int sliderHeight = (this instanceof StackWindow)?20:0;
+		//int sliderHeight = (this instanceof StackWindow)?20:0;
 		int screenHeight = maxWindow.y+maxWindow.height-sliderHeight;
 		double mag = 1;
 		while (xbase+width*mag>maxWindow.x+maxWindow.width || ybase+height*mag>=screenHeight) {
