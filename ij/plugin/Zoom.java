@@ -115,7 +115,8 @@ public class Zoom implements PlugIn{
 			ic.setSourceRect(new Rectangle(x-srcWidth/2,y-srcHeight/2,srcWidth,srcHeight));
 			ic.setMagnification(mag);
 			Insets insets = win.getInsets();
-			int margins = IJ.isMacOSX()?10:14;
+			//int margins = IJ.isMacOSX()?10:14;
+			int margins = 10;
 			int stackInset = (imp.getNDimensions()-2)*15;
 			win.setSize((int)(srcWidth*mag+insets.right+insets.left+margins), (int)(srcHeight*mag+insets.top+insets.bottom+margins+stackInset));
 			return;
