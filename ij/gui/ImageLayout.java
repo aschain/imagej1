@@ -71,7 +71,7 @@ public class ImageLayout implements LayoutManager {
 		for (int i=1; i<nmembers; i++) {
 			Component m = target.getComponent(i);
 			d = m.getPreferredSize();
-			extraHeight += d.height;
+			extraHeight += d.height+vgap;
 		}
 		d = target.getSize();
 		int preferredImageWidth = d.width - (insets.left + insets.right + hgap*2);
