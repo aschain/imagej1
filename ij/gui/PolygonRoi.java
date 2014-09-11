@@ -99,6 +99,7 @@ public class PolygonRoi extends Roi {
 			Prefs.pointAutoMeasure = false;
 			Prefs.pointAutoNextSlice = false;
 			Prefs.pointAddToManager = false;
+			Prefs.pointAddToOverlay = false;
 			userCreated = true;
 		}
 		if (lineWidth>1 && isLine())
@@ -529,36 +530,6 @@ public class PolygonRoi extends Roi {
 		}
 	}
 	
-	/*
-	void move(int sx, int sy) {
-		int xNew = ic.offScreenX(sx);
-		int yNew = ic.offScreenY(sy);
-		x += xNew - startX;
-		y += yNew - startY;
-		startX = xNew;
-		startY = yNew;
-		if (bounds!=null) {
-			double xdNew = ic.offScreenXD(sx);
-			double ydNew = ic.offScreenYD(sy);
-			bounds.x += xdNew - startXD;
-			bounds.y += ydNew - startYD;
-			startXD = xdNew;
-			startYD = ydNew;
-			x = (int)bounds.x;
-			y = (int)bounds.y;
-		}
-		updateClipRect();
-		if ((lineWidth>1 && isLine()) || ignoreClipRect)
-			imp.draw();
-		else
-			imp.draw(clipX, clipY, clipWidth, clipHeight);
-		oldX = x;
-		oldY = y;
-		oldWidth = width;
-		oldHeight=height;
-	}
-	*/
-
 	protected void moveHandle(int sx, int sy) {
 		if (clipboard!=null) return;
 		int ox = ic.offScreenX(sx);
@@ -772,9 +743,14 @@ public class PolygonRoi extends Roi {
 			if (i!=pointToDelete)
 				points2.addPoint(points.xpoints[i], points.ypoints[i]);
 		}
-		if (type==POINT)
-			imp.setRoi(new PointRoi(points2.xpoints, points2.ypoints, points2.npoints));
-		else {
+		if (type==POINT) {
+			PointRoi roi1 = (PointRoi)this;
+			PointRoi roi2 = new PointRoi(points2.xpoints, points2.ypoints, points2.npoints);
+			roi2.setPointType(roi1.getPointType());
+			roi2.setSize(roi1.getSize());
+			roi2.setShowLabels(roi1.getShowLabels());
+			imp.setRoi(roi2);
+		} else {
 			if (subPixelResolution()) {
 				Roi roi2 = new PolygonRoi(points2, type);
 				roi2.setDrawOffset(getDrawOffset());

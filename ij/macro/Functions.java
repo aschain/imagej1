@@ -4753,9 +4753,12 @@ public class Functions implements MacroConstants, Measurements {
 	}
 
 	void makePoint() {
-		int x = (int)getFirstArg();
-		int y = (int)getLastArg();
-		IJ.makePoint(x, y);
+		double x = getFirstArg();
+		double y = getLastArg();
+		if ((int)x==(int)y)
+			IJ.makePoint((int)x, (int)y);
+		else
+			IJ.makePoint(x, y);
 		resetImage(); 
 	}
 
@@ -5843,7 +5846,11 @@ public class Functions implements MacroConstants, Measurements {
 		Roi roi = imp.getRoi();
 		if (roi==null)
 			interp.error("No selection");
-		if (name.equals("getBounds")) {
+		if (name.equals("contains")) {
+			int x = (int)Math.round(getFirstArg());
+			int y = (int)Math.round(getLastArg());
+			return roi.contains(x,y)?"1":"0";
+		} else if (name.equals("getBounds")) {
 			getBounds();
 			return null;
 		} else if (name.equals("getDefaultColor")) {
@@ -5911,7 +5918,6 @@ public class Functions implements MacroConstants, Measurements {
 			interp.error("Unrecognized Roi function");
 		return null;
 	}
-
 		
 } // class Functions
 
