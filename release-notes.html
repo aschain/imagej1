@@ -5,24 +5,25 @@
 </head>
 <body>
 
-<li> <u>1.49h 5 September 2014</u>
+<li> <u>1.49i 30 September 2014</u>
 <ul>
-<li> Selections in the ROI Manager and in overlays can be dragged by their labels. To
-show labels in the ROI Manager, click on the "Labels" checkbox. To show labels in
-an overlay, enable "Show labels" in the <i>Image&gt;Overlay&gt;Labels</i> dialog.
-<li> Thanks to Jeremy Adler, added "Type" and "Add to overlay" options
-to <i>Edit&gt;Options&gt;Point Tool</i> dialog. Note that the 
-"Add to overlay" option is not available if the multi-point tool is active.
-<li> Thanks to Ilan Tal, single macro tools in the macros/toolsets folder
-added to the toolbar using the toolbar's "&gt;&gt;" menu are restored to
-the toolbar when ImageJ restarts if the file name matches the tool name
-and there is a free toolbar slot.
-<li> Thanks to Philippe Carl and Jerome Mutterer, added the Roi.contains(x,y) macro function.
-<li> Thanks to Thomas Siegmund, the RoiManager's getRoisAsArray() method is now synchronized.
-<li> Thanks to Pedro Pepe, fixed a bug that caused the "Sum Method" of
-<i>Image&gt;Stacks&gt;Z Project</i> to not work correctly with signed 16-bit stacks.
-<li> Fixed a bug that caused the makePoint(x,y) macro function to not work correctly with
-non-integer coordinates.
+<li> The "Live" and "RGB" buttons are no longer added to stack histogram windows.
+<li> Thanks to Michael Schmid, added the Array.fourier() macro function
+and FHT.fourier1D() method
+(<a href="macros/examples/TestArrayFourier.txt">example</a>).
+<li> Thanks to Matt Pearson, fixed a bug that caused the particle analyzer to not work
+as expected when processing stacks using "Overlay Outlines" or "Overlay Masks".
+<li> Thanks to Matt Pearson, fixed a bug that sometimes caused the wrong image
+to be activated after using the <i>Split Channels</i> command in a macro not
+running in batch mode.
+<li> Thanks to Christian Tischer and Kota Miura, fixed a bug that caused the
+BatchProcessor to not ignore hidden Thumbs.db files.
+<li> Thanks to Christian Tischer, fixed a bug that caused calibration bars to not
+be displayed correctly on contrast enhanced 8-bit images.
+<li> Thanks to Bill Christens-Barry, fixed a bug that caused rounded
+rectangle selections to not be drawn correctly.
+<li> Thanks to Neil Fazel, fixed a v1.49h regression that caused selections
+moved using the arrow keys to not be drawn correctly.
 </ul>
 
 <a href="http://imagej.nih.gov/ij">Home</a>
