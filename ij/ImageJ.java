@@ -77,8 +77,8 @@ public class ImageJ extends Frame implements ActionListener,
 	MouseListener, KeyListener, WindowListener, ItemListener, Runnable {
 
 	/** Plugins should call IJ.getVersion() or IJ.getFullVersion() to get the version string. */
-	public static final String VERSION = "1.49i";
-	public static final String BUILD = "13"; 
+	public static final String VERSION = "1.49j";
+	public static final String BUILD = "1"; 
 	public static Color backgroundColor = new Color(237,237,237);
 	/** SansSerif, 12-point, plain font. */
 	public static final Font SansSerif12 = new Font("SansSerif", Font.PLAIN, 12);
@@ -770,18 +770,16 @@ public class ImageJ extends Frame implements ActionListener,
 		}
 		if (!quitting)
 			return;
-		try {  // attempt to work around Open JDK bug
-			if (!WindowManager.closeAllWindows()) {
-				quitting = false;
-				return;
-			}
-			if (applet==null) {
-				saveWindowLocations();
-				Prefs.savePreferences();
-			}
-			IJ.cleanup();
-			dispose();
-		} catch (Throwable e) {}
+		if (!WindowManager.closeAllWindows()) {
+			quitting = false;
+			return;
+		}
+		if (applet==null) {
+			saveWindowLocations();
+			Prefs.savePreferences();
+		}
+		IJ.cleanup();
+		dispose();
 		if (exitWhenQuitting)
 			System.exit(0);
 	}
