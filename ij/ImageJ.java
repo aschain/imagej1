@@ -718,14 +718,7 @@ public class ImageJ extends Frame implements ActionListener,
 	public static int getPort() {
 		return port;
 	}
-	
-	public static boolean setPort(int delta) {
-		if (delta>0 && DEFAULT_PORT+delta<65536) {
-			port = DEFAULT_PORT+delta;
-			return !OtherInstance.sendArguments(new String[0]);
-		} else return false;
-	}
-	
+		
 	/** Returns the command line arguments passed to ImageJ. */
 	public static String[] getArgs() {
 		return arguments;
