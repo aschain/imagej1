@@ -1485,12 +1485,14 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 				continue;
 			}
 			int n = getSliceNumber(name);
-			if (n==-1) continue;
+			if (n==-1) {
+				roi.setPosition(0);
+				continue;
+			}
 			String name2 = name.substring(5, name.length());
 			name2 = getUniqueName(name2);
 			rois.remove(name);
 			roi.setName(name2);
-			roi.setPosition(0);
 			rois.put(name2, roi);
 			listModel.setElementAt(name2, index);
 		}
@@ -2085,7 +2087,7 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 		return;
 	}
 	
-	/** Deselect the specified ROI if it is the only selected ROI. */
+	/** Deselect the specified ROI if it is the only one selected. */
 	public void deselect(Roi roi) {
 		int[] indexes = getSelectedIndexes();
 		if (indexes.length==1) {

@@ -15,22 +15,25 @@ public class MeasurementsWriter implements PlugIn {
 	
 	public boolean save(String path) {
 		Frame frame = WindowManager.getFrontWindow();
-		if (frame!=null && (frame instanceof TextWindow)) {
-			TextWindow tw = (TextWindow)frame;
-			return tw.getTextPanel().saveAs(path);
-		} else if (IJ.isResultsWindow()) {
+		if (frame!=null && (frame instanceof TextWindow) && ((TextWindow)frame).getTextPanel().getResultsTable()!=null) {
+			ResultsTable rt = ((TextWindow)frame).getTextPanel().getResultsTable();
+			return rt.save(path);
+		} else if (IJ.isResultsWindow() && IJ.getTextPanel()!=null) {
 			TextPanel tp = IJ.getTextPanel();
-			if (tp!=null) {
-				if (!tp.saveAs(path))
-					return false;
-			}
+			ResultsTable rt = tp.getResultsTable();
+			return rt.save(path);
 		} else {
 			ResultsTable rt = ResultsTable.getResultsTable();
 			if (rt==null || rt.getCounter()==0) {
 				frame = WindowManager.getFrame("Results");
-				if (frame==null || !(frame instanceof TextWindow))
-					return false;
-				else {
+				if (frame==null || !(frame instanceof TextWindow)) {
+					frame = WindowManager.getFrontWindow();
+					if (frame!=null && (frame instanceof TextWindow)) {
+						TextWindow tw = (TextWindow)frame;
+						return tw.getTextPanel().saveAs(path);
+					} else
+						return false;
+				} else {
 					TextWindow tw = (TextWindow)frame;
 					return tw.getTextPanel().saveAs(path);
 				}
@@ -41,13 +44,8 @@ public class MeasurementsWriter implements PlugIn {
 				if (file == null) return false;
 				path = sd.getDirectory() + file;
 			}
-			try {
-				rt.saveAs(path);
-			} catch (IOException e) {
-				IJ.error(""+e);
-			}
+			return rt.save(path);
 		}
-		return true;
 	}
 
 }
