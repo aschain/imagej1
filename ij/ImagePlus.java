@@ -262,6 +262,42 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 		draw();
 	}
 	
+	/** Sets the display mode of composite color images, where 'mode' 
+		 should be IJ.COMPOSITE, IJ.COLOR or IJ.GRAYSCALE. */
+	public void setDisplayMode(int mode) {
+		if (this instanceof CompositeImage) {
+			((CompositeImage)this).setMode(mode);
+			updateAndDraw();
+		}
+	}
+
+	/** Returns the display mode (IJ.COMPOSITE, IJ.COLOR
+		or IJ.GRAYSCALE) if this is a composite color
+		image, or 0 if it not. */
+	public int getDisplayMode() {
+		if (this instanceof CompositeImage)
+			return ((CompositeImage)this).getMode();
+		else
+			return 0;
+	}
+	
+	/** Controls which channels in a composite color image are displayed, 
+		where 'channels' is a list of ones and zeros that specify the channels to
+		display. For example, "101" causes channels 1 and 3 to be displayed. */ 
+	public void setActiveChannels(String channels) {
+		if (!(this instanceof CompositeImage))
+			return;
+		boolean[] active = ((CompositeImage)this).getActiveChannels();
+		for (int i=0; i<active.length; i++) {
+			boolean b = false;
+			if (channels.length()>i && channels.charAt(i)=='1')
+				b = true;
+			active[i] = b;
+		}
+		updateAndDraw();
+		Channels.updateChannels();
+	}
+
 	/** Updates this image from the pixel data in its 
 		associated ImageProcessor, then displays it.
 		The CompositeImage class overrides this method 
