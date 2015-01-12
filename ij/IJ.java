@@ -201,14 +201,14 @@ public class IJ {
 				new PlugInFilterRunner(thePlugIn, commandName, arg);
 		}
 		catch (ClassNotFoundException e) {
-			if (className.indexOf('_')!=-1 && !suppressPluginNotFoundError)
+			if (className.contains("_")  && !suppressPluginNotFoundError)
 				error("Plugin or class not found: \"" + className + "\"\n(" + e+")");
 		}
 		catch (NoClassDefFoundError e) {
-			int dotIndex = className.indexOf('.');
-			if (dotIndex>=0)
-				return runUserPlugIn(commandName, className.substring(dotIndex+1), arg, createNewLoader);
-			if (className.indexOf('_')!=-1 && !suppressPluginNotFoundError)
+			//int dotIndex = className.indexOf('.');
+			//if (dotIndex>=0)
+			//	return runUserPlugIn(commandName, className.substring(dotIndex+1), arg, createNewLoader);
+			if (className.contains("_") && !suppressPluginNotFoundError)
 				error("Plugin or class not found: \"" + className + "\"\n(" + e+")");
 		}
 		catch (InstantiationException e) {error("Unable to load plugin (ins)");}
@@ -1616,6 +1616,11 @@ public class IJ {
 	/** Opens the nth image of the specified tiff stack. */
 	public static ImagePlus openImage(String path, int n) {
 		return (new Opener()).openImage(path, n);
+	}
+
+	/** Opens the specified tiff file as a virtual stack. */
+	public static ImagePlus openVirtual(String path) {
+		return FileInfoVirtualStack.openVirtual(path);
 	}
 
 	/** Opens an image using a file open dialog and returns it as an ImagePlus object. */
