@@ -4230,6 +4230,7 @@ public class Functions implements MacroConstants, Measurements {
 	}
 
 	public static void registerExtensions(MacroExtension extensions) {
+		if (IJ.debugMode) IJ.log("registerExtensions");
 		Interpreter interp = Interpreter.getInstance();
 		if (interp==null) {
 			IJ.error("Macro must be running to install macro extensions");
@@ -4237,8 +4238,10 @@ public class Functions implements MacroConstants, Measurements {
 		}
 		interp.pgm.extensionRegistry = new Hashtable();
 		ExtensionDescriptor[] descriptors = extensions.getExtensionFunctions();
-		for (int i=0; i<descriptors.length; ++i)
+		for (int i=0; i<descriptors.length; ++i) {
 			interp.pgm.extensionRegistry.put(descriptors[i].name, descriptors[i]);
+			if (IJ.debugMode) IJ.log("  "+i+" "+descriptors[i].name);
+		}
 	}
 	
 	String doExt() {
