@@ -718,7 +718,7 @@ public class ImageJ extends Frame implements ActionListener,
 	public static int getPort() {
 		return port;
 	}
-		
+	
 	/** Returns the command line arguments passed to ImageJ. */
 	public static String[] getArgs() {
 		return arguments;
