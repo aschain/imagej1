@@ -281,8 +281,16 @@ public class Animator implements PlugIn {
 				if(IJ.controlKeyDown() || IJ.spaceBarDown()||IJ.altKeyDown() ) csfo+=npo;
 				if(csfo==1)csfo+=npo;
 			}else{
-				if ( IJ.controlKeyDown() ) csfo += npo;
-				else if (IJ.spaceBarDown()||IJ.altKeyDown()) csfo += npo*2;
+				if ( IJ.controlKeyDown() ) {
+					csfo += npo;
+					if (IJ.spaceBarDown()||IJ.altKeyDown()) csfo += npo;
+				}else if (IJ.spaceBarDown()){
+					csfo += npo*2;
+					if(IJ.altKeyDown()) csfo-=npo;
+				}else if (IJ.altKeyDown()){
+					csfo += npo*2;
+					if(IJ.spaceBarDown()) csfo-=npo;
+				}
 			}
 			if (csfo>3) csfo=csfo%3; if (csfo<1) csfo= csfo%3+3;
 			
