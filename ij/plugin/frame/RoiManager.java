@@ -67,6 +67,7 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 	private ResultsTable mmResults;
 	private int imageID;
 	private boolean allowRecording;
+	private boolean recordShowAll = true;
 		
 	/* Constructs and displays an ROIManager. */
 	public RoiManager() {
@@ -257,10 +258,18 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 
 	public void itemStateChanged(ItemEvent e) {
 		Object source = e.getSource();
+		boolean showAllMode = showAllCheckbox.getState();
 		if (source==showAllCheckbox) {
 			if (firstTime)
 				labelsCheckbox.setState(true);
 			showAll(showAllCheckbox.getState()?SHOW_ALL:SHOW_NONE);
+			if (Recorder.record && recordShowAll) {
+				if (showAllMode)
+						Recorder.record("roiManager", "Show All");
+					else
+						Recorder.record("roiManager", "Show None");
+			}
+			recordShowAll = true;
 			firstTime = false;
 			return;
 		}
@@ -273,7 +282,16 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 				showAll(SHOW_NONE);
 			else {
 				showAll(editState?LABELS:NO_LABELS);
-				if (editState) showAllCheckbox.setState(true);
+				if (Recorder.record) {
+					if (editState)
+						Recorder.record("roiManager", "Show All with labels");
+					else if (showAllState)
+						Recorder.record("roiManager", "Show All without labels");
+				}
+				if (editState && !showAllState) {
+					showAllCheckbox.setState(true);
+					recordShowAll = false;
+				}
 			}
 			firstTime = false;
 			return;
@@ -1601,15 +1619,8 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 		boolean showAll = mode==SHOW_ALL;
 		if (showAll)
 			imageID = imp.getID();
-		if (mode==LABELS) {
+		if (mode==LABELS || mode==NO_LABELS)
 			showAll = true;
-			if (record())
-				Recorder.record("roiManager", "Show All with labels");
-		} else if (mode==NO_LABELS) {
-			showAll = true;
-			if (record())
-				Recorder.record("roiManager", "Show All without labels");
-		}
 		if (showAll) imp.deleteRoi();
 		Roi[] rois = getRoisAsArray();
 		if (mode==SHOW_NONE) {
@@ -1621,8 +1632,6 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 				overlay.add(rois[i]);
 			setOverlay(imp, overlay);
 		}
-		if (record())
-			Recorder.record("roiManager", showAll?"Show All":"Show None");
 	}
 
 	void updateShowAll() {
@@ -1856,6 +1865,7 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 			showAllCheckbox.setState(true);
 			if (Interpreter.isBatchMode()) IJ.wait(250);
 		} else if (cmd.equals("show all without labels")) {
+			showAllCheckbox.setState(true);
 			labelsCheckbox.setState(false);
 			showAll(NO_LABELS);
 			if (Interpreter.isBatchMode()) IJ.wait(250);
@@ -2079,10 +2089,13 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 		if (!(shiftKeyDown||altKeyDown))
 			select(index);
 		ImagePlus imp = IJ.getImage();
-		if (imp==null) return;
+		if (imp==null)
+			return;
 		Roi previousRoi = imp.getRoi();
-		if (previousRoi==null)
-			{select(index); return;}
+		if (previousRoi==null) {
+			select(index);
+			return;
+		}
 		Roi.previousRoi = (Roi)previousRoi.clone();
 		String label = (String) listModel.getElementAt(index);
 		Roi roi = (Roi)rois.get(label);
@@ -2225,6 +2238,11 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 		return indexes;
 	}
 	
+	/** Returns 'true' if the index is valid and the indexed ROI is selected. */
+	public boolean isSelected(int index) {
+		return index>=0 && index<listModel.getSize() && list.isSelectedIndex(index);
+	}
+	
 	private Overlay newOverlay() {
 		Overlay overlay = OverlayLabels.createOverlay();
 		overlay.drawLabels(labelsCheckbox.getState());
@@ -2286,6 +2304,11 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 		if (WindowManager.getCurrentImage()!=null) {
 			if (selected.length==1) {
 				ImagePlus imp = getImage();
+				if (imp!=null) {
+					Roi roi = imp.getRoi();
+					if (roi!=null)
+						Roi.previousRoi = (Roi)roi.clone();
+				}
 				restore(imp, selected[0], true);
 				imageID = imp!=null?imp.getID():0;
 			}
