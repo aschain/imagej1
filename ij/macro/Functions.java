@@ -5875,7 +5875,7 @@ public class Functions implements MacroConstants, Measurements {
 		if (name.equals("paste")) {
 			interp.getParens();
 			if (roiClipboard!=null)
-				getImage().setRoi(roiClipboard);
+				getImage().setRoi((Roi)roiClipboard.clone());
 			return null;
 		} else if (name.equals("setPolygonSplineAnchors"))
 			return setSplineAnchors(imp, false);
@@ -5891,6 +5891,8 @@ public class Functions implements MacroConstants, Measurements {
 		} else if (name.equals("copy")) {
 			interp.getParens();
 			roiClipboard = getImage().getRoi();
+			if (roiClipboard!=null)
+				roiClipboard = (Roi)roiClipboard.clone();
 			return null;
 		} else if (name.equals("getBounds")) {
 			getBounds();
