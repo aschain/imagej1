@@ -194,7 +194,8 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 		painted = true;
 		Roi roi = imp.getRoi();
 		if (roi!=null || overlay!=null || showAllOverlay!=null || Prefs.paintDoubleBuffered) {
-			if (roi!=null) roi.updatePaste();
+			if (roi!=null)
+				roi.updatePaste();
 			if (!IJ.isMacOSX() && imageWidth!=0) {
 				paintDoubleBuffered(g);
 				setPaintPending(false);
@@ -1632,12 +1633,14 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 	
 	public boolean hideZoomIndicator(boolean hide) {
 		boolean hidden = this.hideZoomIndicator;
+		if (!(srcRect.width<imageWidth||srcRect.height<imageHeight))
+			return hidden;
 		this.hideZoomIndicator = hide;
 		setPaintPending(true);
 		repaint();
 		long t0 = System.currentTimeMillis();
-		while(getPaintPending() && (System.currentTimeMillis()-t0)<250L)
-			IJ.wait(1);
+		while(getPaintPending() && (System.currentTimeMillis()-t0)<500L)
+			IJ.wait(10);
 		return hidden;
 	}
 
