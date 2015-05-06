@@ -246,7 +246,7 @@ public abstract class ImageProcessor implements Cloneable {
     	for (int i=0; i<mapSize; i++) {
 			r2 = rLUT[i]&0xff; g2 = gLUT[i]&0xff; b2 = bLUT[i]&0xff;
     		distance = (r2-r1)*(r2-r1)+(g2-g1)*(g2-g1)+(b2-b1)*(b2-b1);
-			//ij.IJ.write(i+" "+minIndex+" "+distance+" "+(rLUT[i]&255));
+			//ij.IJ.log("  "+i+" "+minIndex+" "+distance+"   "+(rLUT[i]&255)+" "+(gLUT[i]&255)+" "+(bLUT[i]&255));
     		if (distance<minDistance) {
     			minDistance = distance;
     			minIndex = i;
@@ -1062,6 +1062,10 @@ public abstract class ImageProcessor implements Cloneable {
 
 	/** Draws a line from the current drawing location to (x2,y2). */
 	public void lineTo(int x2, int y2) {
+		int xMin = clipXMin-lineWidth/2-1;  //need not draw dots outside of this rect
+		int xMax = clipXMax+lineWidth/2+1;
+		int yMin = clipYMin-lineWidth/2-1;
+		int yMax = clipYMax+lineWidth/2+1;
 		int dx = x2-cx;
 		int dy = y2-cy;
 		int absdx = dx>=0?dx:-dx;
@@ -1071,20 +1075,41 @@ public abstract class ImageProcessor implements Cloneable {
 		double yinc = (double)dy/n;
 		double x = cx;
 		double y = cy;
-		n++;
-		cx = x2; cy = y2;
-		if (n>1000000) return;
-		do {
+		cx = x2; cy = y2;       //keep end point as starting for the next lineTo
+		int i1 = 0;
+		if (dx>0)
+			i1 = Math.max(i1, (int)((xMin-x)/xinc));
+		else if (dx<0)
+			i1 = Math.max(i1, (int)((xMax-x)/xinc));
+		else if (x<xMin || x>xMax)
+			return; // vertical line outside y range
+		if (dy>0)
+			i1 = Math.max(i1, (int)((yMin-y)/yinc));
+		else if (dy<0)
+			i1 = Math.max(i1, (int)((yMax-y)/yinc));
+		else if (y<yMin || y>yMax)
+			return; // horizontal line outside y range
+		int i2 = n;
+		if (dx>0)
+			i2 = Math.min(i2, (int)((xMax-x)/xinc));
+		else if (dx<0)
+			i2 = Math.min(i2, (int)((xMin-x)/xinc));
+		if (dy>0)
+			i2 = Math.min(i2, (int)((yMax-y)/yinc));
+		else if (dy<0)
+			i2 = Math.min(i2, (int)((yMin-y)/yinc));
+		x += i1*xinc;
+		y += i1*yinc;
+		for (int i=i1; i<=i2; i++) {
 			if (lineWidth==1)
 				drawPixel((int)Math.round(x), (int)Math.round(y));
 			else if (lineWidth==2)
 				drawDot2((int)Math.round(x), (int)Math.round(y));
 			else
-				drawDot((int)x, (int)y);
+				drawDot((int)Math.round(x), (int)Math.round(y));
 			x += xinc;
 			y += yinc;
-		} while (--n>0);
-		//if (lineWidth>2) resetRoi();
+		}
 	}
 		
 	/** Draws a line from (x1,y1) to (x2,y2). */
@@ -1219,7 +1244,7 @@ public abstract class ImageProcessor implements Cloneable {
 		int descent = metrics.getDescent();
 		g.setFont(font);
 
-		if (antialiasedText && cxx>=00 && cy-h>=0) {
+		if (antialiasedText && cxx>=0 && cy-h>=0) {
 			Java2.setAntialiasedText(g, true);
 			setRoi(cxx, cy-h, w, h);
 			ImageProcessor ip = crop();
@@ -2009,13 +2034,20 @@ public abstract class ImageProcessor implements Cloneable {
 		else {  //downsizing with averaging in at least one direction: convert to float
 			ImageProcessor ip2 = createProcessor(dstWidth, dstHeight);
 			FloatProcessor fp = null;
-			for (int channelNumber=0; channelNumber<getNChannels(); channelNumber++) {
+			int channels = getNChannels();
+			boolean showStatus = getProgressIncrement(width,height)>0;
+			boolean showProgress = showStatus && channels>1;
+			if (showProgress) showProgress(0.15);
+			for (int channelNumber=0; channelNumber<channels; channelNumber++) {
 				fp = toFloat(channelNumber, fp);
 				fp.setInterpolationMethod(interpolationMethod);
 				fp.setRoi(getRoi());
-				FloatProcessor fp2 = fp.downsize(dstWidth, dstHeight);
+				String msg = showStatus?" ("+(channelNumber+1)+"/"+channels+")":null;
+				FloatProcessor fp2 = fp.downsize(dstWidth, dstHeight, msg);
 				ip2.setPixels(channelNumber, fp2);
+			    if (showProgress) showProgress(0.40+0.25*channelNumber);
 			}
+			if (showProgress) showProgress(1.0);
 			return ip2;
 		}
 	}
@@ -2541,5 +2573,20 @@ public abstract class ImageProcessor implements Cloneable {
 	public Overlay getOverlay() {
 		return overlay;
 	}
-
+	
+	protected int getProgressIncrement(int w, int h) {
+		if (progressBar==null)
+			return 0;
+		int inc = 0;
+		int threshold = 15000000;
+		if (interpolationMethod==BICUBIC)
+			threshold = 5000000;
+		boolean isBig = w*h>threshold;
+		if (isBig) {
+			inc = h/30;
+			if (inc<1) inc=1;
+		}
+		return inc;
+	}
+	
 }

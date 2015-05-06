@@ -40,7 +40,10 @@ public class ImageStatistics implements Measurements {
 	public int xstart, ystart;
 	/** Used by HistogramWindow */
 	public boolean stackStatistics;
-	
+	/** Minimum threshold when "Limit to threshold" enabled */
+	public double lowerThreshold = Double.NaN;	
+	/** Maximum threshold when "Limit to threshold" enabled */
+	public double upperThreshold = Double.NaN;	
 	public double histMin;
 	public double histMax;
 	public int histYMax;
@@ -227,6 +230,10 @@ public class ImageStatistics implements Measurements {
 	
 	void calculateMedian(int[] hist, int first, int last, Calibration cal) {
 		//ij.IJ.log("calculateMedian: "+first+"  "+last+"  "+hist.length+"  "+pixelCount);
+		if (pixelCount==0) {
+			median = Double.NaN;
+			return;
+		}
 		double sum = 0;
 		int i = first-1;
 		double halfCount = pixelCount/2.0;

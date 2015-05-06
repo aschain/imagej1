@@ -21,10 +21,18 @@ public class FloatStatistics extends ImageStatistics {
 		setup(ip, cal);
 		double minT = ip.getMinThreshold();
 		double minThreshold,maxThreshold;
-		if ((mOptions&LIMIT)==0 || minT==ImageProcessor.NO_THRESHOLD)
-			{minThreshold=-Float.MAX_VALUE; maxThreshold=Float.MAX_VALUE;}
-		else
-			{minThreshold=minT; maxThreshold=ip.getMaxThreshold();}
+		boolean limitToThreshold = (mOptions&LIMIT)!=0;
+		if (!limitToThreshold || minT==ImageProcessor.NO_THRESHOLD) {
+			minThreshold=-Float.MAX_VALUE;
+			maxThreshold=Float.MAX_VALUE;
+		} else {
+			minThreshold=minT;
+			maxThreshold=ip.getMaxThreshold();
+		}
+		if (limitToThreshold) {
+			lowerThreshold = minThreshold;
+			upperThreshold = maxThreshold;
+		}
 		getStatistics(ip, minThreshold, maxThreshold);
 		if ((mOptions&MODE)!=0)
 			getMode();
@@ -216,6 +224,10 @@ public class FloatStatistics extends ImageStatistics {
 	}
 	
 	void getMedian(ImageProcessor ip, double minThreshold, double maxThreshold) {
+		if (pixelCount==0) {
+			median = Double.NaN;
+			return;
+		}
 		float[] pixels = (float[])ip.getPixels();
 		float[] pixels2 = new float[pixelCount];
 		byte[] mask = ip.getMaskArray();

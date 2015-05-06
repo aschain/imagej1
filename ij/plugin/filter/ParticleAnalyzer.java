@@ -504,14 +504,12 @@ public class ParticleAnalyzer implements PlugInFilter, Measurements {
 		}
 		calibration = redirectImp!=null?redirectImp.getCalibration():imp.getCalibration();
 		
-		if (rt==null) {
+		if (measurements==0)
+			measurements = Analyzer.getMeasurements();
+		measurements &= ~LIMIT;	 // ignore "Limit to Threshold"
+		if (rt==null)
 			rt = Analyzer.getResultsTable();
-			analyzer = new Analyzer(imp);
-		} else {
-			if (measurements==0)
-				measurements = Analyzer.getMeasurements();
-			analyzer = new Analyzer(imp, measurements, rt);
-		}
+		analyzer = new Analyzer(imp, measurements, rt);
 		if (resetCounter && slice==1) {
 			if (!Analyzer.resetCounter())
 				return false;
@@ -542,11 +540,8 @@ public class ParticleAnalyzer implements PlugInFilter, Measurements {
 		ImageWindow win = imp.getWindow();
 		if (win!=null)
 			win.running = true;
-		if (measurements==0)
-			measurements = Analyzer.getMeasurements();
 		if (showChoice==ELLIPSES)
 			measurements |= ELLIPSE;
-		measurements &= ~LIMIT;	 // ignore "Limit to Threshold"
 		roiNeedsImage = (measurements&PERIMETER)!=0 || (measurements&SHAPE_DESCRIPTORS)!=0 || (measurements&FERET)!=0;
 		particleCount = 0;
 		wand = new Wand(ip);
@@ -820,7 +815,6 @@ public class ParticleAnalyzer implements PlugInFilter, Measurements {
 	int counter = 0;
 	
 	void analyzeParticle(int x, int y, ImagePlus imp, ImageProcessor ip) {
-		//Wand wand = new Wand(ip);
 		ImageProcessor ip2 = redirectIP!=null?redirectIP:ip;
 		wand.autoOutline(x, y, level1, level2, wandMode);
 		if (wand.npoints==0)
@@ -861,7 +855,6 @@ public class ParticleAnalyzer implements PlugInFilter, Measurements {
 			double perimeter = roi.getLength();
 			double circularity = perimeter==0.0?0.0:4.0*Math.PI*(stats.pixelCount/(perimeter*perimeter));
 			if (circularity>1.0) circularity = 1.0;
-			//IJ.log(circularity+"	"+perimeter+"  "+stats.area);
 			if (circularity<minCircularity || circularity>maxCircularity) include = false;
 		}
 		if (stats.pixelCount>=minSize && stats.pixelCount<=maxSize && include) {
