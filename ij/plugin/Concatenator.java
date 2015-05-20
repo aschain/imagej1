@@ -180,9 +180,10 @@ public class Concatenator implements PlugIn, ItemListener{
 		int channels = images[0].getNChannels();
 		int slices =  images[0].getNSlices();
 		int frames = images[0].getNFrames();
-		boolean concatSlices = slices>1 && frames==1;
+		boolean concatSlices = slices>1 && frames==1, keepCalibration=true;
 		maxWidth = width;
 		maxHeight = height;
+		Calibration cal = images[0].getCalibration();
 		
 		for (int i=1; i<n; i++) {
 			if (images[i].getNFrames()>1) concatSlices = false;
@@ -191,6 +192,11 @@ public class Concatenator implements PlugIn, ItemListener{
 			|| (!concatSlices && images[i].getNSlices()!=slices)) {
 				IJ.error(pluginName, "Images do not all have the same dimensions or type");
 				return null;
+			}
+			if(images[i].getCalibration().pixelWidth != cal.pixelWidth 
+			|| images[i].getCalibration().pixelHeight != cal.pixelHeight 
+			|| images[i].getCalibration().pixelDepth != cal.pixelDepth) {
+				keepCalibration=false;
 			}
 			if (images[i].getWidth()>maxWidth)
 				maxWidth = images[i].getWidth();
@@ -240,6 +246,7 @@ public class Concatenator implements PlugIn, ItemListener{
 		}
 		if (channels>1 && frames2>1)
 			imp2.setOpenAsHyperStack(true);
+		if(keepCalibration) imp2.setCalibration(cal);
 		if (!keep) {
 			for (int i=0; i<n; i++) {
 				images[i].changes = false;
