@@ -520,7 +520,7 @@ public class PlotWindow extends ImageWindow implements ActionListener,	ItemListe
 			IJ.error("Plot has no data");
 			return;
 		}
-		SaveDialog sd = new SaveDialog("Save as Text", "Values", ".txt");
+		SaveDialog sd = new SaveDialog("Save as Text", "Values", Prefs.defaultResultsExtension());
 		String name = sd.getFileName();
 		if (name==null) return;
 		String directory = sd.getDirectory();
@@ -727,6 +727,11 @@ public class PlotWindow extends ImageWindow implements ActionListener,	ItemListe
 		Font font = live.getFont();
 		live.setFont(new Font(font.getName(), Font.PLAIN, font.getSize()));
 		live.setForeground(Color.black);
+	}
+	
+	/** Returns the Plot associated with this PlotWindow. */
+	public Plot getPlot() {
+		return plot;
 	}
 	
 }

@@ -1097,10 +1097,8 @@ public class Functions implements MacroConstants, Measurements {
 			row = (int)interp.getExpression();
 		}
 		interp.getRightParen();
-		ResultsTable rt = Analyzer.getResultsTable();
+		ResultsTable rt = getResultsTable(true);
 		int counter = rt.getCounter();
-		if (counter==0)
-			interp.error("\"Results\" table empty");
 		if (row==-1) row = counter-1;
 		if (row<0 || row>=counter)
 			interp.error("Row ("+row+") out of range");
@@ -1127,10 +1125,8 @@ public class Functions implements MacroConstants, Measurements {
 			row = (int)interp.getExpression();
 		}
 		interp.getRightParen();
-		ResultsTable rt = Analyzer.getResultsTable();
+		ResultsTable rt = getResultsTable(true);
 		int counter = rt.getCounter();
-		if (counter==0)
-			interp.error("\"Results\" table empty");
 		if (row==-1) row = counter-1;
 		if (row<0 || row>=counter)
 			interp.error("Row ("+row+") out of range");
@@ -1143,14 +1139,28 @@ public class Functions implements MacroConstants, Measurements {
 
 	String getResultLabel() {
 		int row = (int)getArg();
-		ResultsTable rt = Analyzer.getResultsTable();
+		ResultsTable rt = getResultsTable(true);
 		int counter = rt.getCounter();
-		if (counter==0)
-			interp.error("\"Results\" table empty");
 		if (row<0 || row>=counter)
 			interp.error("Row ("+row+") out of range");
 		String label = rt.getLabel(row);
 		return label!=null?label:"";
+	}
+
+	private ResultsTable getResultsTable(boolean reportErrors) {
+		ResultsTable rt = Analyzer.getResultsTable();
+		int size = rt.size();
+		if (size==0) {
+			Frame frame = WindowManager.getFrontWindow();
+			if (frame!=null && (frame instanceof TextWindow)) {
+				TextPanel tp = ((TextWindow)frame).getTextPanel();
+				rt = tp.getOrCreateResultsTable();
+				size = rt!=null?rt.size():0;
+			}
+		}
+		if (size==0 && reportErrors)
+			interp.error("No results found");
+		return rt;
 	}
 
 	void setResult() {
@@ -2041,8 +2051,8 @@ public class Functions implements MacroConstants, Measurements {
 			} else
 				currentPlot.setFrozen(getBooleanArg());
 			return;
-		}  else if (name.equals("setLegend")) {
-			setPlotLegend(currentPlot);
+		}  else if (name.equals("addLegend") || name.equals("setLegend")) {
+			addPlotLegend(currentPlot);
 			return;
 		}  else if (name.equals("makeHighResolution")) {
 			makeHighResolution(currentPlot);
@@ -2096,26 +2106,7 @@ public class Functions implements MacroConstants, Measurements {
 			return;
 		} else if (name.equals("add")) {
 			String arg = getFirstString();
-			arg = arg.toLowerCase(Locale.US);
-			int what = Plot.CIRCLE;
-			if (arg.indexOf("curve")!=-1 || arg.indexOf("line")!=-1)
-				what = Plot.LINE;
-			if (arg.indexOf("connected")!=-1)
-				what = Plot.CONNECTED_CIRCLES;
-			else if (arg.indexOf("box")!=-1)
-				what = Plot.BOX;
-			else if (arg.indexOf("triangle")!=-1)
-				what = Plot.TRIANGLE;
-			else if (arg.indexOf("cross")!=-1)
-				what = Plot.CROSS;		
-			else if (arg.indexOf("dot")!=-1)
-				what = Plot.DOT;		
-			else if (arg.indexOf("xerror")!=-1)
-				what = -2;
-			else if (arg.indexOf("error")!=-1)
-				what = -1;
-			else if (arg.indexOf("x")!=-1)
-				what = Plot.X;
+			int what = Plot.toShape(arg);
 			addToPlot(what); 
 			return;
 		} else
@@ -2294,28 +2285,16 @@ public class Functions implements MacroConstants, Measurements {
 		plot.useTemplate(templatePlot);
 	}
 
-	void setPlotLegend(Plot plot) {
+	void addPlotLegend(Plot plot) {
 		String labels = getFirstString();
-		int flags = Plot.AUTO_POSITION;
-		if (interp.nextToken()!=')') {
-			String options = getLastString().toLowerCase();
-			if (options.indexOf("top-left") >= 0)
-				flags |= Plot.TOP_LEFT;
-			else if (options.indexOf("top-right") >= 0)
-				flags |= Plot.TOP_RIGHT;
-			else if (options.indexOf("bottom-left") >= 0)
-				flags |= Plot.BOTTOM_LEFT;
-			else if (options.indexOf("bottom-right") >= 0)
-				flags |= Plot.BOTTOM_RIGHT;
-			if (options.indexOf("bottom-to-top") >= 0)
-				flags |= Plot.LEGEND_BOTTOM_UP;
-			if (options.indexOf("erase") >= 0)
-				flags |= Plot.LEGEND_ERASE;
-		} else
+		String options = null;
+		if (interp.nextToken()!=')')
+			options = getLastString();
+		else
 			interp.getRightParen();
 		plot.setColor(Color.BLACK);
 		plot.setLineWidth(1);
-		plot.setLegend(labels, flags);
+		plot.addLegend(labels, options);
 	}
 
 	void getPlotLimits(Plot plot) {
@@ -2333,11 +2312,11 @@ public class Functions implements MacroConstants, Measurements {
 	void makeHighResolution(Plot plot) {
 		String title = getFirstString();
 		double scale = getNextArg();
-		boolean antialiasedText = false;
+		boolean antialiasedText = true;
 		if (interp.nextToken()!=')') {
 			String options = getLastString().toLowerCase();
-			if (options.indexOf("anti")!=-1)
-				antialiasedText = true;
+			if (options.indexOf("disable")!=-1)
+				antialiasedText = false;
 		} else
 			interp.getRightParen();
 		plot.makeHighResolution(title, (float)scale, antialiasedText, true);
@@ -4520,6 +4499,9 @@ public class Functions implements MacroConstants, Measurements {
 			if (roi==null)
 				interp.error("No selection");
 			return roi.getStrokeWidth();
+		} else if (key.equals("results.count")) {
+			ResultsTable rt = getResultsTable(false);
+			return rt!=null?rt.size():0;
 		} else {
 			interp.error("Invalid key");
 			return 0.0;

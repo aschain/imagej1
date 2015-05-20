@@ -4,6 +4,7 @@ import java.util.*;
 import ij.*;
 import ij.process.*;
 import ij.util.*;
+import ij.plugin.Colors;
 import ij.plugin.filter.Analyzer;
 import ij.macro.Interpreter;
 import ij.measure.Calibration;
@@ -32,7 +33,7 @@ public class Plot implements Cloneable {
 	/** Legend has its curves in bottom-to-top sequence (otherwise top to bottom) */
 	public static final int LEGEND_BOTTOM_UP = 0x100;
 	/** Legend erases background (otherwise transparent) */
-	public static final int LEGEND_ERASE = 0x200;
+	public static final int LEGEND_TRANSPARENT = 0x200;
 	/** Display points using a circle (5 pixels in diameter if line thickness<=1, otherwise 7). */
 	public static final int CIRCLE = 0;
 	/** Display points using an X-shaped mark. */
@@ -118,7 +119,7 @@ public class Plot implements Cloneable {
 	private static final int MIN_Y_GRIDSPACING = 30;	//minimum distance between grid lines or ticks along y at plot height 0
 	private final double MIN_LOG_RATIO = 3;				//If max/min ratio is less than this, force linear axis even if log required. should be >2
 	private static final int LEGEND_PADDING = 4;		//pixels around legend text etc
-	private static final int LEGEND_LINELENGTH = 15;	//length of lines in legend
+	private static final int LEGEND_LINELENGTH = 20;	//length of lines in legend
 	private static final int USUALLY_ENLARGE = 1, ALWAYS_ENLARGE = 2; //enlargeRange settings
 	private static final double RELATIVE_ARROWHEAD_SIZE = 0.2; //arrow heads have 1/5 of vector length
 	private static final int MIN_ARROWHEAD_LENGTH = 3;
@@ -481,7 +482,9 @@ public class Plot implements Cloneable {
 				xValues[i] = i;
 		}
 		allPlotObjects.add(new PlotObject(xValues, yValues, yErrorBars, shape, currentLineWidth, currentColor, currentColor2, label));
+		if (plotDrawn) updateImage();
 	}
+	
 	/** Adds a set of points to the plot or adds a curve if shape is set to LINE.
 	 * @param x			the x coordinates
 	 * @param y			the y coordinates
@@ -499,6 +502,34 @@ public class Plot implements Cloneable {
 	/** This a version of addPoints that works with JavaScript. */
 	public void addPoints(String dummy, float[] x, float[] y, int shape) {
 		addPoints(x, y, shape);
+	}
+
+	public void add(String shape, double[] x, double[] y) {
+		addPoints(Tools.toFloat(x), Tools.toFloat(y), null, toShape(shape), null);
+	}
+	
+	public static int toShape(String str) {
+		str = str.toLowerCase(Locale.US);
+		int shape = Plot.CIRCLE;
+		if (str.contains("curve") || str.contains("line"))
+			shape = Plot.LINE;
+		if (str.contains("connected"))
+			shape = Plot.CONNECTED_CIRCLES;
+		else if (str.contains("box"))
+			shape = Plot.BOX;
+		else if (str.contains("triangle"))
+			shape = Plot.TRIANGLE;
+		else if (str.contains("cross"))
+			shape = Plot.CROSS;		
+		else if (str.contains("dot"))
+			shape = Plot.DOT;		
+		else if (str.contains("xerror"))
+			shape = -2;
+		else if (str.contains("error"))
+			shape = -1;
+		else if (str.contains("x"))
+			shape = Plot.X;
+		return shape;
 	}
 
 	/** Adds a set of points to the plot using double ArrayLists.
@@ -591,12 +622,39 @@ public class Plot implements Cloneable {
 		allPlotObjects.add(new PlotObject(label, x, y, currentJustification, currentFont, currentColor, PlotObject.LABEL));
 	}
 
+	/** Adds an automatically positioned legend, where 'labels' is a 
+		newline-delimited list of curve or point lables. To modify the legend's 
+		style, call 'setFont' and 'setLineWidth' before 'addLegend'. */
+	public void addLegend(String labels) {
+		addLegend(labels, null);
+	}
+	
+	public void addLegend(String labels, String options) {
+		int flags = Plot.AUTO_POSITION;
+		if (options!=null) {
+			options = options.toLowerCase();
+			if (options.contains("top-left"))
+				flags |= Plot.TOP_LEFT;
+			else if (options.contains("top-right"))
+				flags |= Plot.TOP_RIGHT;
+			else if (options.contains("bottom-left"))
+				flags |= Plot.BOTTOM_LEFT;
+			else if (options.contains("bottom-right"))
+				flags |= Plot.BOTTOM_RIGHT;
+			if (options.contains("bottom-to-top"))
+				flags |= Plot.LEGEND_BOTTOM_UP;
+			if (options.contains("transparent"))
+				flags |= Plot.LEGEND_TRANSPARENT;
+		}
+		setLegend(labels, flags);
+	}
+
 	/** Adds a legend. The legend will be always drawn last (on top of everything).
-	 *	To modify the legend's style, call 'setFont' and 'setLineWidth' before 'setLegend'
+	 *	To modify the legend's style, call 'setFont' and 'setLineWidth' before 'addLegend'
 	 *	@param labels labels of the points or curves in the sequence of the data added, tab-delimited or linefeed-delimited.
 	 *	The labels of the datasets will be set to these values. If null or not given, the labels set
 	 *	previously (if any) will be used.
-	 *	@param flags  Bitwise or of position (AUTO_POSITION, TOP_LEFT etc.), ERASE_BACKGROUND, and LEGEND_BOTTOM_UP if desired.
+	 *	@param flags  Bitwise or of position (AUTO_POSITION, TOP_LEFT etc.), LEGEND_TRANSPARENT, and LEGEND_BOTTOM_UP if desired.
 	 *	Updates the image (if it is shown already). */
 	public void setLegend(String labels, int flags) {
 		legend = new PlotObject(labels, currentLineWidth == 0 ? 1 : currentLineWidth,
@@ -621,6 +679,10 @@ public class Plot implements Cloneable {
 		currentColor2 = null;
 	}
 	
+	public void setColor(String color) {
+		setColor(Colors.getColor(color, Color.black));
+	}
+
 	/** Changes the drawing color for the next objects that will be added to the plot.
 	 *	It also sets secondary color: This is the color of the line for CONNECTED_CIRCLES,
 	 *	and the color for filling open symbols (CIRCLE, BOX, TRIANGLE).
@@ -1115,7 +1177,7 @@ public class Plot implements Cloneable {
 		frameHeight = sc(plotHeight);
 		int width  = frameWidth + leftMargin + rightMargin;
 		int height = frameHeight + topMargin + bottomMargin;
-		if (ip == null || width != ip.getWidth() || height != ip.getHeight()) {
+		if (ip == null || width != ip.getWidth() || height != ip.getHeight() || (isColor && (ip instanceof ByteProcessor))) {
 			if (isColor) {
 				ip = new ColorProcessor(width, height);
 			} else {
@@ -2094,7 +2156,7 @@ public class Plot implements Cloneable {
 
 		ip.setColor(Color.white);
 		ip.setLineWidth(1);
-		if (legendObject.hasFlag(LEGEND_ERASE)) {
+		if (!legendObject.hasFlag(LEGEND_TRANSPARENT)) {
 			ip.setRoi(x0, y0, width, height);
 			ip.fill();
 		} else if (hasFlag(X_GRID | Y_GRID)) {	//erase grid
@@ -2480,7 +2542,7 @@ class PlotObject implements Cloneable {
 		this.color = color;
 	}
 
-	/** Constructor for the legend. <code>flags</code> is bitwise or of TOP_LEFT etc. and ERASE_BACKGROUND if desired */
+	/** Constructor for the legend. <code>flags</code> is bitwise or of TOP_LEFT etc. and LEGEND_TRANSPARENT if desired */
 	PlotObject(String labels, float lineWidth, Font font, Color color, int flags) {
 		this.type = LEGEND;
 		this.label = labels;
