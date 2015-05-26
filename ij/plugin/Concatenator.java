@@ -185,7 +185,6 @@ public class Concatenator implements PlugIn, ItemListener{
 		Calibration cal = images[0].getCalibration();
 		maxWidth = width;
 		maxHeight = height;
-		Calibration cal = images[0].getCalibration();
 		
 		for (int i=1; i<n; i++) {
 			if (images[i].getNFrames()>1) concatSlices = false;
