@@ -132,7 +132,7 @@ public class TextRoi extends Roi {
 
 	public TextRoi(int x, int y, ImagePlus imp) {
 		super(x, y, imp);
-		ImageCanvas ic = imp.getCanvas();
+		//ImageCanvas ic = imp.getCanvas();
 		double mag = getMagnification();
 		if (mag>1.0)
 			mag = 1.0;
@@ -193,6 +193,7 @@ public class TextRoi extends Roi {
 			char[] chr = {c};
 			theText[cline] += new String(chr);
 			updateBounds(null);
+			imp.draw();
 			updateText();
 			firstChar = false;
 			return;
@@ -465,7 +466,7 @@ public class TextRoi extends Roi {
 	
 	/** Increases the size of bounding rectangle so it's large enough to hold the text. */ 
 	void updateBounds(Graphics g) {
-		if (firstChar || drawStringMode)
+		if (drawStringMode)
 			return;
 		double mag = ic!=null?ic.getMagnification():1.0;
 		if (nonScalable) mag = 1.0;
