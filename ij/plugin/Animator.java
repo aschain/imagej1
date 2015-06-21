@@ -253,6 +253,7 @@ public class Animator implements PlugIn {
 		if (csfod>2) csfod=0;
 		if (csfod<0) csfod=2;
 		if (Prefs.reverseNextPreviousOrder) {npo = -1; csfo=3;}
+		if(imp.isLocked()) return;
 		if (!imp.lock())
 			return;
 		boolean hyperstack = imp.isDisplayedHyperStack();
