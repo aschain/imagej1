@@ -3,7 +3,6 @@ package ij;
 import ij.IJ;
 import ij.ImageJ;
 import ij.Prefs;
-import ij.util.Tools;
 
 import ij.io.OpenDialog;
 import ij.io.Opener;
@@ -36,8 +35,6 @@ import java.util.Properties;
  *	@author Johannes Schindelin
  */
 public class OtherInstance {
-
-	private static int port=ImageJ.getPort();
 
 	interface ImageJInstance extends Remote {
 		void sendArgument(String arg) throws RemoteException;
@@ -86,7 +83,7 @@ public class OtherInstance {
 		return tmpDir + "ImageJ-"
 			+ System.getProperty("user.name") + "-"
 			+ (display == null ? "" : display + "-")
-			+ port + ".stub";
+			+ ImageJ.getPort() + ".stub";
 	}
 
 	public static void makeFilePrivate(String path) {
@@ -127,13 +124,6 @@ public class OtherInstance {
 	public static boolean sendArguments(String[] args) {
 		if (!isRMIEnabled())
 			return false;
-		for (int i=0; i<args.length; i++) {
-			if(args[i].startsWith("-port")){
-				int delta = (int)Tools.parseDouble(args[i].substring(5, args[i].length()), 0.0);
-				if (delta>0 && ImageJ.DEFAULT_PORT+delta<65536)
-					port = ImageJ.DEFAULT_PORT+delta;
-			}
-		}
 		String file = getStubPath();
 		if (args.length>0) try {
 			FileInputStream in = new FileInputStream(file);
