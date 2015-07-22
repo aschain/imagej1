@@ -879,9 +879,11 @@ public class IJ {
 				break;
 			case KeyEvent.VK_ALT:
 				altDown=true;
+				updateStatus();
 				break;
 			case KeyEvent.VK_SHIFT:
 				shiftDown=true;
+				updateStatus();
 				if (debugMode) beep();
 				break;
 			case KeyEvent.VK_SPACE: {
@@ -902,8 +904,8 @@ public class IJ {
 		switch (key) {
 			case KeyEvent.VK_CONTROL: controlDown=false; break;
 			case KeyEvent.VK_META: if (isMacintosh()) controlDown=false; break;
-			case KeyEvent.VK_ALT: altDown=false; break;
-			case KeyEvent.VK_SHIFT: shiftDown=false; if (debugMode) beep(); break;
+			case KeyEvent.VK_ALT: altDown=false; updateStatus(); break;
+			case KeyEvent.VK_SHIFT: shiftDown=false; updateStatus();  if (debugMode) beep(); break;
 			case KeyEvent.VK_SPACE:
 				spaceDown=false;
 				ImageWindow win = WindowManager.getCurrentWindow();
@@ -912,6 +914,17 @@ public class IJ {
 			case ALL_KEYS:
 				shiftDown=controlDown=altDown=spaceDown=false;
 				break;
+		}
+	}
+	
+	private static void updateStatus() {
+		ImagePlus imp = WindowManager.getCurrentImage();
+		if (imp!=null) {
+			ImageCanvas ic = imp.getCanvas();
+			if (ic!=null && imp.getCalibration().scaled()) {
+				Point p = ic.getCursorLoc();
+				imp.mouseMoved(p.x, p.y);
+			}
 		}
 	}
 	
