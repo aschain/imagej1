@@ -5,13 +5,26 @@
 </head>
 <body>
 
-<li> <u>1.50c 6 September 2015</u>
+<li> <u>1.50c 15 September 2015</u>
 <ul>
 <li> Worked around Java 8 bugs that caused the 't' shortcut
 (<i>Edit&gt;Selection&gt;Add to Manager</i>) and ROI Manager arrow
 key and mouse wheel scrolling to not work as expected on OS X.
 <li> Fixed a bug that caused the "ImageJ" window to expand to full screen
 on Windows and Linux when you double clicked on the title bar. 
+<li> Thanks to Jens Kriese, fixed a bug that caused no more that 99 menu
+entries in a plungins.config file to be loaded.
+<li> Thanks to Jochen Reichel, fixed several RGB-related bugs in the Brightness/Contrast dialog.
+<li> Thanks to Jan Eglinger, fix a bug that caused the getResultString() macro
+function to return "null" on re-opened Results tables if the first column
+was non-numeric and all other columns were numeric.
+<li> Thanks to Avital Steinberg, fixed a bug that caused the particle analyzer
+to alter the Results counter when the "Display results" option was not enabled.
+<li> Thanks to John Wolodzko, fixed bugs that prevented ImageJ from correctly
+opening .csv and .xls tables with cells containing commas.
+<li> Thanks to Linda Fothergill, fixed a bug that caused selections to change
+when rotated and then rotated back by the same angle.
+
 </ul>
 
 <a href="http://imagej.nih.gov/ij">Home</a>
