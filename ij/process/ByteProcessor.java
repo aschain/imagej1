@@ -184,9 +184,8 @@ public class ByteProcessor extends ImageProcessor {
 	
 	/** Reset the image from snapshot.*/
 	public void reset() {
-		if (snapshotPixels==null)
-			return;	
-        System.arraycopy(snapshotPixels,0,pixels,0,width*height);
+		if (snapshotPixels!=null)
+			System.arraycopy(snapshotPixels,0,pixels,0,width*height);
 	}
 	
 	/** Swaps the pixel and snapshot (undo) arrays. */
@@ -960,8 +959,8 @@ public class ByteProcessor extends ImageProcessor {
 		double xScale = (double)dstWidth/roiWidth;
 		double yScale = (double)dstHeight/roiHeight;
 		if (interpolationMethod!=NONE) {
-			dstCenterX += xScale/4.0;
-			dstCenterY += yScale/4.0;
+			if (dstWidth!=width) dstCenterX+=xScale/4.0;
+			if (dstHeight!=height) dstCenterY+=yScale/4.0;
 		}
 		ImageProcessor ip2 = createProcessor(dstWidth, dstHeight);
 		byte[] pixels2 = (byte[])ip2.getPixels();

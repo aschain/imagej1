@@ -1296,7 +1296,7 @@ public class Roi extends Object implements Cloneable, java.io.Serializable {
 		previousRoi.modState = NO_MODS;
 		PointRoi p1 = (PointRoi)previousRoi;
 		FloatPolygon poly = getFloatPolygon();
-		p1.addPoint(poly.xpoints[0], poly.ypoints[0]);
+		p1.addPoint(imp, poly.xpoints[0], poly.ypoints[0]);
 		imp.setRoi(p1);
 	}
 	
@@ -1969,6 +1969,37 @@ public class Roi extends Object implements Cloneable, java.io.Serializable {
 	public void setRotationCenter(double x, double y) {
 		xcenter = x;
 		ycenter = y;
+	}
+	
+	/* 
+	 * Returns the centroid of this selection.<br> 
+	 * Author: Peter Haub (phaub at dipsystems.de)
+	 */
+	public double[] getCentroid() {
+		double xC=0, yC=0, lSum=0, x, y, dx, dy, l;
+		FloatPolygon poly = getFloatPolygon();
+		int nPoints = poly.npoints;
+		for (int i=0; i<nPoints-1; i++){
+			dx = poly.xpoints[i+1] - poly.xpoints[i];
+			dy = poly.ypoints[i+1] - poly.ypoints[i];
+			x = poly.xpoints[i] + dx;
+			y = poly.ypoints[i] + dy;
+			l = Math.sqrt(dx*dx + dy*dy);
+			xC += x*l;
+			yC += y*l;
+			lSum += l;
+		}
+		dx = poly.xpoints[0] - poly.xpoints[nPoints-1];
+		dy = poly.ypoints[0] - poly.ypoints[nPoints-1];
+		x = poly.xpoints[nPoints-1] + dx;
+		y = poly.ypoints[nPoints-1] + dy;
+		l = Math.sqrt(dx*dx + dy*dy);
+		xC += x*l;
+		yC += y*l;
+		lSum += l;
+		xC /= lSum;
+		yC /= lSum;
+		return new double[]{xC, yC};
 	}
 
 	/** Returns a hashcode for this Roi that typically changes 
