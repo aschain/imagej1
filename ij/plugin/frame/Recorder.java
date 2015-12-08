@@ -433,7 +433,7 @@ public class Recorder extends PlugInFrame implements PlugIn, ActionListener, Ima
 	public static void saveCommand() {
 		String name = commandName;
 		if (name!=null) {
-			if (commandOptions==null && (name.equals("Fill")||name.equals("Clear")))
+			if (commandOptions==null && (name.equals("Fill")||name.equals("Clear")||name.equals("Draw")))
 				commandOptions = "slice";
 			if (!fgColorSet && (name.equals("Fill")||name.equals("Draw")))
 				setForegroundColor(Toolbar.getForegroundColor());
@@ -809,5 +809,12 @@ public class Recorder extends PlugInFrame implements PlugIn, ActionListener, Ima
 			recordString("setOption(\"BlackBackground\", "+bb+");\n");
 		bbSet = true;
 	}
-
+	
+	/** Override windowActivated in PlugInFrame. */
+	public void windowActivated(WindowEvent e) {
+		if (IJ.isMacintosh() && !IJ.isJava17())
+			this.setMenuBar(Menus.getMenuBar());
+		WindowManager.setWindow(this);
+	}
+	
 }

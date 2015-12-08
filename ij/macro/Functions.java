@@ -1141,8 +1141,12 @@ public class Functions implements MacroConstants, Measurements {
 		int col = rt.getColumnIndex(column);
 		if (rt.columnExists(col))
 			return rt.getStringValue(col, row);
-		else
-			return "null";
+		else {
+			String label = null;
+			if ("Label".equals(column))
+				label = rt.getLabel(row);
+			return label!=null?label:"null";
+		}
 	}
 
 	String getResultLabel() {
@@ -1152,7 +1156,12 @@ public class Functions implements MacroConstants, Measurements {
 		if (row<0 || row>=counter)
 			interp.error("Row ("+row+") out of range");
 		String label = rt.getLabel(row);
-		return label!=null?label:"";
+		if (label!=null)
+			return label;
+		else {
+			label = rt.getStringValue("Label", row);
+			return label!=null?label:"";
+		}
 	}
 
 	private ResultsTable getResultsTable(boolean reportErrors) {
@@ -4568,8 +4577,18 @@ public class Functions implements MacroConstants, Measurements {
 		String name = interp.tokenString;
 		if (name.equals("isHyperstack")||name.equals("isHyperStack"))
 			return getImage().isHyperStack()?1.0:0.0;
-		else if (name.equals("getDimensions"))
-			{getDimensions(); return Double.NaN;}
+		else if (name.equals("getDimensions")) {
+			getDimensions();
+			return Double.NaN;
+		} else if (name.equals("stopOrthoViews")) {
+			interp.getParens(); 
+			Orthogonal_Views.stop();
+			return Double.NaN;
+		} else if (name.equals("getOrthoViewsID")) {
+			interp.getParens(); 
+			return Orthogonal_Views.getImageID();
+		} else if (name.equals("setOrthoViews"))
+			return setOrthoViews();
 		ImagePlus imp = getImage();
 		if (name.equals("setPosition"))
 			{setPosition(imp); return Double.NaN;}
@@ -4616,6 +4635,16 @@ public class Functions implements MacroConstants, Measurements {
 			getStackStatistics(imp, true);
 		else
 			interp.error("Unrecognized Stack function");
+		return Double.NaN;
+	}
+	
+	private double setOrthoViews() { 
+		int x = (int)getFirstArg();
+		int y = (int)getNextArg();
+		int z = (int)getLastArg();
+		Orthogonal_Views orthoViews = Orthogonal_Views.getInstance();
+		if (orthoViews!=null)
+			orthoViews.setCrossLoc(x, y, z);
 		return Double.NaN;
 	}
 	

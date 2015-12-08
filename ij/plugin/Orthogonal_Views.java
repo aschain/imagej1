@@ -56,16 +56,24 @@ public class Orthogonal_Views implements PlugIn, MouseListener, MouseMotionListe
 	 
 	public void run(String arg) {
 		imp = IJ.getImage();
-		if (instance!=null) {
-			instance.dispose();
-			return;
-		}
-		if (imp.getStackSize()==1) {
-			IJ.error("Othogonal Views", "This command requires a stack.");
-			return;
-		}
+		boolean isStack = imp.getStackSize()>1;
 		hyperstack = imp.isHyperStack();
-		if ((hyperstack||imp.isComposite()) && imp.getNSlices()<=1) {
+		if ((hyperstack||imp.isComposite()) && imp.getNSlices()<=1)
+			isStack = false;
+		if (instance!=null) {
+			if (imp==instance.imp) {
+				instance.dispose();
+				return;
+			} else if (isStack) {
+				instance.dispose();
+				if (IJ.isMacro()) IJ.wait(1000);
+			} else {
+				ImageWindow win = instance.imp!=null?instance.imp.getWindow():null;
+				if (win!=null) win.toFront();
+				return;
+			}
+		}
+		if (!isStack) {
 			IJ.error("Othogonal Views", "This command requires a stack, or a hypertack with Z>1.");
 			return;
 		}
@@ -159,10 +167,12 @@ public class Orthogonal_Views implements PlugIn, MouseListener, MouseMotionListe
 			cal_yz.pixelHeight=o_height;
 		}
 		yz_image.setCalibration(cal_yz);
+		yz_image.setIJMenuBar(false);
 		cal_xz.setUnit(unit);
 		cal_xz.pixelWidth=o_width;
 		cal_xz.pixelHeight=o_depth/az;
 		xz_image.setCalibration(cal_xz);
+		xz_image.setIJMenuBar(false);
 	}
 
 	private void updateMagnification(int x, int y) {
@@ -245,14 +255,14 @@ public class Orthogonal_Views implements PlugIn, MouseListener, MouseMotionListe
 			yz_image.show();
 			ImageCanvas ic = yz_image.getCanvas();
 			ic.addKeyListener(this);
-			//ic.addMouseListener(this);
+			ic.addMouseListener(this);
 			//ic.addMouseMotionListener(this);
 			ic.setCustomRoi(true);
 			//yz_image.getWindow().addMouseWheelListener(this);
 			yzID = yz_image.getID();
 		} else {
 			ImageCanvas ic = yz_image.getWindow().getCanvas();
-			//ic.addMouseListener(this);
+			ic.addMouseListener(this);
 			//ic.addMouseMotionListener(this);
 			ic.setCustomRoi(true);
 		}
@@ -260,14 +270,14 @@ public class Orthogonal_Views implements PlugIn, MouseListener, MouseMotionListe
 			xz_image.show();
 			ImageCanvas ic = xz_image.getCanvas();
 			ic.addKeyListener(this);
-			//ic.addMouseListener(this);
+			ic.addMouseListener(this);
 			//ic.addMouseMotionListener(this);
 			ic.setCustomRoi(true);
 			//xz_image.getWindow().addMouseWheelListener(this);
 			xzID = xz_image.getID();
 		} else {
 			ImageCanvas ic = xz_image.getWindow().getCanvas();
-			//ic.addMouseListener(this);
+			ic.addMouseListener(this);
 			//ic.addMouseMotionListener(this);
 			ic.setCustomRoi(true);
 		}
@@ -534,7 +544,7 @@ public class Orthogonal_Views implements PlugIn, MouseListener, MouseMotionListe
 		path.moveTo(x, 0f);
 		path.lineTo(x, height);	
 	}
-	      
+	
 	void dispose() {
 		synchronized(this) {
 			done = true;
@@ -557,6 +567,8 @@ public class Orthogonal_Views implements PlugIn, MouseListener, MouseMotionListe
 				ic.setCustomRoi(false);
 			}
 		}
+		xz_image.changes = false;
+		xz_image.close();
 		yz_image.setOverlay(null);
 		ImageWindow win2 = yz_image.getWindow();
 		if (win2!=null) {
@@ -569,6 +581,8 @@ public class Orthogonal_Views implements PlugIn, MouseListener, MouseMotionListe
 				ic.setCustomRoi(false);
 			}
 		}
+		yz_image.changes = false;
+		yz_image.close();
 		ImagePlus.removeImageListener(this);
 		Executer.removeCommandListener(this);
 		win.removeWindowListener(this);
@@ -669,7 +683,8 @@ public class Orthogonal_Views implements PlugIn, MouseListener, MouseMotionListe
 	}
 	
 	private void exec() {
-		if (canvas==null) return;
+		if (canvas==null)
+			return;
 		int width=imp.getWidth();
 		int height=imp.getHeight();
 		if (hyperstack) {
@@ -696,7 +711,8 @@ public class Orthogonal_Views implements PlugIn, MouseListener, MouseMotionListe
 		updateViews(p, is);
 		GeneralPath path = new GeneralPath();
 		drawCross(imp, p, path);
-		imp.setOverlay(path, color, new BasicStroke(1));
+		if (!done)
+			imp.setOverlay(path, color, new BasicStroke(1));
 		canvas.setCustomRoi(true);
 		updateCrosses(p.x, p.y, arat, brat);
 		if (syncZoom) updateMagnification(p.x, p.y);
@@ -714,7 +730,8 @@ public class Orthogonal_Views implements PlugIn, MouseListener, MouseMotionListe
 		p=new Point (x, zcoord);
 		GeneralPath path = new GeneralPath();
 		drawCross(xz_image, p, path);
-		xz_image.setOverlay(path, color, new BasicStroke(1));
+		if (!done)
+			xz_image.setOverlay(path, color, new BasicStroke(1));
 		if (rotateYZ) {
 			if (flipXZ)
 				zcoord=(int)Math.round(brat*(z-zlice));
@@ -727,7 +744,8 @@ public class Orthogonal_Views implements PlugIn, MouseListener, MouseMotionListe
 		}
 		path = new GeneralPath();
 		drawCross(yz_image, p, path);
-		yz_image.setOverlay(path, color, new BasicStroke(1));
+		if (!done)
+			yz_image.setOverlay(path, color, new BasicStroke(1));
 		IJ.showStatus(imp.getLocationAsString(crossLoc.x, crossLoc.y));
 	}
 
@@ -762,7 +780,8 @@ public class Orthogonal_Views implements PlugIn, MouseListener, MouseMotionListe
 	}
 
 	public void imageClosed(ImagePlus imp) {
-		dispose();
+		if (!done)
+			dispose();
 	}
 
 	public void imageOpened(ImagePlus imp) {
@@ -820,7 +839,8 @@ public class Orthogonal_Views implements PlugIn, MouseListener, MouseMotionListe
 	}
 
 	public void windowClosing(WindowEvent e) {
-		dispose();		
+		if (!done)
+			dispose();		
 	}
 
 	public void windowDeactivated(WindowEvent e) {
@@ -866,6 +886,16 @@ public class Orthogonal_Views implements PlugIn, MouseListener, MouseMotionListe
 			return null;
 	}
 	
+	public static int getImageID() {
+		ImagePlus img = getImage();
+		return img!=null?img.getID():0;
+	}
+
+ 	public static void stop() {
+		if (instance!=null)
+			instance.dispose();
+	}
+
 	public static synchronized boolean isOrthoViewsImage(ImagePlus imp) {
 		if (imp==null || instance==null)
 			return false;
