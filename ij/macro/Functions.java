@@ -1568,11 +1568,18 @@ public class Functions implements MacroConstants, Measurements {
 				return getWindowType();
 			} else if (lowercaseKey.equals("window.title")||lowercaseKey.equals("window.name")) {
 				return getWindowTitle();
+			} else if (lowercaseKey.equals("macro.filepath")) {
+				String path = Macro_Runner.getFilePath();
+				return path!=null?path:"null";
 			} else {
 				String value = "";
-				try {value = System.getProperty(key);}
-				catch (Exception e) {};
-				return value!=null?value:"";
+				try {
+					value = System.getProperty(key);
+				} catch (Exception e) {};
+					if (value==null)
+						return("Invalid key");
+					else
+						return value;
 			}
 			return "";
 	}
