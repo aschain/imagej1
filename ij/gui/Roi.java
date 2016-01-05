@@ -1326,7 +1326,8 @@ public class Roi extends Object implements Cloneable, java.io.Serializable {
 	 }
 
 	protected void showStatus() {
-		if (imp==null) return;
+		if (imp==null)
+			return;
 		String value;
 		if (state!=CONSTRUCTING && (type==RECTANGLE||type==POINT) && width<=25 && height<=25) {
 			ImageProcessor ip = imp.getProcessor();
@@ -1337,8 +1338,8 @@ public class Roi extends Object implements Cloneable, java.io.Serializable {
 			value = "";
 		Calibration cal = imp.getCalibration();
 		String size;
-		if (cal.scaled() && !IJ.altKeyDown())
-			size = ", w="+IJ.d2s(width*cal.pixelWidth)+", h="+IJ.d2s(height*cal.pixelHeight);
+		if (cal.scaled() && !(IJ.altKeyDown()||(state==NORMAL&&IJ.shiftKeyDown())))
+			size = ", w="+IJ.d2s(width*cal.pixelWidth)+" ("+width+"), h="+IJ.d2s(height*cal.pixelHeight)+" ("+height+")";
 		else
 			size = ", w="+width+", h="+height;
 		IJ.showStatus(imp.getLocationAsString(x,y)+size+value);
