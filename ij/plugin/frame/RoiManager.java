@@ -220,9 +220,10 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 			Point ploc = panel.getLocation();
 			Point bloc = moreButton.getLocation();
 			pm.show(this, ploc.x, bloc.y);
-		} else if (command.equals("OR (Combine)"))
-			combine();
-		else if (command.equals("Split"))
+		} else if (command.equals("OR (Combine)")) {
+			new MacroRunner("roiManager(\"Combine\");");
+			if (Recorder.record) Recorder.record("roiManager", "Combine");
+		} else if (command.equals("Split"))
 			split();
 		else if (command.equals("AND"))
 			and();
@@ -822,13 +823,16 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 		DataOutputStream out = null;
 		IJ.showStatus("Saving "+indexes.length+" ROIs "+" to "+path);
 		long t0 = System.currentTimeMillis();
+		String[] names = new String[listModel.size()];
+		for (int i=0; i<listModel.size(); i++)
+			names[i] = (String)listModel.getElementAt(i);
 		try {
 			ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(path)));
 			out = new DataOutputStream(new BufferedOutputStream(zos));
 			RoiEncoder re = new RoiEncoder(out);
 			for (int i=0; i<indexes.length; i++) {
 				IJ.showProgress(i, indexes.length);
-				String label = (String) listModel.getElementAt(indexes[i]);
+				String label = getUniqueName(names, indexes[i]);
 				Roi roi = (Roi)rois.get(indexes[i]);
 				if (IJ.debugMode) IJ.log("saveMultiple: "+i+"  "+label+"  "+roi);
 				if (roi==null) continue;
@@ -853,6 +857,34 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 		return true;
 	}
 	
+	String getUniqueName(String[] names, int index) {
+		String name = names[index];
+		int n = 1;
+		int index2 = getIndex(names, index, name);
+		while (index2!=-1) {
+			index2 = getIndex(names, index, name);
+			if (index2!=-1) {
+				int lastDash = name.lastIndexOf("-");
+				if (lastDash!=-1 && name.length()-lastDash<5)
+					name = name.substring(0, lastDash);
+				name = name+"-"+n;
+				n++;
+			}
+			index2 = getIndex(names, index, name);
+		}
+		names[index] = name;
+		return name;
+	}
+    
+	private int getIndex(String[] names, int index, String name) {
+		int index2 = -1;
+		for (int i=0; i<names.length; i++) {
+			if (i!=index && names[i].equals(name))
+			return i;
+		}
+		return index2;
+	}
+
 	private void listRois() {
 		Roi[] list = getRoisAsArray();
 		OverlayCommands.listRois(list);
@@ -1008,7 +1040,7 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 	}
 	
 	private static ResultsTable multiMeasure(ImagePlus imp, Roi[] rois, boolean appendResults) {
-		int nSlices = imp.getNSlices();
+		int nSlices = imp.getStackSize();
 		Analyzer aSys = new Analyzer(imp); // System Analyzer
 		ResultsTable rtSys = Analyzer.getResultsTable();
 		ResultsTable rtMulti = new ResultsTable();
@@ -1300,7 +1332,7 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 		return labelsCheckbox.getState();
 	}
 
-	void combine() {
+	private synchronized void combine() {
 		ImagePlus imp = getImage();
 		if (imp==null) return;
 		int[] indexes = getSelectedIndexes();
@@ -1322,13 +1354,13 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 			combinePoints(imp, indexes);
 		else
 			combineRois(imp, indexes);
-		if (record()) Recorder.record("roiManager", "Combine");
 	}
 	
-	void combineRois(ImagePlus imp, int[] indexes) {
+	private void combineRois(ImagePlus imp, int[] indexes) {
 		ShapeRoi s1=null, s2=null;
 		ImageProcessor ip = null;
 		for (int i=0; i<indexes.length; i++) {
+			IJ.showProgress(i, indexes.length-1);
 			Roi roi = (Roi)rois.get(indexes[i]);
 			if (!roi.isArea()) {
 				if (ip==null)
