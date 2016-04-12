@@ -10,7 +10,7 @@ import java.lang.reflect.*;
 
 /** This plugin implements the Help/Update ImageJ command. */
 public class ImageJ_Updater implements PlugIn {
-	private static final String URL = "http://wsr.imagej.net/download";
+	private static final String URL = "http://wsr.imagej.net";
 	private String notes;
 
 	public void run(String arg) {
@@ -51,7 +51,7 @@ public class ImageJ_Updater implements PlugIn {
 			urls[i] = URL+"/jars/ij"+version.substring(1,2)+version.substring(3,6)+".jar";
 		}
 		versions[count-2] = "daily build";
-		urls[count-2] = URL+"/daily-build/ij.jar";
+		urls[count-2] = URL+"/download/daily-build/ij.jar";
 		versions[count-1] = "previous";
 		urls[count-1] = URL+"/jars/ij2.jar";
 		//for (int i=0; i<count; i++)
@@ -136,23 +136,6 @@ public class ImageJ_Updater implements PlugIn {
 		return data;
 	}
 
-	/*Changes the name of ij.jar to ij-old.jar
-	boolean renameJar(File f) {
-		File backup = new File(Prefs.getImageJDir() + "ij-old.jar");
-		if (backup.exists()) {
-			if (!backup.delete()) {
-				error("Unable to delete backup: "+backup.getPath());
-				return false;
-			}
-		}
-		if (!f.renameTo(backup)) {
-			error("Unable to rename to ij-old.jar: "+f.getPath());
-			return false;
-		}
-		return true;
-	}
-	*/
-
 	void saveJar(File f, byte[] data) {
 		try {
 			FileOutputStream out = new FileOutputStream(f);
@@ -183,25 +166,6 @@ public class ImageJ_Updater implements PlugIn {
 		return lines;
 	}
 
-	// Use reflection to get version since early versions
-	// of ImageJ do not have the IJ.getVersion() method.
-	/*
-	String version() {
-		String version = "";
-		try {
-			Class ijClass = ImageJ.class;
-			Field field = ijClass.getField("VERSION");
-			version = (String)field.get(ijClass);
-		} catch (Exception ex) {}
-		return version;
-	}
-	*/
-
-	boolean isMac() {
-		String osname = System.getProperty("os.name");
-		return osname.startsWith("Mac");
-	}
-	
 	void error(String msg) {
 		IJ.error("ImageJ Updater", msg);
 	}
