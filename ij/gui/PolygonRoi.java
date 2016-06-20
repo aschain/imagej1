@@ -656,7 +656,7 @@ public class PolygonRoi extends Roi {
 		imp.draw(xmin2-m, ymin2-m, xmax2-xmin2+m*2, ymax2-ymin2+m*2);
 	}
 
-	private void resetBoundingRect() {
+	protected void resetBoundingRect() {
 		//IJ.log("resetBoundingRect");
 		if (xpf!=null) {
 			resetSubPixelBoundingRect();
@@ -1616,6 +1616,7 @@ public class PolygonRoi extends Roi {
 			xpf = toFloat(xp);
 			ypf = toFloat(yp);
 		}
+		subPixel = true;
 	}
 
 	public String getDebugInfo() {
