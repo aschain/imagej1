@@ -820,10 +820,11 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 		return mask;
 	}
 
-	/** Returns an ImageStatistics object generated using all
-		measurement options. This code demonstrates how
-		to get the area, mean, max and median of the
-		current image or selection:
+	/** Get statistics for this image or ROI, including 
+		 histogram, area, mean, min and max, standard
+		 deviation, mode and median.
+		This code demonstrates how to get the area, mean
+		max and median of the current image or selection:
 		<pre>
          imp = IJ.getImage();
          stats = imp.getStatistics();
@@ -836,11 +837,12 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 		@see ij.process.ImageStatistics#getStatistics
 		*/
 	public ImageStatistics getStatistics() {
-		return getStatistics(ALL_STATS);
+		return getStatistics(AREA+MEAN+STD_DEV+MODE+MIN_MAX+RECT+MEDIAN);
 	}
 	
-	/** Returns an ImageStatistics object generated using all 
-		measurement options and ignoring calibration. */
+	/* Get uncalibrated statistics for this image or ROI,
+		including histogram, area, mean, min and max, 
+		standard deviation, mode and median. */
 	public ImageStatistics getRawStatistics() {
 		setupProcessor();
 		if (roi!=null && roi.isArea())
