@@ -45,6 +45,7 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 	private static int count;
 	private static boolean centerOnScreen;
 	private static Point nextLocation;
+	public static long setMenuBarTime;
 	
     private int textGap = centerOnScreen?0:TEXT_GAP;
 	
@@ -467,10 +468,12 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 	}
 	
 	public Rectangle getMaximumBounds() {
+		Rectangle maxWindow = GUI.getMaxWindowBounds();
+		if (imp==null)
+			return maxWindow;
 		double width = imp.getWidth();
 		double height = imp.getHeight();
 		double iAspectRatio = width/height;
-		Rectangle maxWindow = GUI.getMaxWindowBounds();
 		maxWindowBounds = maxWindow;
 		if (iAspectRatio/((double)maxWindow.width/maxWindow.height)>0.75) {
 			maxWindow.y += 22;  // uncover ImageJ menu bar
@@ -554,8 +557,6 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 		ImageJ ij = IJ.getInstance();
 		if (ij!=null && !closed && !ij.quitting() && !Interpreter.isBatchMode())
 			WindowManager.setCurrentWindow(this);
-		if (imp.isComposite())
-			Channels.updateChannels();
 		Roi roi = imp.getRoi();
 		if (roi!=null && (roi instanceof PointRoi))
 			PointToolOptions.update();
@@ -697,10 +698,17 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 		MenuBar mb = Menus.getMenuBar();
 		if (mb!=null && mb==win.getMenuBar())
 			setMenuBar = false;
-		if (ij!=null && !ij.quitting() && !Interpreter.nonBatchMacroRunning() && setMenuBar) {
+		setMenuBarTime = 0L;
+		if (setMenuBar && ij!=null && !ij.quitting() && !Interpreter.nonBatchMacroRunning()) {
 			IJ.wait(10); // may be needed for Java 1.4 on OS X
+			long t0 = System.currentTimeMillis();
 			win.setMenuBar(mb);
+			long time = System.currentTimeMillis()-t0;
+			setMenuBarTime = time;
 			Menus.setMenuBarCount++;
+			if (IJ.debugMode) IJ.log("setMenuBar: "+time+"ms ("+Menus.setMenuBarCount+")");
+			if (time>2000L)
+				Prefs.setIJMenuBar = false;
 		}
 		if (imp!=null) imp.setIJMenuBar(true);
 	}

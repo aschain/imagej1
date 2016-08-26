@@ -210,6 +210,7 @@ public class OverlayCommands implements PlugIn {
 			} else
 				roi.setPosition(imp.getCurrentSlice());
 		}
+		//IJ.log(roi.getCPosition()+" "+roi.getZPosition()+" "+roi.getTPosition());
 	}
 
 	void hide() {
@@ -248,8 +249,8 @@ public class OverlayCommands implements PlugIn {
 		ImageCanvas ic = imp.getCanvas();
 		if (ic!=null)
 			roiManagerOverlay = ic.getShowAllList();
-		if (overlay==null && imp.getRoi()==null && roiManagerOverlay==null && !imp.isComposite() && !IJ.macroRunning()) {
-			IJ.error("Flatten", "Overlay, selection or multi-channel image required");
+		if (imp.getBitDepth()==24 && overlay==null && imp.getRoi()==null && roiManagerOverlay==null && !imp.isComposite() && !IJ.macroRunning()) {
+			IJ.error("Flatten", "Overlay or selection required to flatten RGB image");
 			return;
 		}
 		int flags = IJ.setupDialog(imp, 0);
@@ -362,6 +363,8 @@ public class OverlayCommands implements PlugIn {
 	public static void listRois(Roi[] rois) {
 		ArrayList list = new ArrayList();
 		for (int i=0; i<rois.length; i++) {
+			if (rois[i]==null)
+				continue;
 			Rectangle r = rois[i].getBounds();
 			String color = Colors.colorToString(rois[i].getStrokeColor());
 			String fill = Colors.colorToString(rois[i].getFillColor());
