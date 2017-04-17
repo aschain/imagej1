@@ -5,7 +5,7 @@
 </head>
 <body>
 
-<li> <u>1.51m 3 April 2017</u>
+<li> <u>1.51m 13 April 2017</u>
 <ul>
 <li> Added the <i>Image&gt;Zoom&gt;Maximize</i> command.
 <li> A <i>Plugins&gt;Why are Plugins Missing?</i> command
@@ -14,6 +14,9 @@ due to macOS
 (<a href="docs/install/osx.html#randomization">Path Randomization</a>).
 <li> Added the <i>Help&gt;Examples&gt;JavaScript&gt;TeraByte VirtualStack</i>
 example script.
+<li> Changed the default extension when saving tables from ".xls" to ".csv"
+(coma-delimited values) and added support for opening and saving tables in
+ ".tsv" (tab-delimited values) format.
 <li> The <i>Macros&gt;Evaluate JavaScript</i> command in the text editor
 now respects the "use strict" directive (Java 8 only) to indicate that the code
 should be executed in "strict mode". In strict mode, you can not, for example,
@@ -34,6 +37,17 @@ edgeMode argument to the Array.findMaxima() function
 <li> Thanks to Stefan Helfrich and Mojo Dodo, fixed a bug that caused the
  <i>Image&gt;Color&gt;Arrange Channels</i> command to not
  close the source image in batch mode macros.
+ <li> Thanks to Robert Dougherty, fixed a bug that caused the "Overlay"
+ checkbox in the <i>Analyze&gt;Tools&gt;Calibration Bar</i> dialog
+ box to not be remenbered.
+<li> Thanks to Robert Dougherty, fixed a bug that caused the backgrounds
+of scrollbars to be white when running on Windows 10 and Java 6.
+<li> Thanks to Martin Hohne, fixed a bug that caused the
+run("Point Tool...", "...") macro function to not work as expected.
+<li> Thanks to Stefan Helfrich, fixed a bug that caused the GroupedZProjector to always
+generate a time series regardless of the input stack format.
+<li> Thanks to lcsglvr, fixed a bug that caused slow drawing of 16-bit and 32-bit multi-channel
+composite color images in "Color" mode.
 </ul>
 
 <a href="http://imagej.nih.gov/ij">Home</a>
