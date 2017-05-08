@@ -989,15 +989,16 @@ public abstract class ImageProcessor implements Cloneable {
 				ry += yinc;
 			}
 		} else {
+			rx-=0.5; ry-=0.5; 
 			for (int i=0; i<n; i++) {
-				data[i] = getPixelValue((int)(rx+0.5), (int)(ry+0.5));
+				data[i] = getPixelValue((int)Math.round(rx), (int)Math.round(ry));
 				rx += xinc;
 				ry += yinc;
 			}
 		}
 		return data;
 	}
-	
+		
 	/** Returns the pixel values along the horizontal line starting at (x,y). */
 	public void getRow(int x, int y, int[] data, int length) {
 		for (int i=0; i<length; i++)
