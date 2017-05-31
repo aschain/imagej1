@@ -99,6 +99,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
  		addMouseListener(this);
  		addMouseMotionListener(this);
  		addKeyListener(ij);  // ImageJ handles keyboard shortcuts
+ 		setFocusTraversalKeysEnabled(false);
 		setScaleToFit(true);
 	}
 		
@@ -209,7 +210,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 		if (roi!=null || overlay!=null || showAllOverlay!=null || Prefs.paintDoubleBuffered) {
 			if (roi!=null)
 				roi.updatePaste();
-			if (!IJ.isMacOSX() && imageWidth!=0) {
+			if (imageWidth!=0) {
 				paintDoubleBuffered(g);
 				setPaintPending(false);
 				return;
