@@ -1454,6 +1454,7 @@ public class IJ {
 		return doWand(getImage(), x, y, tolerance, mode);
 	}
 	
+	/** This version of doWand adds an ImagePlus argument. */
 	public static int doWand(ImagePlus img, int x, int y, double tolerance, String mode) {
 		ImageProcessor ip = img.getProcessor();
 		if ((img.getType()==ImagePlus.GRAY32) && Double.isNaN(ip.getPixelValue(x,y)))
@@ -1477,20 +1478,22 @@ public class IJ {
 			w.autoOutline(x, y, t1, ip.getMaxThreshold(), imode);
 		if (w.npoints>0) {
 			Roi previousRoi = img.getRoi();
-			int type = Wand.allPoints()?Roi.FREEROI:Roi.TRACED_ROI;
-			Roi roi = new PolygonRoi(w.xpoints, w.ypoints, w.npoints, type);
+			Roi roi = new PolygonRoi(w.xpoints, w.ypoints, w.npoints, Roi.TRACED_ROI);
 			img.deleteRoi();
 			img.setRoi(roi);			
 			if (previousRoi!=null)
 				roi.update(shiftKeyDown(), altKeyDown());  // add/subtract ROI to previous one if shift/alt key down
 			Roi roi2 = img.getRoi();
 			if (smooth && roi2!=null && roi2.getType()==Roi.TRACED_ROI) {
-				if (smoothMacro==null)
-					smoothMacro = BatchProcessor.openMacroFromJar("SmoothWandTool.txt");
-				if (EventQueue.isDispatchThread())
-					new MacroRunner(smoothMacro); // run on separate thread
-				else
-					IJ.runMacro(smoothMacro);
+				Rectangle bounds = roi2.getBounds();
+				if (bounds.width>1 && bounds.height>1) {
+					if (smoothMacro==null)
+						smoothMacro = BatchProcessor.openMacroFromJar("SmoothWandTool.txt");
+					if (EventQueue.isDispatchThread())
+						new MacroRunner(smoothMacro); // run on separate thread
+					else
+						IJ.runMacro(smoothMacro);
+				}
 			}
 		}
 		return w.npoints;
