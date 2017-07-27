@@ -78,6 +78,8 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 	protected boolean overlay;
 	protected boolean wideLine;
 	protected boolean ignoreClipRect;
+	protected double flattenScale = 1.0;
+
 	private String name;
 	private int position;
 	private int channel, slice, frame;
@@ -2120,6 +2122,10 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 	public int getHashCode() {
 		return hashCode() ^ (new Double(getXBase()).hashCode()) ^
 			Integer.rotateRight(new Double(getYBase()).hashCode(),16);
+	}
+	
+	public void setFlattenScale(double scale) {
+		flattenScale = scale;
 	}
 	
 	public void notifyListeners(int id) {

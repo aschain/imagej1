@@ -2669,7 +2669,6 @@ public class Functions implements MacroConstants, Measurements {
 				win.running2 = false;
 			}
 		}
-		//Macro.abort();
 	}
 	
 	void open() {
@@ -4960,9 +4959,74 @@ public class Functions implements MacroConstants, Measurements {
 			setMeasurements();
 		else if (name.equals("setCommands"))
 			setCommands();
-		else
+		else if (name.equals("indexOf")) {
+			int index = -1;
+			String key = getStringArg();
+			int size = props.size();
+			String[] keyArr = new String[size];
+			String[] valueArr = new String[size];
+			listToArrays(keyArr, valueArr);
+			for (int i = 0; i < size; i++) {
+				if (keyArr[i].equals(key)) {
+					index = i;
+					break;
+				}
+			}
+			value = "" + index;			
+		} else if (name.equals("fromArrays")) {
+			interp.getLeftParen();
+			String[] keys = getStringArray();
+			interp.getComma();
+			String[] values = getStringArray();
+			if (values.length != keys.length) {
+				interp.error("Arrays must have same length");
+			}
+			props.clear();
+			for (int i = 0; i < keys.length; i++) {
+				if (keys[i].equals("")) {
+					interp.error("Key cannot be an empty string");
+				}
+				props.setProperty(keys[i], values[i]);
+			}
+			interp.getRightParen();
+		} else if (name.equals("toArrays")) {
+			Variable keys = getFirstArrayVariable();
+			Variable values = getLastArrayVariable();
+
+			int size = props.size();
+			String[] keyArr = new String[size];
+			String[] valueArr = new String[size];
+
+			listToArrays(keyArr, valueArr);
+			Variable[] keysVar, valuesVar;
+			keysVar = new Variable[size];
+			valuesVar = new Variable[size];
+			for (int i = 0; i < size; i++) {
+				keysVar[i] = new Variable();
+				keysVar[i].setString(keyArr[i]);
+				valuesVar[i] = new Variable();
+				valuesVar[i].setString(valueArr[i]);
+			}
+			keys.setArray(keysVar);
+			values.setArray(valuesVar);			
+		} else {
 			interp.error("Unrecognized List function");
+		}
 		return value;
+	}
+
+	void listToArrays(String[] keys, String[] values) {
+		Vector v = new Vector();
+		for (Enumeration en = props.keys(); en.hasMoreElements();) {
+			v.addElement(en.nextElement());
+		}
+		for (int i = 0; i < keys.length; i++) {
+			keys[i] = (String) v.elementAt(i);
+		}
+		Arrays.sort(keys);
+		for (int i = 0; i < keys.length; i++) {
+			values[i] = (String) props.get(keys[i]);
+		}
 	}
 	
 	void setCommands() {
@@ -5546,8 +5610,8 @@ public class Functions implements MacroConstants, Measurements {
 		Variable[] a1 = getArray();
 		int len1 = a1.length;
 		int len2 = (int)getLastArg();
-		if (len2<=0)
-			interp.error("Length<=0");
+		if (len1 == 0 || len2<=0)
+			interp.error("Cannot resample from or to zero-length");
 		double[] d1 = new double[len1];
 		for (int i=0; i<len1; i++)
 			d1[i] = a1[i].getValue();
@@ -5562,6 +5626,14 @@ public class Functions implements MacroConstants, Measurements {
 		int len1 = y1.length;
 		double factor =  (double)(len2-1)/(len1-1);
 		double[] y2 = new double[len2];
+		if(len1 == 0){ 
+		    return y2;
+		}
+		if(len1 == 1){
+		    for (int jj=0; jj<len2; jj++)
+			    y2[jj] = y1[0];
+		    return(y2);
+		}
 		double[] f1 = new double[len1];//fractional positions
 		double[] f2 = new double[len2];
 		for (int jj=0; jj<len1; jj++)
