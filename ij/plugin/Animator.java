@@ -9,7 +9,6 @@ public class Animator implements PlugIn {
 
 	private static double animationRate = Prefs.getDouble(Prefs.FPS, 7.0);
 	private static int firstFrame=0, lastFrame=0;
-	public static int csfod=0;
 	private ImagePlus imp;
 	private StackWindow swin;
 	private int slice;
@@ -253,8 +252,6 @@ public class Animator implements PlugIn {
 
 	void changeSlice(int pn) {
 		int npo = 1, csfo=1;
-		if (csfod>2) csfod=0;
-		if (csfod<0) csfod=2;
 		if (Prefs.reverseNextPreviousOrder) {npo = -1; csfo=3;}
 		if(imp.isLocked()) return;
 		boolean hyperstack = imp.isDisplayedHyperStack();
@@ -265,7 +262,6 @@ public class Animator implements PlugIn {
 			{stopAnimation(); return;} //if only one dimension, stop animating
 		if(hyperstack){
 			int c=imp.getChannel(); int z=imp.getSlice(); int t=imp.getFrame();
-			csfo+=csfod*npo;
 			if (csfo>3) csfo=csfo%3; if (csfo<1) csfo= csfo%3+3;
 			if(frames==1 || (swin.getAnimate() && frames>1)){
 				if(csfo==3) csfo+=npo;
