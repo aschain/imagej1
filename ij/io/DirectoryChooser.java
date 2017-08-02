@@ -47,6 +47,7 @@ import javax.swing.filechooser.*;
 							IJ.log("DirectoryChooser,setSelectedFile: "+f);
 						chooser.setSelectedFile(f);
 					}
+					chooser.setAccessory(new PrevFolderSelector(chooser));
 					chooser.setApproveButtonText("Select");
 					if (chooser.showOpenDialog(null)==JFileChooser.APPROVE_OPTION) {
 						File file = chooser.getSelectedFile();
@@ -74,6 +75,7 @@ import javax.swing.filechooser.*;
 					IJ.log("DirectoryChooser,setSelectedFile: "+f);
 				chooser.setSelectedFile(f);
 			}
+			chooser.setAccessory(new PrevFolderSelector(chooser));
 			chooser.setApproveButtonText("Select");
 			if (chooser.showOpenDialog(null)==JFileChooser.APPROVE_OPTION) {
 				File file = chooser.getSelectedFile();
