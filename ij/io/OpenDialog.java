@@ -106,6 +106,7 @@ import javax.swing.filechooser.*;
 			fc.setCurrentDirectory(fdir);
 		if (fileName!=null)
 			fc.setSelectedFile(new File(fileName));
+		fc.setAccessory(new PrevFolderSelector(fc));
 		int returnVal = fc.showOpenDialog(IJ.getInstance());
 		if (returnVal!=JFileChooser.APPROVE_OPTION)
 			{Macro.abort(); return;}
@@ -130,6 +131,7 @@ import javax.swing.filechooser.*;
 					fc.setCurrentDirectory(fdir);
 				if (fileName!=null)
 					fc.setSelectedFile(new File(fileName));
+				fc.setAccessory(new PrevFolderSelector(fc));
 				int returnVal = fc.showOpenDialog(IJ.getInstance());
 				if (returnVal!=JFileChooser.APPROVE_OPTION)
 					{Macro.abort(); return;}
