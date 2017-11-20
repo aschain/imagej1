@@ -111,6 +111,7 @@ public class SaveDialog {
 		}
 		if (defaultName!=null)
 			fc.setSelectedFile(new File(defaultName));
+		fc.setAccessory(new PrevFolderSelector(fc));
 		int returnVal = fc.showSaveDialog(IJ.getInstance());
 		if (returnVal!=JFileChooser.APPROVE_OPTION)
 			{Macro.abort(); return;}
@@ -150,6 +151,7 @@ public class SaveDialog {
 					}
 					if (defaultName!=null)
 						fc.setSelectedFile(new File(defaultName));
+					fc.setAccessory(new PrevFolderSelector(fc));
 					int returnVal = fc.showSaveDialog(IJ.getInstance());
 					if (returnVal!=JFileChooser.APPROVE_OPTION)
 						{Macro.abort(); return;}

@@ -29,8 +29,7 @@ public class PrevFolderSelector extends JComponent
 			File newDir = (File) e.getNewValue();
             if(newDir.getPath().equals(oldDir.getParent())) {
 				if(UIManager.getLookAndFeel().getName().equals("Windows") || UIManager.getLookAndFeel().getName().equals("Windows Classic")){
-					int[] windowsfilepane={2,1,0,0,0,0};
-					Component c=getBuriedComponent(fc, windowsfilepane);
+					Component c=fc.findComponentAt(106,40);
 					if(c!=null && c instanceof JComponent){
 						c.requestFocusInWindow();
 					}
@@ -43,19 +42,5 @@ public class PrevFolderSelector extends JComponent
             //file = (File) e.getNewValue();
         }
     }
-	
-	private Component getBuriedComponent(Component comp, int[] tree){
-		
-		Component next=comp;
-		
-		for(int n:tree){
-			if(next instanceof Container){
-				if(n< ((Container) next).getComponentCount()){
-					next=((Container) next).getComponent(n);
-				}else {return null;}
-			}else {return null;}
-		}
-		return next;
-	}
 	
 }
