@@ -20,7 +20,7 @@ import ij.measure.ResultsTable;
  *
  * @author Wayne Rasband
  * @author Philippe CARL, CNRS, philippe.carl (AT) unistra.fr (log axes, arrows, ArrayList data)
- * @author Norbert Vischer (overlay range arrows and 'R'eset range, ...)
+ * @author Norbert Vischer (overlay range arrows, 'R'eset range and filled plots)
  * @author Michael Schmid (axis grid/ticks, resizing/panning/changing range, high-resolution, serialization)
  */
 public class Plot implements Cloneable {
@@ -53,16 +53,20 @@ public class Plot implements Cloneable {
 	public static final int DOT = 6;
 	/** Draw black lines between the dots and a circle with the given color at each dot */
 	public static final int CONNECTED_CIRCLES = 7;
+	/** Display points using an diamond-shaped mark. */
+	public static final int DIAMOND = 8;
+	/** Draw black lines between the dots and a circle with the given color at each dot */
+	public static final int FILLED = 9;
 	/** Draw shape using macro code */
-	public static final int CUSTOM = 8;
-
+	public static final int CUSTOM = 10;
+	
 	/** Names for the shapes as an array */
 	final static String[] SHAPE_NAMES = new String[] {
-			"Circle", "X", "Line", "Box", "Triangle", "+", "Dot", "Connected Circles", "Custom"};
+			"Circle", "X", "Line", "Box", "Triangle", "+", "Dot", "Connected Circles", "Diamond", "Filled", "Custom"};
 	/** Names in nicely sorting order for menus */
 	final static String[] SORTED_SHAPES = new String[] {
-			SHAPE_NAMES[LINE], SHAPE_NAMES[CONNECTED_CIRCLES], SHAPE_NAMES[CIRCLE], SHAPE_NAMES[BOX], SHAPE_NAMES[TRIANGLE],
-			SHAPE_NAMES[CROSS], SHAPE_NAMES[X], SHAPE_NAMES[DOT]};
+			SHAPE_NAMES[LINE], SHAPE_NAMES[CONNECTED_CIRCLES], SHAPE_NAMES[FILLED],SHAPE_NAMES[CIRCLE], SHAPE_NAMES[BOX], SHAPE_NAMES[TRIANGLE],
+			SHAPE_NAMES[CROSS], SHAPE_NAMES[DIAMOND], SHAPE_NAMES[X], SHAPE_NAMES[DOT]};
 	/** flag for numeric labels of x-axis ticks */
 	public static final int X_NUMBERS = 0x1;
 	/** flag for numeric labels of x-axis ticks */
@@ -389,7 +393,6 @@ public class Plot implements Cloneable {
 		if (plotDrawn)
 			setLimitsToDefaults(true);
 	}
-	//n__ end setLimits
 
 	/** Returns the current limits as an array xMin, xMax, yMin, yMax.
 	 *	Note that future versions might return a longer array (e.g. for y2 axis limits) */
@@ -633,7 +636,7 @@ public class Plot implements Cloneable {
 	 * @param xValues	the x coordinates, or null. If null, integers starting at 0 will be used for x.
 	 * @param yValues	the y coordinates (must not be null)
 	 * @param yErrorBars error bars in y, may be null
-	 * @param shape		CIRCLE, X, BOX, TRIANGLE, CROSS, DOT, LINE, CONNECTED_CIRCLES
+	 * @param shape		CIRCLE, X, BOX, TRIANGLE, CROSS, DIAMOND, DOT, LINE, CONNECTED_CIRCLES
 	 * @param label		Label for this curve or set of points, used for a legend and for listing the plots
 	 */
 	public void addPoints(float[] xValues, float[] yValues, float[] yErrorBars, int shape, String label) {
@@ -649,7 +652,7 @@ public class Plot implements Cloneable {
 	/** Adds a set of points to the plot or adds a curve if shape is set to LINE.
 	 * @param x			the x coordinates
 	 * @param y			the y coordinates
-	 * @param shape		CIRCLE, X, BOX, TRIANGLE, CROSS, DOT, LINE, CONNECTED_CIRCLES
+	 * @param shape		CIRCLE, X, BOX, TRIANGLE, CROSS, DIAMOND, DOT, LINE, CONNECTED_CIRCLES
 	 */
 	public void addPoints(float[] x, float[] y, int shape) {
 		addPoints(x, y, null, shape, null);
@@ -678,12 +681,16 @@ public class Plot implements Cloneable {
 			shape = Plot.LINE;
 		if (str.contains("connected"))
 			shape = Plot.CONNECTED_CIRCLES;
+		else if (str.contains("filled"))
+			shape = Plot.FILLED;
 		else if (str.contains("box"))
 			shape = Plot.BOX;
 		else if (str.contains("triangle"))
 			shape = Plot.TRIANGLE;
 		else if (str.contains("cross") || str.contains("+"))
 			shape = Plot.CROSS;
+		else if (str.contains("diamond"))
+			shape = Plot.DIAMOND;
 		else if (str.contains("dot"))
 			shape = Plot.DOT;
 		else if (str.contains("xerror"))
@@ -707,7 +714,7 @@ public class Plot implements Cloneable {
 	 * @param x			the x-coodinates
 	 * @param y			the y-coodinates
 	 * @param errorBars			the vertical error bars, may be null
-	 * @param shape		CIRCLE, X, BOX, TRIANGLE, CROSS, DOT or LINE
+	 * @param shape		CIRCLE, X, BOX, TRIANGLE, CROSS, DIAMOND, DOT or LINE
 	 */
 	public void addPoints(double[] x, double[] y, double[] errorBars, int shape) {
 		addPoints(Tools.toFloat(x), Tools.toFloat(y), Tools.toFloat(errorBars), shape, null);
@@ -2277,10 +2284,29 @@ public class Plot implements Cloneable {
 				boolean drawLine = plotObject.hasCurve();
 				if (plotObject.shape == CONNECTED_CIRCLES)
 					ip.setColor(plotObject.color2 == null ? Color.black : plotObject.color2);
-				if (drawLine)
-					//draw line
-					drawFloatPolyline(ip, plotObject.xValues, plotObject.yValues,
-							Math.min(plotObject.xValues.length, plotObject.yValues.length));
+				if (drawLine) {
+					int shortLen = Math.min(plotObject.xValues.length, plotObject.yValues.length);
+					if(plotObject.shape == FILLED){
+						//ip.setColor(plotObject.color);
+						boolean twoColors = plotObject.color2 != null;
+						if(twoColors){
+							ip.setColor(plotObject.color2);
+							ip.setLineWidth(1);
+						}
+						else
+							ip.setColor(plotObject.color);
+
+						drawFloatPolyLineFilled(ip, plotObject.xValues, plotObject.yValues, shortLen);
+						if(twoColors){
+							ip.setColor(plotObject.color);
+							ip.setClipRect(frame);
+							ip.setLineWidth(sc(plotObject.lineWidth));
+							drawFloatPolyline(ip, plotObject.xValues, plotObject.yValues, shortLen);
+						}
+					}
+					else
+					    drawFloatPolyline(ip, plotObject.xValues, plotObject.yValues, shortLen);
+				}
 				if (drawMarker) {
 					int markSize = plotObject.getMarkerSize();
 					if (plotObject.hasFilledMarker()) {
@@ -2370,6 +2396,7 @@ public class Plot implements Cloneable {
 	/** Draw the symbols for data points */
 	void drawShape(PlotObject plotObject, int x, int y, int size) {
 		int shape = plotObject.shape;
+		if (shape == DIAMOND) size = (int)(size*1.21);
 		int xbase = x-sc(size/2);
 		int ybase = y-sc(size/2);
 		int xend = x+sc(size/2);
@@ -2393,6 +2420,12 @@ public class Plot implements Cloneable {
 			case CROSS:
 				ip.drawLine(xbase,y,xend,y);
 				ip.drawLine(x,ybase,x,yend);
+				break;
+			case DIAMOND:
+				ip.drawLine(xbase,y,x,ybase);
+				ip.drawLine(x,ybase,xend,y);
+				ip.drawLine(xend,y,x,yend);
+				ip.drawLine(x,yend,xbase,y);
 				break;
 			case DOT:
 				ip.drawDot(x, y); //uses current line width
@@ -2433,10 +2466,10 @@ public class Plot implements Cloneable {
 	/** Fill the area of the symbols for data points (except for shape=DOT)
 	 *	Note that ip.fill, ip.fillOval etc. can't be used here: they do not care about the clip rectangle */
 	void fillShape(int shape, int x0, int y0, int size) {
+		if (shape == DIAMOND) size = (int)(size*1.21);
 		int r = sc(size/2)-1;
 		switch(shape) {
 			case BOX:
-				int widthOrHeight = 2*sc(size/2);
 				for (int dy=-r; dy<=r; dy++)
 					for (int dx=-r; dx<=r; dx++)
 						ip.drawDot(x0+dx, y0+dy);
@@ -2448,6 +2481,17 @@ public class Plot implements Cloneable {
 				double hwStep = halfWidth/(yend-ybase+1);
 				for (int y=yend; y>=ybase; y--, halfWidth -= hwStep) {
 					int dx = (int)(Math.round(halfWidth));
+					for (int x=x0-dx; x<=x0+dx; x++)
+						ip.drawDot(x,y);
+				}
+				break;
+			case DIAMOND:
+				ybase = y0 - r - sc(1);
+				yend = y0 + r;
+				halfWidth = sc(size/2)+sc(1)-1;
+				hwStep = halfWidth/(yend-ybase+1);
+				for (int y=yend; y>=ybase; y--) {
+					int dx = (int)(Math.round(halfWidth-(hwStep+1)*Math.abs(y-y0)));
 					for (int x=x0-dx; x<=x0+dx; x++)
 						ip.drawDot(x,y);
 				}
@@ -2530,6 +2574,87 @@ public class Plot implements Cloneable {
 		}
 	}
 
+	/**
+	 * Fills space between polyline and y=0 with secondary color.
+	 * author: Norbert Vischer
+	 */
+	void drawFloatPolyLineFilled(ImageProcessor ip, float[] xF, float[] yF, int len) {
+		if (xF == null || len == 0) {
+			return;
+		}
+		double[] xD = new double[len];
+		double[] yD = new double[len];
+		double minX = Double.MAX_VALUE;
+		double maxX = -Double.MAX_VALUE;
+		for (int i = 0; i < len; i++) {
+			xD[i] = xF[i];
+			yD[i] = yF[i];
+			if (xF[i] < minX) {
+				minX = xF[i];
+			}
+			if (xF[i] > maxX) {
+				maxX = xF[i];
+			}
+		}
+		double dx = maxX - minX;
+		int stretchedLen = (int) (dx * xScale * 10) + 1;
+		double[] stretchedArrX = resampleArray(xD, stretchedLen);
+		double[] stretchedArrY = resampleArray(yD, stretchedLen);
+		int yZero = scaleY(0);
+		int prevX = 0;
+		if (logYAxis) {
+			yZero = 999999;
+		}
+		for (int i = 0; i < stretchedLen; i++) {
+			if (Double.isNaN(stretchedArrY[i])) {
+				continue;
+			}
+			int intX = scaleX(stretchedArrX[i]);
+			int intY = scaleY(stretchedArrY[i]);
+			if (intX != prevX) {//don't paint twice
+				ip.drawLine(intX, intY, intX, yZero);
+			}
+			prevX = intX;
+		}
+		ip.setLineWidth((int) scale);
+		ip.setColor(Color.black);
+
+		makeRangeGetSteps();
+	}
+
+	double[] resampleArray(double[] y1, int len2) {
+		int len1 = y1.length;
+		double factor = (double) (len2 - 1) / (len1 - 1);
+		double[] y2 = new double[len2];
+		if (len1 == 0) {
+			return y2;
+		}
+		if (len1 == 1) {
+			for (int jj = 0; jj < len2; jj++) {
+				y2[jj] = y1[0];
+			}
+			return (y2);
+		}
+		double[] f1 = new double[len1];//fractional positions
+		double[] f2 = new double[len2];
+		for (int jj = 0; jj < len1; jj++) {
+			f1[jj] = jj * factor;
+		}
+		for (int jj = 0; jj < len2; jj++) {
+			f2[jj] = jj / factor;
+		}
+		for (int jj = 0; jj < len2 - 1; jj++) {
+			double pos = f2[jj];
+			int leftPos = (int) Math.floor(pos);
+			int rightPos = (int) Math.floor(pos) + 1;
+			double fraction = pos - Math.floor(pos);
+			double value = y1[leftPos] + fraction * (y1[rightPos] - y1[leftPos]);
+			y2[jj] = value;
+		}
+		y2[len2 - 1] = y1[len1 - 1];
+		return y2;
+	}
+
 	/** Vertical text for y axis label */
 	void drawYLabel(String yLabel, int xRight, int yFrameTop, int frameHeight, Font scaledFont) {
 		if (yLabel.equals(""))
@@ -2595,7 +2720,7 @@ public class Plot implements Cloneable {
 			for (int y=y0; y<y0+height; y++)
 				for (int x=x0; x<x0+width; x++)
 					if ((ip.getPixel(x, y) & 0xffffff) == grid)
-						ip.drawDot(x, y);
+						ip.drawPixel(x, y);
 		}
 		ip.setLineWidth(frameThickness);
 		ip.setColor(legendObject.color);
@@ -3095,18 +3220,18 @@ class PlotObject implements Cloneable, Serializable {
 
 	/** Whether an XY_DATA object has a curve to draw */
 	boolean hasCurve() {
-		return type == XY_DATA && (shape == Plot.LINE || shape == Plot.CONNECTED_CIRCLES);
+		return type == XY_DATA && (shape == Plot.LINE || shape == Plot.CONNECTED_CIRCLES || shape == Plot.FILLED);
 	}
 
 	/** Whether an XY_DATA object has markers to draw */
 	boolean hasMarker() {
 		return type == XY_DATA && (shape == Plot.CIRCLE || shape == Plot.X || shape == Plot.BOX || shape == Plot.TRIANGLE ||
-				shape == Plot.CROSS || shape == Plot.DOT || shape == Plot.CONNECTED_CIRCLES || shape == Plot.CUSTOM);
+				shape == Plot.CROSS || shape == Plot.DIAMOND || shape == Plot.DOT || shape == Plot.CONNECTED_CIRCLES || shape == Plot.CUSTOM);
 	}
 
 	/** Whether an XY_DATA object has markers that can be filled */
 	boolean hasFilledMarker() {
-		return type == XY_DATA && color2 != null && (shape == Plot.CIRCLE || shape == Plot.BOX || shape == Plot.TRIANGLE);
+		return type == XY_DATA && color2 != null && (shape == Plot.CIRCLE || shape == Plot.BOX || shape == Plot.TRIANGLE || shape == Plot.DIAMOND);
 	}
 
 	/** Size of the markers for an XY_DATA object with markers */
