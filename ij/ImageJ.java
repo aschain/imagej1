@@ -9,7 +9,6 @@ import ij.text.*;
 import ij.macro.Interpreter;
 import ij.io.Opener;
 import ij.util.*;
-import ij.macro.*;
 import java.awt.*;
 import java.util.*;
 import java.awt.event.*;
@@ -79,8 +78,8 @@ public class ImageJ extends Frame implements ActionListener,
 	MouseListener, KeyListener, WindowListener, ItemListener, Runnable {
 
 	/** Plugins should call IJ.getVersion() or IJ.getFullVersion() to get the version string. */
-	public static final String VERSION = "1.51t";
-	public static final String BUILD = "8";
+	public static final String VERSION = "1.51u";
+	public static final String BUILD = "9";
 	public static Color backgroundColor = new Color(237,237,237);
 	/** SansSerif, 12-point, plain font. */
 	public static final Font SansSerif12 = new Font("SansSerif", Font.PLAIN, 12);
@@ -229,7 +228,7 @@ public class ImageJ extends Frame implements ActionListener,
 		configureProxy();
 		if (applet==null)
 			loadCursors();
-		(new StartupRunner()).run(batchMode); // run RunAtStartup and AutoRun macros
+		(new ij.macro.StartupRunner()).run(batchMode); // run RunAtStartup and AutoRun macros
 		IJ.showStatus(version()+ m.getPluginCount() + " commands; " + m.getMacroCount() + str);
  	}
  	
@@ -452,7 +451,13 @@ public class ImageJ extends Frame implements ActionListener,
 			}
 		}
 
-		if ((!Prefs.requireControlKey || control || meta) && keyChar!='+') {
+		if (keyCode==KeyEvent.VK_SEPARATOR)
+			keyCode = KeyEvent.VK_DECIMAL;
+		boolean functionKey = keyCode>=KeyEvent.VK_F1 && keyCode<=KeyEvent.VK_F12;
+		boolean numPad = keyCode==KeyEvent.VK_DIVIDE || keyCode==KeyEvent.VK_MULTIPLY
+			|| keyCode==KeyEvent.VK_DECIMAL
+			|| (keyCode>=KeyEvent.VK_NUMPAD0 && keyCode<=KeyEvent.VK_NUMPAD9);			
+		if ((!Prefs.requireControlKey||control||meta||functionKey||numPad) && keyChar!='+') {
 			Hashtable shortcuts = Menus.getShortcuts();
 			if (shift)
 				cmd = (String)shortcuts.get(new Integer(keyCode+200));
@@ -474,7 +479,7 @@ public class ImageJ extends Frame implements ActionListener,
 		if (cmd==null) {
 			switch (keyCode) {
 				case KeyEvent.VK_TAB: WindowManager.putBehind(); return;
-				case KeyEvent.VK_BACK_SPACE: // delete
+				case KeyEvent.VK_BACK_SPACE: case KeyEvent.VK_DELETE: 
 					if (deleteOverlayRoi(imp))
 						return;
 					if (imp!=null&&imp.getOverlay()!=null&&imp==GelAnalyzer.getGelImage())
