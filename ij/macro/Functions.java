@@ -1373,26 +1373,6 @@ public class Functions implements MacroConstants, Measurements {
 			return new Variable(array).getArray();
 	}
 
-	Variable[] newArray() {
-		if (interp.nextToken()!='(' || interp.nextNextToken()==')') {
-			interp.getParens();
-			return new Variable[0];
-		}
-		interp.getLeftParen();
-		int next = interp.nextToken();
-		int nextNext = interp.nextNextToken();
-		if (next==STRING_CONSTANT || nextNext==',' || nextNext=='[' || next=='-' || next==PI
-		|| nextNext=='+' || nextNext=='-' || nextNext=='*' || nextNext=='/')
-			return initNewArray();
-		int size = (int)interp.getExpression();
-		if (size<0) interp.error("Negative array size");
-		interp.getRightParen();
-    	Variable[] array = new Variable[size];
-    	for (int i=0; i<size; i++)
-    		array[i] = new Variable();
-    	return array;
-	}
-
 	Variable[] split() {
 		String s1 = getFirstString();
 		String s2 = null;
@@ -1456,7 +1436,14 @@ public class Functions implements MacroConstants, Measurements {
     	return array;
 	}
 
-	Variable[] initNewArray() {
+	Variable[] newArray() {
+		if (interp.nextToken()!='(' || interp.nextNextToken()==')') {
+			interp.getParens();
+			return new Variable[0];
+		}
+		interp.getLeftParen();
+		int next = interp.nextToken();
+		int nextNext = interp.nextNextToken();
 		Vector vector = new Vector();
 		int size = 0;
 		do {
@@ -2149,6 +2136,12 @@ public class Functions implements MacroConstants, Measurements {
 		} else if (name.equals("drawVectors")) {
 			drawPlotVectors();
 			return;
+		} else if (name.equals("drawBoxes")) {
+			drawPlotBoxes();
+			return;
+		} else if (name.equals("drawBoxesX")) {
+			drawPlotBoxesX();
+			return;
 		} else if (name.startsWith("setLineWidth")) {
 			plot.setLineWidth((float)getArg());
 			return;
@@ -2159,6 +2152,9 @@ public class Functions implements MacroConstants, Measurements {
 			String arg = getFirstString();
 			int what = Plot.toShape(arg);
 			addToPlot(what, arg);
+			return;
+		} else if (name.equals("appendToStack")) {
+			plot.appendToStack();
 			return;
 		} else
 			interp.error("Unrecognized plot function");
@@ -2285,6 +2281,29 @@ public class Functions implements MacroConstants, Measurements {
 		double[] x2 = getNextArray();
 		double[] y2 = getLastArray();
 		plot.drawVectors(x1, y1, x2, y2);
+	}
+	
+	void drawPlotBoxes() {
+		drawPlotBoxes(false);
+	}
+	void drawPlotBoxesX() {
+		drawPlotBoxes(true);
+	}
+	
+	void drawPlotBoxes(boolean swapXY) {
+		double boxWidth = getFirstArg();
+		double[] x1 = getNextArray();
+		double[] y1 = getNextArray();
+		double[] y2 = getNextArray();
+		double[] y3 = getNextArray();
+		double[] y4 = getNextArray();
+		double[] y5 = getLastArray();
+		int l = x1.length;
+		if (l != y1.length ||l != y2.length ||l != y3.length ||l != y4.length ||l != y5.length || l==0 )
+			interp.error("Arrays must have same length");
+		if (swapXY )
+			boxWidth = - boxWidth;
+		plot.drawBoxes((int) boxWidth, x1, y1, y2, y3, y4, y5);	
 	}
 
 	void setPlotColor(Plot plot) {
