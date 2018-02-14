@@ -5,32 +5,51 @@
 </head>
 <body>
 
-<li> <u>1.51u 30 January 2018</u>l
+<li> <u>1.51u 13 February 2018</u>l
 <ul>
+<li> Thanks to Norbert Vischer, added support for plotting
+rectangles, vertical and horizontal bar charts, and vertical
+and horizontal boxes and whiskers. Use the <i>Bar Charts</i>
+and <i>Shapes</i> commands in the <i>Help&gt;Examples&gt;Plots</i>
+menu to see examples.
+<li> Thanks to Norbert Vischer, zooming in and out of plot windows
+using the "+" and "-" keys works better.
+<li> Thanks to Norbert Vischer, added the
+<i>Help&gt;Examples&gt;Open as Panel</i> command.
 <li> Thanks to Norbert Vischer, added the Plot.appendToStack() 
-macro function. The Dynamic_Plot.ijm, Dynamic_Plot_2D.ijm and
-Dynamic_Plot.js examples in the
-<i>Help&gt;Examples</i> menu demonstrate how to use appendToStack().
+function. The "Dynamic Plot" and "Dynamic Plot 2D" macros in the
+<i>Help&gt;Examples&gt;Plots</i> menu and the "Dynamic Plot"
+script in the <i>Help&gt;Examples&gt;JavaScript</i> menu demonstrate
+how to use it.
 <li> Added the <i>Help&gt;Examples&gt;Plots&gt;Histograms</i>
 example macro, which demonstrates how to use the new 
 Plot.add("bars",x,y) macro function to draw histograms.
-<li> Thanks to Norbert Vischer, added support for box plots. Use the
-<i>Help&gt;Examples&gt;Plots&gt;Box Plot</i> command to see an example.
 <li> The <i>File&gt;Save As&gt;Gif</i> command now works with RGB images
 and stacks, saving stacks as animated GIFs
 (<a href="http://wsr.imagej.net/images/Sum_of_Gaussians.gif">example1</a>, 
 <a href="http://wsr.imagej.net/images/sunset.gif">example2</a>).
+<li> The <i>Plugins&gt;Utilities&gt;Control Panel</i> now requires
+a double click to run a command.
 <li> Thanks to Stein Rorvik, when moving the mouse pointer, or creating
 a selection, on spatially calibrated images, the uncalibrated x and y pixel
 coordinates are shown in parenthesis in the status bar.
 <li> Thanks to Jerome Mutterer, the focus is reset to the 
 prompt when  either the backspace or delete key is pressed
 in the macro functions finder.
+<li> Thanks to Norbert Vischer, the close(pattern) macro function
+closes windows whose title matches 'pattern'. Non-image windows, like "Roi Manager"
+have to be specified without wildcards. For text windows, wildcards are allowed if 'pattern'
+ends with ".txt", ".ijm" etc. Use close(pattern, "unchanged") to
+close only unchanged windows.
+<li> Thanks to Michael Schmid, added the Recorder.fixString() method, 
+which is used to escape strings passed to the recorder.
 <li> Thanks to Michael Schmid, the delete key on Windows keyboards 
 can be used as a substitute for backspace as a shortcut for the
 <i>Image&gt;Clear</i> command, for deleting ROIs from overlays and
 for deleting lines in Results Tables and in the Log window. In addition, 
 the ',' key on european numeric keypads is mapped to the '.' key.
+<li> Thanks to Norbert Vischer, added the Plot.drawShapes() and
+Plot.drawGrid macro functions.
 <li> Thanks to Gregory Jefferis, fixed a bug that caused the run("Scale...", "...")
 macro function to fail in Fiji headless mode.
 <li> Thanks to Stein Rorvik, fixed a bug that caused the min/max 
@@ -38,7 +57,7 @@ constrast values to be lost when duplicating virtual stacks.
 <li> Thanks to Michael Schmid, fixed a bug that caused incorrect
 log x axis coordinates to be displayed at the bottom of plot windows.
 <li> Thanks to Andrew Shum, fixed a bug that caused the 
-<i>File&gt;Batch&gt;Macro</i> and File&gt;Batch&gt;Virtual Stack</i>
+<i>File&gt;Batch&gt;Macro</i> and <i>File&gt;Batch&gt;Virtual Stack</i>
 commands to not be correctly recorded.
 <li> Thanks to Philippe Carl and Jan Eglinger, fixed a bug that caused the 
 newArray() macro function to fail if there were multiple arguments
@@ -48,6 +67,9 @@ strings to be pasted in the wrong position in text windows.
 <li> Thanks to Michael Schmid, fixed a bug that caused the
 <i>Process&gt;Filters&gt;Variance</i> command to sometimes
 generate negative values with 32-bit images.
+<li> Thanks to Tobias Starborg, fixed a bug that caused the 
+<i>Image&gt;Stacks&gt;Animation&gt;Animation Options</i>
+command to not work in batch mode macros.
 
 </ul>
 
