@@ -47,6 +47,7 @@ public class Editor extends PlugInFrame implements ActionListener, ItemListener,
 	static final String DEFAULT_DIR= "editor.dir";
 	static final String INSERT_SPACES= "editor.spaces";
 	static final String TAB_INC= "editor.tab-inc";
+	public static Editor currentMacroEditor;
 	private TextArea ta;
 	private String path;
 	protected boolean changes;
@@ -248,8 +249,6 @@ public class Editor extends PlugInFrame implements ActionListener, ItemListener,
 				debugMenu.addActionListener(this);
 				mb.add(debugMenu);
 			}
-			//if (macroExtension && text.indexOf("macro \"")!=-1)
-			//	installMacros(text, false);	
 		} else {
 			fileMenu.addSeparator();
 			fileMenu.add(new MenuItem("Compile and Run", new MenuShortcut(KeyEvent.VK_R)));
@@ -283,6 +282,7 @@ public class Editor extends PlugInFrame implements ActionListener, ItemListener,
 		if (installInPluginsMenu || nShortcutsOrTools>0)
 			installer.install(null);
 		dontShowWindow = installer.isAutoRunAndHide();
+		currentMacroEditor = this;
 	}
 		
 	/** Opens a file and replaces the text (if any) by the contents of the file. */
@@ -418,6 +418,7 @@ public class Editor extends PlugInFrame implements ActionListener, ItemListener,
 			changes = true;
 			checkForCurlyQuotes = false;
 		}
+		currentMacroEditor = this;
 		new MacroRunner(text, debug?this:null);
 	}
 	
@@ -771,7 +772,7 @@ public class Editor extends PlugInFrame implements ActionListener, ItemListener,
 		else if (what.equals("Copy to Image Info"))
 			copyToInfo();
 		else if (what.endsWith(".ijm") || what.endsWith(".java") || what.endsWith(".js") || what.endsWith(".bsh") || what.endsWith(".py"))
-			openExample(what, e);
+			openExample(what);
 		else {
 			if (altKeyDown) {
 				enableDebugging();
@@ -781,16 +782,17 @@ public class Editor extends PlugInFrame implements ActionListener, ItemListener,
 		}
 	}
 	
-	private void openExample(String name, ActionEvent e) {
+	/** Opens an example from the Help/Examples menu
+		and runs if "Autorun Exampes" is checked. */
+	public static boolean openExample(String name) {
 		boolean isJava = name.endsWith(".java");
 		boolean isJavaScript = name.endsWith(".js");
 		boolean isBeanShell = name.endsWith(".bsh");
 		boolean isPython = name.endsWith(".py");
-		int flags = e.getModifiers();
-		boolean shift = (flags & KeyEvent.SHIFT_MASK) != 0;
-		boolean control = (flags & KeyEvent.CTRL_MASK) != 0;
-		boolean alt = (flags & KeyEvent.ALT_MASK) != 0;
-		boolean run = !isJava && (Prefs.autoRunExamples||shift||control||alt);
+		boolean isMacro = name.endsWith(".ijm");
+		if (!(isMacro||isJava||isJavaScript||isBeanShell||isPython))
+			return false;
+		boolean run = !isJava && !name.contains("_Tool") && Prefs.autoRunExamples;
 		int rows = 24;
 		int columns = 70;
 		int options = MENU_BAR;
@@ -809,24 +811,12 @@ public class Editor extends PlugInFrame implements ActionListener, ItemListener,
 		text = IJ.openUrlAsString(url);
 		if (text.startsWith("<Error: ")) {
 			IJ.error("Open Example", text);
-			return;
+			return true;
 		}
-		if (ta!=null && ta.getText().length()==0 && !(isJava||isJavaScript||isBeanShell||isPython)) {
-			ta.setText(text);
-			ta.setCaretPosition(0);
-			setTitle(name);
-		} else
-			ed.create(name, text);
-		if (run) {
-			if (isJavaScript)
-				ed.evaluateJavaScript();
-			else if (isBeanShell)
-				ed.evaluateScript(".bsh");
-			else if (isPython)
-				ed.evaluateScript(".py");
-			else
-				IJ.runMacro(text);
-		}
+		ed.create(name, text);
+		if (run)
+			ed.runMacro(false);
+		return true;
 	}
 	
 	protected void showMacroFunctions() {
