@@ -618,7 +618,6 @@ public class PointRoi extends PolygonRoi {
 		rt.setValue(firstColumnHdr, row, "Total");
 		for (int i=0; i<nCounters; i++)
 			rt.setValue("Ctr "+i, row, counts[i]);
-		rt.showRowNumbers(false);
 		rt.show(getCountsTitle());
 		if (IJ.debugMode) debug();
 	}
@@ -632,7 +631,6 @@ public class PointRoi extends PolygonRoi {
 			rt.setValue("X", i, p.xpoints[i]);
 			rt.setValue("Y", i, p.ypoints[i]);
 		}
-		rt.showRowNumbers(false);
 		rt.show(getCountsTitle());
 	}
 
@@ -743,6 +741,8 @@ public class PointRoi extends PolygonRoi {
 		int index = -1;
 		double distance = Double.MAX_VALUE;
 		int slice = imp!=null&&positions!=null&&imp.getStackSize()>1?imp.getCurrentSlice():0;
+		if (Prefs.showAllPoints)
+			slice = 0;
 		for (int i=0; i<points.npoints; i++) {
 			double dx = points.xpoints[i] - x;
 			double dy = points.ypoints[i] - y;

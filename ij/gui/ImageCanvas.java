@@ -206,8 +206,10 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
     public void paint(Graphics g) {
 		if (IJ.debugMode) IJ.log("ImageCanvas.paint: "+imp);
 		painted = true;
-		Roi roi = imp.getRoi();
-		if (roi!=null || overlay!=null || showAllOverlay!=null || Prefs.paintDoubleBuffered) {
+		Roi roi = imp.getRoi();		
+		if (roi!=null || overlay!=null || showAllOverlay!=null || Prefs.paintDoubleBuffered || (IJ.isLinux() && magnification<0.25)) {
+			// Double buffering to avoid flickering of ROIs and to work around a 
+			// Linux problem of large images not showing at low magnification.
 			if (roi!=null)
 				roi.updatePaste();
 			if (imageWidth!=0) {
@@ -312,6 +314,11 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 		else
 			labelRects = null;
 		font = overlay.getLabelFont();
+		if (overlay.scalableLabels() && font!=null) {
+			double mag = getMagnification();
+			if (mag!=1.0)
+				font = font.deriveFont((float)(font.getSize()*mag));
+		}
 		Roi activeRoi = imp.getRoi();
 		boolean roiManagerShowAllMode = overlay==showAllOverlay && !Prefs.showAllSliceOnly;
 		for (int i=0; i<n; i++) {
@@ -623,7 +630,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 		Overlay o = showAllOverlay;
 		if (o==null)
 			o = overlay;
-		if (o==null || !o.getDrawLabels() || labelRects==null)
+		if (o==null || !o.isSelectable() || !o.getDrawLabels() || labelRects==null)
 			return false;
 		for (int i=o.size()-1; i>=0; i--) {
 			if (labelRects!=null&&labelRects[i]!=null&&labelRects[i].contains(sx,sy)) {
@@ -932,8 +939,6 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 			setMagnification(newMag);
 			imp.getWindow().pack();
 		}
-		//IJ.write(newMag + " " + srcRect.x+" "+srcRect.y+" "+srcRect.width+" "+srcRect.height+" "+dstWidth + " " + dstHeight);
-		//IJ.write(srcRect.x + " " + srcRect.width + " " + dstWidth);
 		setMaxBounds();
 		repaint();
 	}
@@ -1004,7 +1009,6 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 	
 	Color getColor(int index){
 		IndexColorModel cm = (IndexColorModel)imp.getProcessor().getColorModel();
-		//IJ.write(""+index+" "+(new Color(cm.getRGB(index))));
 		return new Color(cm.getRGB(index));
 	}
 	
@@ -1541,7 +1545,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 		Overlay o = showAllOverlay;
 		if (o==null)
 			o = overlay;
-		if (o==null)
+		if (o==null || !o.isSelectable())
 			return false;
 		boolean roiManagerShowAllMode = o==showAllOverlay && !Prefs.showAllSliceOnly;
 		boolean labels = o.getDrawLabels();
