@@ -5,19 +5,12 @@
 </head>
 <body>
 
-<li> <u>1.52b 26 April 2018</u>
+<li> <u>1.52d 21 May 2018</u>
 <ul>
-<li> Changed "Random" to "Noise" in the "Fill with:" choice of
-the <i>File&gt;New&gt;Image</i> dialog box.
-<li> Thanks to Christian Evenhuis, fixed a bug with the
-<i>Edit&gt;Selection&gt;Line to Area</i> command that caused 
-the resulting area selection to translated if the source was a polyline 
-or freeline selection less than 5 pixels wide.
-<li> Thanks to Fred Damen, fixed bugs that caused the
-<i>Image&gt;Stacks&gt;Tools&gt;Concatenate</i> command
-to sometimes not work as expected.
-<li> Thanks to Aryeh Weiss and Michael Schmid, worked around a 
-Linux problem with large images not showing at low magnification.
+<li> Thanks to David Kysela, added the PointRoi.promptBeforeDeleting(boolean) method
+(<a href="http://wsr.imagej.net/macros/PointsWithPrompting.js">JavaScript example</a>).
+<li> Thanks to Michael Kaul, fixed a 1.52a regression that caused 
+an EOFException when opening Analyze format RGB images.
 
 </ul> 
 
