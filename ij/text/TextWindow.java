@@ -346,6 +346,11 @@ public class TextWindow extends Frame implements ActionListener, FocusListener, 
 	}
 	
 	public void focusGained(FocusEvent e) {
+		ImageJ ij = IJ.getInstance();
+		if (!Interpreter.isBatchMode() && ij!=null && !ij.quitting()) {
+			if (IJ.debugMode) IJ.log("focusGained: "+this);
+			WindowManager.setWindow(this);
+		}
 	}
 
 	public void focusLost(FocusEvent e) {}
