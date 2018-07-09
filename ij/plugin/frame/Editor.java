@@ -113,7 +113,7 @@ public class Editor extends PlugInFrame implements ActionListener, ItemListener,
 			fontSize = sizes.length-1;
 		setFont();
 		positionWindow();
-		if (IJ.isJava16() && !IJ.isJava18() && !IJ.isLinux())
+		if (!IJ.isJava18() && !IJ.isLinux())
 			insertSpaces = false;
 	}
 	
@@ -135,11 +135,8 @@ public class Editor extends PlugInFrame implements ActionListener, ItemListener,
 		m = new Menu("Edit");
 		MenuItem item = new MenuItem("Undo",new MenuShortcut(KeyEvent.VK_Z));
 		m.add(item);
-		m.addSeparator();
-		boolean shortcutsBroken = IJ.isWindows()
-			&& (System.getProperty("java.version").indexOf("1.1.8")>=0
-			||System.getProperty("java.version").indexOf("1.5.")>=0);
-		shortcutsBroken = false;
+		m.addSeparator();		
+		boolean shortcutsBroken = IJ.isWindows();
 		if (shortcutsBroken)
 			item = new MenuItem("Cut  Ctrl+X");
 		else
@@ -453,7 +450,7 @@ public class Editor extends PlugInFrame implements ActionListener, ItemListener,
 			if (strictMode)
 				text = "'use strict';" + text;
 		}
-		if ((IJ.isJava16() && !(IJ.isMacOSX()&&!IJ.is64Bit()))) {
+		if (!(IJ.isMacOSX()&&!IJ.is64Bit())) {
 			// Use JavaScript engine built into Java 6 and later.
 			IJ.runPlugIn("ij.plugin.JavaScriptEvaluator", text);
 		} else {
@@ -635,13 +632,12 @@ public class Editor extends PlugInFrame implements ActionListener, ItemListener,
 		} else
 			return false;
 	}
- 
 	  
 	void cut() {
 		if (copy()) {
 			int start = ta.getSelectionStart();
 			int end = ta.getSelectionEnd();
-			ta.replaceRange("", start, end);
+			ta.replaceRange("", start-offset(start), end-offset(start));
 			if (IJ.isMacOSX())
 				ta.setCaretPosition(start);
 		}	
@@ -654,16 +650,29 @@ public class Editor extends PlugInFrame implements ActionListener, ItemListener,
 		Transferable clipData = clipboard.getContents(s);
 		try {
 			s = (String)(clipData.getTransferData(DataFlavor.stringFlavor));
-		}
-		catch  (Exception e)  {
+		} catch  (Exception e)  {
 			s  = e.toString( );
 		}
 		int start = ta.getSelectionStart( );
 		int end = ta.getSelectionEnd( );
-		ta.replaceRange(s, start, end);
+		ta.replaceRange(s, start-offset(start), end-offset(start));
 		if (IJ.isMacOSX())
 			ta.setCaretPosition(start+s.length());
 		checkForCurlyQuotes = true;
+	}
+	
+	// workaround for WIndows bug
+	 private int offset(int pos) {
+		if (!IJ.isWindows())
+			return 0;
+		String text = ta.getText();
+		int rcount = 0;
+		for (int i=0; i<=pos; i++) {
+			if (text.charAt(i)=='\r')
+				rcount++;
+		}
+		if (IJ.debugMode) IJ.log("offset: "+pos+" "+rcount);
+		return pos-rcount>=0?rcount:0;
 	}
 
 	void copyToInfo() { 
@@ -681,7 +690,7 @@ public class Editor extends PlugInFrame implements ActionListener, ItemListener,
 			text = ta.getSelectedText();
 		imp.setProperty("Info", text);
 	}
-
+	
 	public void actionPerformed(ActionEvent e) {
 		String what = e.getActionCommand();
 		int flags = e.getModifiers();
@@ -737,11 +746,11 @@ public class Editor extends PlugInFrame implements ActionListener, ItemListener,
 			print();
 		else if (what.equals("Undo"))
 		   undo();
-		else if (what.equals("Paste"))
+		else if (what.startsWith("Paste"))
 			paste();
-		else if (what.equals("Copy"))
+		else if (what.startsWith("Copy"))
 			copy();
-		else if (what.equals("Cut"))
+		else if (what.startsWith("Cut"))
 		   cut();
 		else if ("Save As...".equals(what))
 			saveAs();
