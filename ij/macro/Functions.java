@@ -6171,6 +6171,11 @@ public class Functions implements MacroConstants, Measurements {
 		Roi roi = imp.getRoi();
 		if (roi==null)
 			interp.error("No selection");
+		if (offscreenOverlay!=null) {
+			imp.setOverlay(offscreenOverlay);
+			offscreenOverlay = null;
+			overlay = imp.getOverlay();
+		}
 		if (overlay==null)
 			overlay = new Overlay();
 		if (strokeColor!=null && !strokeColor.equals("")) {
@@ -6297,6 +6302,7 @@ public class Functions implements MacroConstants, Measurements {
 		if (!nullFont && !antialiasedText)
 			roi.setAntialiased(false);
 		roi.setAngle(angle);
+		roi.setJustification(justification);
 		addRoi(imp, roi);
 		return Double.NaN;
 	}

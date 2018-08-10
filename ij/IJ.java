@@ -1853,6 +1853,9 @@ public class IJ {
 		if (path!=null && path.length()==0)
 			path = null;
 		format = format.toLowerCase(Locale.US);
+		Roi roi2 = imp!=null?imp.getRoi():null;
+		if (roi2!=null)
+			roi2.endPaste();
 		if (format.indexOf("tif")!=-1) {
 			saveAsTiff(imp, path);
 			return;

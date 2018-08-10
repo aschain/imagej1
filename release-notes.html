@@ -5,13 +5,36 @@
 </head>
 <body>
 
-<li> <u>1.52f 12 July 2018</u>
+<li> <u>1.52f 1 August 2018</u>
 <ul>
-<li> Thanks to 'Sethur', added a 'noMetaSort' option to the options
-string of the FolderOpener.open(dir,options) method. This option
-disables sorting of DICOM stacks by series number (0020,0011).
+<li> Thanks to Michael Schmid, added the "Error Function" [y=a+b*erf((x-c)/d)]
+curve fit option and the ij.util.IJ.Math.erf(x) method
+(<a href="http://wsr.imagej.net/macros/ErrorFunctionDemo.txt">example</a>).
+<li> Thanks to Anna Povolná, the "Open all files in folder" and "Use virtual stack"
+options in the <i>File&gt;Import&gt;raw</i> dialog can be used at
+the same time.
+<li> Thanks to 'Sethur', ImageJ no longer sorts imported DICOM
+stacks by series number (tag 0020,0011) if "Sort images numerically" 
+is not checked in the <i>File&gt;Import&gt;ImageSequence</i>
+dialog. Also added a recordable 'noMetaSort' option to the options
+string of the FolderOpener.open(dir,options) method.
+<li> Added the Raw.openAllVirtual() method.
 <li> Thanks to Christian Tischer, fixed bugs in the RoiManager.add(ImagePlus,Roi,int)
 method than caused it to not behave as expected if the ROI name was not null.
+<li> Thanks to Norbert Vischer, fixed bugs that caused the
+<i>Edit&gt;Cut</i> and <i>Analyze&gt;Set Scale</i> commands
+to not set the 'changes' flag.
+<li> Thanks to Stein Rorvik, fixed a bug that caused the Overlay.drawString
+macro function to ignore the justification set by the setJustification() function.
+<li> Thanks to Stein Rorvik, fixed a bug that caused output of the
+Overlay.drawString() function to be lost when text is added using
+Overlay.addSelection().
+<li> Thanks to Lorenzo Cangiono, fixed a bug that caused selections
+pasted into images to not be saved.
+<li> Thanks to Mahmoudi Sidi Ahmed, fixed a bug that caused the
+<i>Analyze&gt;Calibrate</i> command to not work with signed 16-bit images.
+<li> Thanks to Manel Bosch, fixed a 1.52e regression that caused 
+image conversions to RGB to not preserve the color coding.
 </ul>
 
 <li> <u>1.52e 11 July 2018</u>
