@@ -5,7 +5,7 @@
 </head>
 <body>
 
-<li> <u>1.52f 8 August 2018</u>
+<li> <u>1.52f 12 August 2018</u>
 <ul>
 <li> Thanks to Michael Schmid, added the "Error Function" [y=a+b*erf((x-c)/d)]
 curve fit option and the ij.util.IJ.Math.erf(x) method
@@ -18,6 +18,11 @@ stacks by series number (tag 0020,0011) if "Sort images numerically"
 is not checked in the <i>File&gt;Import&gt;ImageSequence</i>
 dialog. Also added a recordable 'noMetaSort' option to the options
 string of the FolderOpener.open(dir,options) method.
+<li> Thanks to 'Alan', added the createThresholdMask()
+and createRoiMask() methods to the ImagePlus class. These methods
+are recorded when using the <i>Edit&gt;Selection&gt;Create Mask</i>
+command.
+(<a href="http://wsr.imagej.net/macros/CreateMaskDemo2.js">example</a>).
 <li> Added the recordable Raw.open(), Raw.openAll() and Raw.openAllVirtual() methods
 (<a href="http://wsr.imagej.net/macros/OpenAllRawVirtual.js">example</a>).
 <li> Thanks to Christian Tischer, fixed bugs in the RoiManager.add(ImagePlus,Roi,int)
@@ -46,6 +51,8 @@ with image titles.
 <li> Thanks to Pete Bankhead, fixed a bug the caused the
 <i>Process&gt;Batch&gt;Convert</i> command to not work
 correctly on Macs.
+<li> Thanks to 'Hamish', fixed a bug that caused the roiManager("delete") macro
+function to throw an exception when used in a loop.
 <li> Thanks to Manel Bosch, fixed a 1.52e regression that caused 
 image conversions to RGB to not preserve the color coding.
 </ul>
