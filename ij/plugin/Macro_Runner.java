@@ -29,13 +29,14 @@ public class Macro_Runner implements PlugIn {
 			else
 				thread.setName(threadName+"_Macro$");
 		}
-		String path = null;
+		String path = Prefs.get("ij.macrodir",IJ.getDirectory("macros"));
 		if (name.equals("")) {
-			OpenDialog od = new OpenDialog("Run Macro or Script...", path);
+			OpenDialog od = new OpenDialog("Run Macro or Script...", path, "");
 			String directory = od.getDirectory();
 			name = od.getFileName();
 			if (name!=null) {
 				path = directory+name;
+				Prefs.set("ij.macrodir",directory);
 				runMacroFile(path, null);
 				if (Recorder.record) {
 					if (Recorder.scriptMode())
