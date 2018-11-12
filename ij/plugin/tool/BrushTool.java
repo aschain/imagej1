@@ -10,7 +10,10 @@ import java.util.Vector;
 // Versions
 // 2012-07-22 shift to confine horizontally or vertically, ctrl-shift to resize, ctrl to pick
 
-	public class BrushTool extends PlugInTool implements Runnable {
+/** This class implements the Paintbrush Tool, which allows the user to draw on
+	 an image, or on an Overlay if "Paint on overlay" is enabled. */	
+public class BrushTool extends PlugInTool implements Runnable {
+	
 	private final static int UNCONSTRAINED=0, HORIZONTAL=1, VERTICAL=2, RESIZING=3, RESIZED=4, IDLE=5; //mode flags
 	private static String BRUSH_WIDTH_KEY = "brush.width";
 	private static String PENCIL_WIDTH_KEY = "pencil.width";
@@ -31,7 +34,6 @@ import java.util.Vector;
 	private ImageRoi overlayImage;
 	private boolean paintOnOverlay;
 	private static BrushTool brushInstance;
-	//private int transparency;
 
 	public void run(String arg) {
 		isPencil = "pencil".equals(arg);
@@ -255,10 +257,6 @@ import java.util.Vector;
 			//gd.addSlider("Transparency (%):", 0, 100, transparency);
 			gd.addChoice("Color:", Colors.getColors(colorName), colorName);
 			gd.addCheckbox("Paint on overlay", paintOnOverlay);
-			//gd.hideCancelButton();
-			//gd.addHelp("");
-			//gd.setHelpLabel("Undo");
-			//gd.setOKLabel("Close");
 			gd.addDialogListener(this);
 			gd.addHelp(getHelp());
 			Point loc = Prefs.getLocation(LOC_KEY);
