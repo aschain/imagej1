@@ -163,19 +163,18 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 		is in use. Returns true if the image was successfully locked.
 		Beeps, displays a message in the status bar, and returns
 		false if the image is already locked. */
-	public synchronized boolean lock() {
-		if (locked) {
-			IJ.beep();
-			IJ.showStatus("\"" + title + "\" is locked");
-			if (IJ.macroRunning())
-				IJ.wait(500);
-			return false;
-        } else {
-        	locked = true;
-			if (IJ.debugMode) IJ.log(title + ": lock");
-			return true;
-        }
-	}
+		public synchronized boolean lock() {
+			if (locked) {
+				IJ.beep();
+				IJ.showStatus("\"" + title + "\" is locked");
+				if (IJ.macroRunning())
+					IJ.wait(500);
+				return false;
+			} else {
+				locked = true;
+				return true;
+			}
+		}
 	
 	/** Similar to lock, but doesn't beep and display an error
 		message if the attempt to lock the image fails. */
@@ -192,7 +191,6 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 	/** Unlocks the image. */
 	public synchronized void unlock() {
 		locked = false;
-		if (IJ.debugMode) IJ.log(title + ": unlock");
 	}
 		
 	private void waitForImage(Image image) {

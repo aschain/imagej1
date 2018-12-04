@@ -620,10 +620,7 @@ public class Functions implements MacroConstants, Measurements {
 			arg2 = getString();
 			interp.getRightParen();
 		}
-		if (arg2!=null)
-			IJ.run(arg1, arg2);
-		else
-			IJ.run(arg1);
+		IJ.run(this.interp, arg1, arg2);
 		resetImage();
 		IJ.setKeyUp(IJ.ALL_KEYS);
 		shiftKeyDown = altKeyDown = false;
@@ -3496,7 +3493,7 @@ public class Functions implements MacroConstants, Measurements {
 			s = sb.toString();
 		}
 		interp.getRightParen();
-		IJ.log(s);
+		interp.log(s);
 		interp.inPrint = false;
 	}
 

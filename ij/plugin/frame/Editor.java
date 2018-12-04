@@ -40,7 +40,8 @@ public class Editor extends PlugInFrame implements ActionListener, ItemListener,
 
 	public static final int MAX_SIZE=28000, XINC=10, YINC=18;
 	public static final int MONOSPACED=1, MENU_BAR=2;
-	public static final int MACROS_MENU_ITEMS = 13;
+	public static final int MACROS_MENU_ITEMS = 14;
+	public static final String INTERACTIVE_NAME = "Interactive Macro Interpreter";
 	static final String FONT_SIZE = "editor.font.size";
 	static final String FONT_MONO= "editor.font.mono";
 	static final String CASE_SENSITIVE= "editor.case-sensitive";
@@ -70,27 +71,28 @@ public class Editor extends PlugInFrame implements ActionListener, ItemListener,
 	private MacroInstaller installer;
 	private static String defaultDir = Prefs.get(DEFAULT_DIR, null);;
 	private boolean dontShowWindow;
-    private int[] sizes = {9, 10, 11, 12, 13, 14, 16, 18, 20, 24, 36, 48, 60, 72};
-    private int fontSize = (int)Prefs.get(FONT_SIZE, 6); // defaults to 16-point
-    private CheckboxMenuItem monospaced;
-    private static boolean wholeWords;
-    private boolean isMacroWindow;
-    private int debugStart, debugEnd;
-    private static TextWindow debugWindow;
-    private boolean step;
-    private int previousLine;
-    private static Editor instance;
-    private int runToLine;
-    private String downloadUrl;
-    private boolean downloading;
-    private FunctionFinder functionFinder;
-    private ArrayList undoBuffer = new ArrayList();
-    private boolean performingUndo;
-    private boolean checkForCurlyQuotes;
-    private static int tabInc = (int)Prefs.get(TAB_INC, 3);
-    private static boolean insertSpaces = Prefs.get(INSERT_SPACES, false);
-    CheckboxMenuItem insertSpacesItem;
-
+	private int[] sizes = {9, 10, 11, 12, 13, 14, 16, 18, 20, 24, 36, 48, 60, 72};
+	private int fontSize = (int)Prefs.get(FONT_SIZE, 6); // defaults to 16-point
+	private CheckboxMenuItem monospaced;
+	private static boolean wholeWords;
+	private boolean isMacroWindow;
+	private int debugStart, debugEnd;
+	private static TextWindow debugWindow;
+	private boolean step;
+	private int previousLine;
+	private static Editor instance;
+	private int runToLine;
+	private String downloadUrl;
+	private boolean downloading;
+	private FunctionFinder functionFinder;
+	private ArrayList undoBuffer = new ArrayList();
+	private boolean performingUndo;
+	private boolean checkForCurlyQuotes;
+	private static int tabInc = (int)Prefs.get(TAB_INC, 3);
+	private static boolean insertSpaces = Prefs.get(INSERT_SPACES, false);
+	private CheckboxMenuItem insertSpacesItem;
+	private boolean interactiveMode;
+	private Interpreter interpreter;
 	
 	public Editor() {
 		this(24, 80, 0, MENU_BAR);
@@ -176,8 +178,8 @@ public class Editor extends PlugInFrame implements ActionListener, ItemListener,
 			setMenuBar(mb);
 		
 		m = new Menu("Font");
-		m.add(new MenuItem("Make Text Smaller", new MenuShortcut(KeyEvent.VK_N)));
-		m.add(new MenuItem("Make Text Larger", new MenuShortcut(KeyEvent.VK_M)));
+		m.add(new MenuItem("Make Text Smaller", new MenuShortcut(KeyEvent.VK_MINUS)));
+		m.add(new MenuItem("Make Text Larger", new MenuShortcut(KeyEvent.VK_EQUALS)));
 		m.addSeparator();
 		monospaced = new CheckboxMenuItem("Monospaced Font", Prefs.get(FONT_MONO, false));
 		if ((options&MONOSPACED)!=0) monospaced.setState(true);
@@ -227,6 +229,7 @@ public class Editor extends PlugInFrame implements ActionListener, ItemListener,
 			macrosMenu.add(new MenuItem("Install Macros", new MenuShortcut(KeyEvent.VK_I)));
 			macrosMenu.add(new MenuItem("Macro Functions...", new MenuShortcut(KeyEvent.VK_M, true)));
 			macrosMenu.add(new MenuItem("Function Finder...", new MenuShortcut(KeyEvent.VK_F, true)));
+			macrosMenu.add(new MenuItem("Enter Interactive Mode", new MenuShortcut(KeyEvent.VK_M)));
 			macrosMenu.addSeparator();
 			macrosMenu.add(new MenuItem("Evaluate Macro"));
 			macrosMenu.add(new MenuItem("Evaluate JavaScript", new MenuShortcut(KeyEvent.VK_J, false)));
@@ -258,6 +261,11 @@ public class Editor extends PlugInFrame implements ActionListener, ItemListener,
 		if (dontShowWindow) {
 			dispose();
 			dontShowWindow = false;
+		}
+		if (name.equals(INTERACTIVE_NAME)) {
+			enterInteractiveMode();
+			String txt = ta.getText();
+			ta.setCaretPosition(txt.length());
 		}
 		WindowManager.setWindow(this);
 		checkForCurlyQuotes = true;
@@ -695,8 +703,7 @@ public class Editor extends PlugInFrame implements ActionListener, ItemListener,
 	public void actionPerformed(ActionEvent e) {
 		String what = e.getActionCommand();
 		int flags = e.getModifiers();
-		boolean altKeyDown = (flags & Event.ALT_MASK)!=0;
-		
+		boolean altKeyDown = (flags & Event.ALT_MASK)!=0;		
 		if ("Save".equals(what))
 			save();
 		else if ("Compile and Run".equals(what))
@@ -781,6 +788,8 @@ public class Editor extends PlugInFrame implements ActionListener, ItemListener,
 			IJ.open();
 		else if (what.equals("Copy to Image Info"))
 			copyToInfo();
+		else if (what.equals("Enter Interactive Mode"))
+			enterInteractiveMode();
 		else if (what.endsWith(".ijm") || what.endsWith(".java") || what.endsWith(".js") || what.endsWith(".bsh") || what.endsWith(".py"))
 			openExample(what);
 		else {
@@ -930,8 +939,67 @@ public class Editor extends PlugInFrame implements ActionListener, ItemListener,
 				spaces += " ";
 			ta.replaceRange(spaces, pos-1, pos);
 		}
+		if (interactiveMode && e.getKeyChar()=='\n')
+			runMacro(e);
 	}
 	
+	private void runMacro(KeyEvent e) {
+		String text = ta.getText();
+		int pos2 = ta.getCaretPosition()-2;
+		if (pos2<0) pos2=0;
+		int pos1 = 0;
+		for (int i=pos2; i>=0; i--) {
+			if (i==0 || text.charAt(i)=='\n') {
+				pos1 = i;
+				break;
+			}
+		}
+		if (interpreter==null) {
+			interpreter = new Interpreter();
+			interpreter.setIgnoreErrors(true);
+			interpreter.setEditor(this);
+		}
+		String code = text.substring(pos1,pos2+1);
+		if (code.length()<=6 && code.contains("help")) {
+			ta.appendText("  Type a macro function (e.g., \"run('Invert')\") to run it.\n");			
+			ta.appendText("  Enter an expression (e.g., \"2+2\" or \"log(2)\") to evaluate it.\n");			
+			ta.appendText("  Move cursor to end of line and press return to repeat.\n");			
+			ta.appendText("  Type \"quit\" to exit interactive mode.\n");			
+			ta.appendText("  Press "+(IJ.isMacOSX()?"cmd":"ctrl")+"+M to enter interactive mode.\n");			
+			ta.appendText("  Press "+(IJ.isMacOSX()?"cmd":"ctrl")+"+shift+F to open the Function Finder.\n");			
+		} else if (code.length()<=6 && code.contains("quit")) {
+			interactiveMode = false;
+			ta.appendText("[Exiting interactive mode.]\n");						
+		} else {
+			interpreter.run(code);
+			String error = interpreter.getErrorMessage();
+			if (error!=null)
+				insertText(error);
+		}
+	}
+	
+	private void enterInteractiveMode() {
+		if (interactiveMode)
+			return;
+		String title = getTitle();
+		if (ta!=null && ta.getText().length()>400 && !(title.equals("Untitled.txt")||!title.contains("."))) {
+			GenericDialog gd = new GenericDialog("Enter Interactive Mode");
+			gd.addMessage("Enter mode that supports interactive\nediting and running of macros?");
+			gd.setOKLabel("Enter");
+			gd.showDialog();
+			if (gd.wasCanceled())
+				return;
+		}
+		ta.appendText("[Entering interactive mode. Type \"help\" for info, \"quit\" to exit.]\n");
+		interactiveMode = true;
+	}
+	
+	public void insertText(String text) {
+		if (ta==null) return;			
+		int start = ta.getSelectionStart( );
+		ta.replaceRange("  "+text+"\n", start, start);
+	}
+		
 	public void keyTyped(KeyEvent e) {
 	}
 

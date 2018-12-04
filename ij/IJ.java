@@ -70,6 +70,7 @@ public class IJ {
 	private static DecimalFormatSymbols dfs;
 	private static boolean trustManagerCreated;
 	private static String smoothMacro;
+	private static Interpreter macroInterpreter;
 			
 	static {
 		osname = System.getProperty("os.name");
@@ -309,9 +310,17 @@ public class IJ {
 		macroRunning = false;
 		Macro.setOptions(null);
 		testAbort();
+		macroInterpreter = null;
 		//IJ.log("run2: "+command+" "+Thread.currentThread().hashCode());
 	}
 	
+	/** The macro interpreter uses this method to run commands. */
+	public static void run(Interpreter interpreter, String command, String options) {
+		macroInterpreter = interpreter;
+		run(command, options);
+		macroInterpreter = null;
+	}
+
 	/** Converts commands that have been renamed so 
 		macros using the old names continue to work. */
 	private static String convert(String command) {
@@ -572,7 +581,12 @@ public class IJ {
     
     /**Displays a "no images are open" dialog box.*/
 	public static void noImage() {
-		error("No Image", "There are no images open.");
+		String msg = "There are no images open.";
+		if (macroInterpreter!=null) {
+			macroInterpreter.abort(msg);
+			macroInterpreter = null;
+		} else
+			error("No Image", msg);
 	}
 
 	/** Displays an "out of memory" message to the "Log" window. */
@@ -645,6 +659,11 @@ public class IJ {
 		macro or JavaScript is running, it is aborted. Writes to the
 		Java console if the ImageJ window is not present.*/
 	public static void error(String msg) {
+		if (macroInterpreter!=null) {
+			macroInterpreter.abort(msg);
+			macroInterpreter = null;
+			return;
+		}
 		error(null, msg);
 		if (Thread.currentThread().getName().endsWith("JavaScript"))
 			throw new RuntimeException(Macro.MACRO_CANCELED);
@@ -931,7 +950,7 @@ public class IJ {
 	}
 
 	public static void setKeyUp(int key) {
-		if (debugMode) IJ.log("setKeyUp: "+key);
+		//if (debugMode) IJ.log("setKeyUp: "+key);
 		switch (key) {
 			case KeyEvent.VK_CONTROL: controlDown=false; break;
 			case KeyEvent.VK_META: if (isMacintosh()) controlDown=false; break;
@@ -2237,7 +2256,7 @@ public class IJ {
 	}
 	
 	static void abort() {
-		if (ij!=null || Interpreter.isBatchMode())
+		if ((ij!=null || Interpreter.isBatchMode()) && macroInterpreter==null)
 			throw new RuntimeException(Macro.MACRO_CANCELED);
 	}
 	
