@@ -12,6 +12,7 @@ import ij.macro.*;
 import ij.plugin.MacroInstaller;
 import ij.plugin.Commands;
 import ij.plugin.Macro_Runner;
+import ij.plugin.JavaScriptEvaluator;
 import ij.io.SaveDialog;
 
 /** This is a simple TextArea based editor for editing and compiling plugins. */
@@ -37,11 +38,26 @@ public class Editor extends PlugInFrame implements ActionListener, ItemListener,
 		"importPackage(java.util);"+
 		"importPackage(java.io);"+
 		"function print(s) {IJ.log(s);};";
+		
+	private static String JS_EXAMPLES =
+		"img = IJ.openImage(\"http://wsr.imagej.net/images/blobs.gif\")\n"
+ 		+"img = IJ.createImage(\"Untitled\", \"16-bit ramp\", 500, 500, 1)\n" 		
+ 		+"img.show()\n"
+ 		+"ip = img.getProcessor()\n"
+ 		+"ip.getStats()\n"
+ 		+"IJ.setAutoThreshold(img, \"IsoData\")\n"
+ 		+"IJ.run(img, \"Analyze Particles...\", \"show=Overlay display clear\")\n"
+		+"ip.invert()\n"
+ 		+"ip.blurGaussian(5)\n"	 
+ 		+"ip.get(10,10)\n"
+ 		+"ip.set(10,10,222)\n"
+ 		+"(To run, move cursor to end of a line and press 'enter'.\n"
+ 		+"Visible images are automatically updated.)\n";
 
 	public static final int MAX_SIZE=28000, XINC=10, YINC=18;
 	public static final int MONOSPACED=1, MENU_BAR=2;
 	public static final int MACROS_MENU_ITEMS = 14;
-	public static final String INTERACTIVE_NAME = "Interactive Macro Interpreter";
+	public static final String INTERACTIVE_NAME = "Interactive Interpreter";
 	static final String FONT_SIZE = "editor.font.size";
 	static final String FONT_MONO= "editor.font.mono";
 	static final String CASE_SENSITIVE= "editor.case-sensitive";
@@ -93,6 +109,8 @@ public class Editor extends PlugInFrame implements ActionListener, ItemListener,
 	private CheckboxMenuItem insertSpacesItem;
 	private boolean interactiveMode;
 	private Interpreter interpreter;
+	private JavaScriptEvaluator evaluator;
+	private int messageCount;
 	
 	public Editor() {
 		this(24, 80, 0, MENU_BAR);
@@ -944,6 +962,7 @@ public class Editor extends PlugInFrame implements ActionListener, ItemListener,
 	}
 	
 	private void runMacro(KeyEvent e) {
+		boolean isScript = getTitle().endsWith(".js");
 		String text = ta.getText();
 		int pos2 = ta.getCaretPosition()-2;
 		if (pos2<0) pos2=0;
@@ -954,43 +973,98 @@ public class Editor extends PlugInFrame implements ActionListener, ItemListener,
 				break;
 			}
 		}
-		if (interpreter==null) {
-			interpreter = new Interpreter();
-			interpreter.setIgnoreErrors(true);
-			interpreter.setEditor(this);
+		if (isScript) {
+			if (evaluator==null) {
+				interpreter = null;
+				evaluator = new JavaScriptEvaluator();
+			}
+		} else {
+			if (interpreter==null) {
+				evaluator = null;
+				interpreter = new Interpreter();
+			}
 		}
 		String code = text.substring(pos1,pos2+1);
-		if (code.length()<=6 && code.contains("help")) {
-			ta.appendText("  Type a macro function (e.g., \"run('Invert')\") to run it.\n");			
-			ta.appendText("  Enter an expression (e.g., \"2+2\" or \"log(2)\") to evaluate it.\n");			
-			ta.appendText("  Move cursor to end of line and press return to repeat.\n");			
-			ta.appendText("  Type \"quit\" to exit interactive mode.\n");			
-			ta.appendText("  Press "+(IJ.isMacOSX()?"cmd":"ctrl")+"+M to enter interactive mode.\n");			
-			ta.appendText("  Press "+(IJ.isMacOSX()?"cmd":"ctrl")+"+shift+F to open the Function Finder.\n");			
+		if (code.length()==0 || code.equals("\n"))
+			return;		
+		else if (code.length()<=6 && code.contains("help")) {
+			ta.appendText("  Type a statement (e.g., \"run('Invert')\") to run it.\n");			
+			ta.appendText("  Enter an expression (e.g., \"x/2\" or \"log(2)\") to evaluate it.\n");			
+			ta.appendText("  Move cursor to end of line and press 'enter' to repeat.\n");			
+			ta.appendText("  \"quit\" - exit interactive mode\n");			
+			ta.appendText("  "+(IJ.isMacOSX()?"cmd":"ctrl")+"+M - enter interactive mode\n");
+			if (isScript) {	
+				ta.appendText("  \"macro\" - switch language to macro\n");
+				ta.appendText("  \"examples\" - show JavaScript examples\n");	
+			} else {
+				ta.appendText("  "+(IJ.isMacOSX()?"cmd":"ctrl")+"+shift+F - open Function Finder\n");	
+				ta.appendText("  \"js\" - switch language to JavaScript\n");	
+			}
+		} else if (isScript && code.length()==9 && code.contains("examples")) {
+			ta.appendText(JS_EXAMPLES);					
+		} else if (code.length()<=3 && code.contains("js")) {
+			interactiveMode = false;
+			interpreter = null;
+			evaluator = null;
+			changeExtension(".js");
+			enterInteractiveMode();
+		} else if (code.length()<=6 && code.contains("macro")) {
+			interactiveMode = false;
+			interpreter = null;
+			evaluator = null;
+			changeExtension(".txt");
+			enterInteractiveMode();
 		} else if (code.length()<=6 && code.contains("quit")) {
 			interactiveMode = false;
-			ta.appendText("[Exiting interactive mode.]\n");						
-		} else {
-			interpreter.run(code);
-			String error = interpreter.getErrorMessage();
-			if (error!=null)
-				insertText(error);
+			interpreter = null;
+			evaluator = null;
+			ta.appendText("[Exiting interactive mode.]\n");
+		} else if (isScript) {
+			boolean updateImage = code.contains("ip.");
+			code = "load(\"nashorn:mozilla_compat.js\");"+JavaScriptIncludes+code;
+			String rtn = evaluator.eval(code);
+			if (rtn!=null && rtn.length()>0) {
+				int index = rtn.indexOf("at line number ");
+				if (index>-1)
+					rtn = rtn.substring(0,index);
+				insertText(rtn);	
+			}
+			if (updateImage && (rtn==null||rtn.length()==0)) {
+				ImagePlus imp = WindowManager.getCurrentImage();
+				if (imp!=null)
+					imp.updateAndDraw();
+			}
+		} else if (!code.startsWith("[Macro ")) {
+			String rtn = interpreter.eval(code);
+			if (rtn!=null)
+				insertText(rtn);
 		}
+	}
+	
+	private void changeExtension(String ext) {
+		String title = getTitle();
+		int index = title.indexOf(".");
+		if (index>-1)
+			title = title.substring(0,index);
+		setTitle(title+ext);
 	}
 	
 	private void enterInteractiveMode() {
 		if (interactiveMode)
 			return;
 		String title = getTitle();
-		if (ta!=null && ta.getText().length()>400 && !(title.equals("Untitled.txt")||!title.contains("."))) {
+		if (ta!=null && ta.getText().length()>400 && !(title.startsWith("Untitled")||title.startsWith(INTERACTIVE_NAME))) {
 			GenericDialog gd = new GenericDialog("Enter Interactive Mode");
-			gd.addMessage("Enter mode that supports interactive\nediting and running of macros?");
+			gd.addMessage("Enter mode that supports interactive\nediting and running of macros and scripts?");
 			gd.setOKLabel("Enter");
 			gd.showDialog();
 			if (gd.wasCanceled())
 				return;
 		}
-		ta.appendText("[Entering interactive mode. Type \"help\" for info, \"quit\" to exit.]\n");
+		String language = title.endsWith(".js")?"JavaScript ":"Macro ";
+		messageCount++;
+		String help = messageCount<=2?" Type \"help\" for info.":"";
+		ta.appendText("["+language+"interactive mode."+help+"]\n");
 		interactiveMode = true;
 	}
 	
