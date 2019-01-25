@@ -81,6 +81,7 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 	private boolean firstPaint = true;
 	private boolean fontSizeSet;
 
+
     /** Creates a new GenericDialog with the specified title. Uses the current image
     	image window as the parent frame or the ImageJ frame if no image windows
     	are open. Dialog parameters are recorded by ImageJ's command recorder but
@@ -563,8 +564,11 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 		c.gridwidth = GridBagConstraints.REMAINDER;
 		c.anchor = GridBagConstraints.WEST;
 		c.fill = GridBagConstraints.HORIZONTAL;
-		if (font!=null)
+		if (font!=null) {
+			if (Prefs.getGuiScale()>1.0)
+				font = font.deriveFont((float)(font.getSize()*Prefs.getGuiScale()));
 			theLabel.setFont(font);
+		}
 		if (color!=null)
 			theLabel.setForeground(color);
 		add(theLabel, c);
@@ -1579,5 +1583,5 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
     public void windowIconified(WindowEvent e) {}
     public void windowDeiconified(WindowEvent e) {}
     public void windowDeactivated(WindowEvent e) {}
-
+    
 }
