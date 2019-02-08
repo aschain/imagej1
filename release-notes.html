@@ -5,7 +5,29 @@
 </head>
 <body>
 
-<li> <u>1.52k66 23 January 2019</u>
+<li> <u>1.52m11 06 February 2019</u>
+<ul>
+<li> On macOS, the <i>Help&gt;Update ImageJ</i> command
+displays a message explaining how to work around Path
+Randomization if the ImageJ home directory is read-only and
+the file path starts with "/private/var/folders/".
+<li> Thanks to Christophe Leterrier, the <i>File&gt;Import&gt;Image Sequence</i>
+command now always sorts the files names on macOS.
+<i>The File&gt;Save As&gt;Image Sequence</i> command saves
+single line slice labels when saving in TIFF format.
+<li> Thanks to Norbert Vischer, the <i>File&gt;Revert</i> command
+now works with virtual stacks.
+<li> Thanks to Alicia Daeden, the makeLine() and makePolygon()
+macro functions no longer have a 200 point limit.
+<li> Thanks to 'cyrilturies' and Jan Eglinger, fixed a bug that caused
+Results table labels to not be displayed for line measurements if no
+measurement options were enabled in Analyze>Set Measurements.
+<li> Thanks to Stein Rorvik, fixed a 1.52d regression that caused
+<i>File&gt;Import&gt;Image Sequence</i> to use the image label
+(if present) as the slice label instead of the filename.
+</ul>
+
+<li> <u>1.52k 29 January 2019</u>
 <ul>
 <li> Thanks to Albert Cardona and Gabriel Landini, added the "GUI scale (0.5-3.0)" 
 option to the <i>Edit&gt;Options&gt;Appearance</i> dialog, which enables
@@ -25,6 +47,7 @@ class (<i>Edit&gt;Selection&gt;Create Selection</i>) that always converts single
 <li> Thanks to Norbert Vischer, added the Table.setSelection(start,end,title),
 Table.getSelectionStart(title) and Table.getSelectionEnd(title) macro functions
 (<a href="http://wsr.imagej.net/macros/TableSelectionDemo.txt">example</a>).
+<li> Added the setOption("ScaleConversions",boolean) macro function.
 <li> Thanks to Robert Haase, fixed a bug that caused the
 <i>Edit&gt;Selection&gt;Create Selection</i> command to ignore the
 "Black background" setting when processing non-thresholded binary images.
@@ -44,13 +67,18 @@ range to change when converting an 8-bit or 16-bit image to 32-bit.
 <li> Thanks to Stein Rorvik, fixed a bug that caused the
 Table.getColumn("Label") macro function to throw an exception.
 <li> Thanks to Philippe Carl, fixed a bug that caused ImageJ to
-freeze when opening the Ineractive Interpreter on Windows using
+freeze when opening the Interactive Interpreter on Windows using
 the ctrl+j keyboard shortcut.
 <li> Thanks to Jerome Mutterer, fixed a bug that caused ImageJ
 to fail to open one column tables.
 <li> Thanks to 'Bio7', worked around a bug that caused 
-toolbar popup menus to not work with OpenJDK 11 and
-OpenJDK 12 on Windows. 
+toolbar popup menus to not work with OpenJDK 11 and 12 on Windows. 
+<li> Thanks to Ved Sharma, fixed a bug that caused the Histogram
+command to not behave as expected when "Limit to Threshold" was
+enabled in <i>Analyze&gt;Set Measurements</i> and there
+was an invisble threshold.
+<li> Thanks to Norbert Vischer, fixed bugs in the toScaled(length)
+and toUnscaled(length) macro functions.
 <li> Thanks to J Xiong, fixed a 1.52j regression that caused the
 <i>Image&gt;Overlay&gt;From ROI Manager</i> command
 to throw an exception.
@@ -60,6 +88,9 @@ using French keyboards.
 <li> Thanks to Stein Rorvik, fixed 1.52j regression that
 sometimes caused macro errors to be ignored
 (<a href="http://wsr.imagej.net/macros/MacroErrorsIgnored.txt">examples</a>).
+<li> Thanks to 'yorgodillo', 'mountain_man' and Jan Eglinger, fixed a 
+1.52e regression that caused float to 8-bit conversions to be
+done incorrectly.
 </ul>
 
 <li> <u>1.52j 29 December 2018</u>
