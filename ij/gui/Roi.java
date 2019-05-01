@@ -717,6 +717,7 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 			r.setStroke(getStroke());
 			r.setFillColor(getFillColor());
 			r.imageID = getImageID();
+			r.listenersNotified = false;
 			if (bounds!=null)
 				r.bounds = (Rectangle2D.Double)bounds.clone();
 			return r;
@@ -2354,5 +2355,5 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 			}
 		}
 	}
-
+	
 }

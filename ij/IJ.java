@@ -1550,7 +1550,7 @@ public class IJ {
 					if (EventQueue.isDispatchThread())
 						new MacroRunner(smoothMacro); // run on separate thread
 					else
-						IJ.runMacro(smoothMacro);
+						Macro.eval(smoothMacro);
 				}
 			}
 		}
@@ -1938,9 +1938,9 @@ public class IJ {
 		} else if (format.indexOf("lut")!=-1) {
 			path = updateExtension(path, ".lut");
 			format = "LUT...";
-		} else if (format.indexOf("results")!=-1 || format.indexOf("measurements")!=-1) {
+		} else if (format.contains("results") || format.contains("measurements") || format.contains("table")) {
 			format = "Results...";
-		} else if (format.indexOf("selection")!=-1 || format.indexOf("roi")!=-1) {
+		} else if (format.contains("selection") || format.contains("roi")) {
 			path = updateExtension(path, ".roi");
 			format = "Selection...";
 		} else if (format.indexOf("xy")!=-1 || format.indexOf("coordinates")!=-1) {
@@ -2221,23 +2221,8 @@ public class IJ {
 	
 	/** Returns the size, in pixels, of the primary display. */
 	public static Dimension getScreenSize() {
-		Rectangle bounds = GUI.getZeroBasedMaxBounds();
-		if (bounds!=null)
-			return new Dimension(bounds.width, bounds.height);
-		if (isWindows())  // GraphicsEnvironment.getConfigurations is *very* slow on Windows
-			return Toolkit.getDefaultToolkit().getScreenSize();
-		if (GraphicsEnvironment.isHeadless())
-			return new Dimension(0, 0);
-		// Can't use Toolkit.getScreenSize() on Linux because it returns 
-		// size of all displays rather than just the primary display.
-		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-		GraphicsDevice[] gd = ge.getScreenDevices();
-		GraphicsConfiguration[] gc = gd[0].getConfigurations();
-		bounds = gc[0].getBounds();
-		if ((bounds.x==0&&bounds.y==0) || (IJ.isLinux()&&gc.length>1))
-			return new Dimension(bounds.width, bounds.height);
-		else
-			return Toolkit.getDefaultToolkit().getScreenSize();
+		Rectangle bounds = GUI.getScreenBounds();
+		return new Dimension(bounds.width, bounds.height);
 	}
 	
 	/** Returns, as an array of strings, a list of the LUTs in the Image/Lookup Tables menu. */

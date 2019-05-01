@@ -5,9 +5,105 @@
 </head>
 <body>
 
-<li> <u>1.52m38 13 March 2019</u>
+<li> <u>1.52p2 30 April 2019</u>
 <ul>
-<li> Thanks to Michael Schmid, ROI improvements, including more accurate
+<li> Thanks to Uwe Schmidt, improved the support for multiple screen setups:
+  <ul>
+  <li> Placement of first image window is more predictable.
+  <li> Reliably determine the correct screen for a given location or window,
+  for example to determine if a window can be enlarged.
+  <li> If there is ambiguity about which screen to use, the one that contains
+  the main ImageJ window will be chosen. For example
+  <i>Plugins&gt;Utilities&gt;Capture Screen</i> and <i>Windows&gt;Tile</i>
+  use the screen with the main ImageJ window.
+  <li> Improved behavior of "+" (<i>Image&gt;Zoom&gt;In</i>) command.
+  <li> Code simplification, especially by removing special cases for Linux.
+  </ul>
+<li> Thanks to "Herbie", restored macro support for the
+"lightGray", "darkGray" and "pink" named colors.
+<li> Thanks to Mikael Eriksson, fixed a bug that caused the
+particle analyzer's "Summary" table to not be accessible in macros
+run from the command line using the -batch option.
+</ul>
+
+<li> <u>1.52o 23 April 2019</u>
+<ul>
+<li> Added the <i>Help&gt;Examples&gt;Macro&gt;Curve Fitting</i>
+and <i>Help&gt;Examples&gt;JavaScript&gt;Curve Fitting</i> examples.
+<li> Thanks to Tiago Ferreira, stack and hyperstack scrollbars 
+now apply the <i>Edit&gt;Options&gt;Appearance</i> "GUI scale".
+<li> Thanks to 'mountain_man', tables can be sorted alphabetically.
+<li> Thanks to Neil Switz, the <i>Process&gt;FFT&gt;Inverse FFT</i>
+command displays a warning message if the "FFT of ..." image
+has been modified but no pixels have been set to 0 or 255.
+<li> Thanks to Stein Rorvik, copies of IJ_Props.txt and/or IJ_Prefs.txt
+in the ImageJ folder override the corresponding files in the default locations.
+<li> Thanks to Stein Rorvik, the Table.update macro function is called
+automatically when a macro finsihes and the Table.setSelection(),
+Table.getSelectionStart and Table.getSelectionEnd functions no
+longer require that a title be specified.
+<li> Thanks to Philippe Carl, the isKeyDown() and setKeyDown() macro
+functions now support the control key
+(<a href="http://wsr.imagej.net/macros/KeysDownDemo.txt">example</a>).
+<li> Thanks to Stein Rorvik, the setColor() and setLineWidth() macro functions
+no longer abort the macro if no image is open.
+<li> Thanks to Sian Culley, removed "Bridge" and "Lena" from the
+<i>File&gt;Open Samples</i> menu. Macros and scripts that use
+these images will continue to work.
+<li> Thanks to Stein Rorvik, the run("Apply LUT") macro function no longer
+shows an error message with images that have a display range of 0-255.
+<li> Thanks to NorbertVischer, Philippe Carl and Stein Rorvik, added the
+Array.deleteValue() and Array.deleteIndex() macro functions
+(<a href="http://wsr.imagej.net/macros/ArrayDeleteDemo.txt">example</a>).
+<li> Thanks to Stein Rorvik, added the Table.setLocationAndSize() 
+macro function.
+<li> Added the ImagePlus.crop(options) method, where 'options' can be
+can be "stack", "slice" or a range (e.g., "20-30").
+<li> Thanks to Stein Rorvik, fixed a bug the caused macros using a
+function key shortcut to not work if the shift key was down.
+<li> Thanks to Salim Kanoun, fixed a bug in the DICOM reader that caused
+it to sometimes not correctly open PT DICOM stacks.
+<li> Thanks to Stein Rorvik, fixed a rounding error with setMinAndMax()
+on some density calibrated 8-bit images.
+<li> Fixed non-macro recording of the <i>Image&gt;Duplicate</i> command.
+<li> Thanks to Norbert Vischer, fixed a bug that caused the
+doWand(x,y,tolerance,"Smooth") macro function to cause
+the macro language's &var variable passing method to fail.
+<li> Thanks to Jan Eglinger, fixed a bug that caused log histogram plots
+to be malformed if the line width was set to greater than 1.
+<li> Thanks to Stein Rorvik, fixed a bug that caused the Table.title
+and getInfo("window.title") macro functions to sometimes
+not work with custom tables.
+<li> Thanks to Stein Rorvik, fixed bugs related to saving and
+opening empty tables.
+<li> Thanks to Norbert Vischer, fixed a bug that caused the 
+Mac menu bar to disappear when activating the Channels, 
+ColorPicker, ContrastAdjuster and ThresholdAdjuster dialogs.
+<li> Thanks to Norbert Vischer, fixed a bug that caused the
+"Save changes?" dialog to not be the front-most window 
+when quitting ImageJ.
+<li> Thanks to Tihamer, fixed a bug that caused the
+CurveFitter.getResultString() method to fail if
+there was a fitting error. 
+<li> Thanks to Ellen Arena, fixed 1.52m regression that caused
+the <i>Edit&gt;Selection&gt;Create Selection</i> command
+to not work as expected with non-thresholded images.
+<li>Thanks to Laurent Thomas, fixed a 1.52n regression that caused the
+MaximumFinder.getMaxima() method to always return 0 points.
+<li> Thanks to Gabriel Landini, fixed a regression that could cause
+the ImagePlus.setSlice() method to throw an exception.
+</ul>
+
+<li> <u>1.52n 22 March 2019</u>
+<ul>
+<li> Thanks to Ellen Arena, fixed a 1.52m regression that caused
+the <i>Edit&gt;Selection&gt;Create Mask</i> command to not
+preserve spatial calibration.
+</ul>
+
+<li> <u>1.52m 20 March 2019</u>
+<ul>
+<li> ROI improvements thanks to Michael Schmid, including more accurate
 Roi.contains, better ShapeRoi filling, improved ShapeRoi.clone(), 
 improved Roi Manager Split, better ShapeRoi length calculation, 
 more accurate perimeter for ovals and rounded rectangles, 
@@ -17,7 +113,7 @@ and addition of Roi.getFeretPoints() macro function
 (<a href="http://wsr.imagej.net/macros/DrawFeret.txt">example</a>).
 <li> Thanks to Tiago Ferreira, the "GUI scale (0.5-3.0)" 
 setting in the <i>Edit&gt;Options&gt;Appearance</i> dialog
-is now applied to almost all the remaining dialogs and widgets,
+is now applied to almost all remaining dialogs and widgets,
 including the Histogram and Plot Windows and the Threshold widget. 
 <li> Thanks to Norbert Vischer, added the <i>File&gt;Show Folder</i>
 submenu.
@@ -35,19 +131,22 @@ Randomization if the ImageJ home directory is read-only and
 the file path starts with "/private/var/folders/".
 <li> Thanks to Christophe Leterrier, the <i>File&gt;Import&gt;Image Sequence</i>
 command now always sorts the files names on macOS.
-<i>The <i>File&gt;Save As&gt;Image Sequence</i> command saves
+<li>The <i>File&gt;Save As&gt;Image Sequence</i> command saves
 single line slice labels when saving in TIFF format.
 <li> Thanks to Norbert Vischer, the <i>File&gt;Revert</i> command
 now works with virtual stacks.
 <li> Thanks to Alicia Daeden, the makeLine() and makePolygon()
 macro functions no longer have a 200 point limit.
+<li> Thanks to Steve Fallows, <i>File&gt;Import&gt;Raw</i> only
+gets .raw file parameters from the filename when it uses 'x' delimiters.
 <li> Thanks to Gilles Carpentier, added the is("line") and
 is("area") macro functions.
 <li> Thanks to Albert Cardona, added the ImagePlus.updateVirtualSlice()
 method.
+<li> Thanks to Michael Kaul, added the Plot.update() method.
 <li> Thanks to 'cyrilturies' and Jan Eglinger, fixed a bug that caused
 Results table labels to not be displayed for line measurements if no
-measurement options were enabled in Analyze>Set Measurements.
+measurement options were enabled in <i>Analyze>Set Measurements</i>.
 <li> Thanks to Stein Rorvik, fixed rounding errors in the
 <i>Image&gt;Scale</i> command.
 <li> Thanks to Norbert Vischer, fixed a bug that caused 
@@ -63,9 +162,15 @@ their 'pointBeforeDeleting' property when saved and re-opened.
 multithread-safe.
 <li> Thanks to Robert Lockwood, fixed a bug that caused the
 <i>File&gt;Save</i> command to not be correctly recorded.
-<li> Thanks to Albert Cardona, fixed a bug that caused
-<i>Edit&gt;Selection&gt;Restore Selection</i> to not 
-emit an Roi MODIFIED event.
+<li> Thanks to Albert Cardona, fixed bugs that caused
+<i>Edit&gt;Selection&gt;Restore Selection</i>, and setting an
+ROI from the ROI Manager, to not emit an Roi MODIFIED event.
+<li> Thanks to Dr-Frog and Jan Eglinger, fixed a bug that caused
+the ImageProcessor.fillOutside(Roi) method to modify the Roi 
+passed as the argument.
+<li> Thanks to Teresa Haider, fixed a bug that sometimes
+caused <i>Image&gt;Transform&gt;Bin</i>
+to not correctly display the output image.
 <li> Thanks to Stein Rorvik, fixed a 1.52d regression that caused
 <i>File&gt;Import&gt;Image Sequence</i> to use the image label
 (if present) as the slice label instead of the filename.
