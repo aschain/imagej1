@@ -195,7 +195,6 @@ public class Functions implements MacroConstants, Measurements {
 		double value = 0.0;
 		switch (type) {
 			case GET_PIXEL: value = getPixel(); break;
-			case GETV: value = getPixelValue(); break;
 			case ABS: case COS: case EXP: case FLOOR: case LOG: case ROUND:
 			case SIN: case SQRT: case TAN: case ATAN: case ASIN: case ACOS:
 				value = math(type);
@@ -900,12 +899,6 @@ public class Functions implements MacroConstants, Measurements {
 		return value;
 	}
 	
-	double getPixelValue() {
-		int x = (int)getFirstArg();
-		int y = (int)getLastArg();
-		return getProcessor().getPixelValue(x,y);
-	}
-
 	void setZCoordinate() {
 		int z = (int)getArg();
 		int n = z + 1;
@@ -4832,7 +4825,14 @@ public class Functions implements MacroConstants, Measurements {
 	}
 
 	double getValue() {
-		String key = getStringArg();
+		interp.getLeftParen();
+		if (!isStringArg()) {  // getValue(x,y)
+			int x = (int)interp.getExpression();
+			int y = (int)getLastArg();
+			return getProcessor().getPixelValue(x,y);
+		}
+		String key = getString();
+		interp.getRightParen();
 		if (key.equals("rgb.foreground"))
 			return Toolbar.getForegroundColor().getRGB()&0xffffff;
 		else if (key.equals("rgb.background"))
@@ -4851,6 +4851,13 @@ public class Functions implements MacroConstants, Measurements {
 			ImageProcessor ip = getProcessor();
 			setFont(ip);
 			return ip.getFontMetrics().getHeight();
+		} else if (key.equals("selection.size")) {
+			ImagePlus imp = getImage();
+			Roi roi = imp.getRoi();
+			if (roi==null)
+				return 0.0;
+			else
+				return roi.size();
 		} else if (key.equals("selection.width")) {
 			ImagePlus imp = getImage();
 			Roi roi = imp.getRoi();
@@ -4860,6 +4867,8 @@ public class Functions implements MacroConstants, Measurements {
 		} else if (key.equals("results.count")) {
 			ResultsTable rt = getResultsTable(false);
 			return rt!=null?rt.size():0;
+		} else if (key.equals("rotation.angle")) {
+			return Rotator.getAngle();
 		} else if (key.equals("hashCode")) {
 			return interp.hashCode();
 		} else if (key.equals("instance")) {
@@ -4870,25 +4879,41 @@ public class Functions implements MacroConstants, Measurements {
 		} else {
 			String[] headings = ResultsTable.getDefaultHeadings();
 			for (int i=0; i<headings.length; i++) {
-				if (key.equals(headings[i]))
-					return getMeasurementValue(headings[i]);
+				if (key.startsWith(headings[i]))
+					return getMeasurementValue(key);
 			}
 			interp.error("Invalid key");
 			return 0.0;
 		}
 	}
 	
-	double getMeasurementValue(String heading) {
+	double getMeasurementValue(String measurement) {
+		String options = "";
+		int index = measurement.indexOf(" ");
+		if (index>0) {
+			if (index<measurement.length()-1)
+				options = measurement.substring(index+1, measurement.length());
+			measurement = measurement.substring(0, index);
+		}
 		ImagePlus imp = getImage();
 		int measurements = ALL_STATS + SLICE;
+		if (options.contains("limit"))
+			measurements += LIMIT;
+		Calibration cal = null;
+		if (options.contains("raw")) {
+			cal = imp.getCalibration();
+			imp.setCalibration(null);
+		}
 		ImageStatistics stats = imp.getStatistics(measurements);
 		ResultsTable rt = new ResultsTable();
 		Analyzer analyzer = new Analyzer(imp, measurements, rt);
 		analyzer.saveResults(stats, imp.getRoi());
 		double value = Double.NaN;
 		try {
-			value = rt.getValue(heading, 0);
+			value = rt.getValue(measurement, 0);
 		} catch (Exception e) {};
+		if (cal!=null)
+			imp.setCalibration(cal);
 		return value;
 	}
 
@@ -6615,6 +6640,8 @@ public class Functions implements MacroConstants, Measurements {
 			return new Variable(getResultsTable(getTitleArg()).getTitle());
 		else if (name.equals("headings"))
 			return new Variable(getResultsTable(getTitleArg()).getColumnHeadings());
+		else if (name.equals("allHeadings"))
+			return getAllHeadings();
 		else if (name.equals("showRowNumbers"))
 			return showRowNumbers(true);
 		else if (name.equals("showRowIndexes"))
@@ -6901,6 +6928,18 @@ public class Functions implements MacroConstants, Measurements {
 		}
 		rt.show(title);
 		return new Variable();
+	}
+
+	private Variable getAllHeadings() {
+		interp.getParens();
+		String[] headings = ResultsTable.getDefaultHeadings();
+		StringBuilder sb = new StringBuilder();
+		for (int i=0; i<headings.length; i++) {
+			sb.append(headings[i]);
+			if (i<headings.length-1)
+				sb.append(" ");
+		}
+		return new Variable(sb.toString());
 	}
 
 	private String getTitle() {
