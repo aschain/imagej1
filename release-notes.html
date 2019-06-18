@@ -5,7 +5,7 @@
 </head>
 <body>
 Maximized image windows no longer revert to the main screen.
-<li> <u>1.52p36 23 May 2019</u>
+<li> <u>1.52p57 17 June 2019</u>
 <ul>
 <li> Thanks to Uwe Schmidt, improved the support for multiple screen setups:
   <ul>
@@ -21,6 +21,7 @@ Maximized image windows no longer revert to the main screen.
   <li> Improved behavior of "+" (<i>Image&gt;Zoom&gt;In</i>) command.
   <li> Code simplification, especially by removing special cases for Linux.
   </ul>
+<li> ImageJ displays a warning dialog before deleting a multi-point selection.
 <li> Thanks to 'alex', the FITS Reader no longer flips images vertically
 so inspection of pixels will produce the expected values.
 <li> Thanks to Jerome Mutterer, added the getValue(measurement)
@@ -30,10 +31,19 @@ macro function, where 'measurement' is "Mean", "Median", "Feret", etc.
 the ImageProcessor.getValue(x,y) method.
 <li> Thanks to "Herbie", restored macro support for the
 "lightGray", "darkGray" and "pink" named colors.
-<li> Thanks to Somsubhro Chaudhuri, added the getValue() macro
-function and the Rotator.getAngle() method.
+<li> Thanks to Somsubhro Chaudhuri, added the getValue("selection.angle")
+macro function and the Rotator.getAngle() method.
+<li> Added the getValue("selection.size") macro function.
+<li> Added the setOption("CopyHeadings",boolean) macro function.
+<li> Thanks to 'MLdish', added the ParticleAnalyzer.setSummaryTable() method
+(<a href="http://wsr.imagej.net/macros/js/HeadlessSummary.js">JavaScript example</a>).
 <li> Thanks to Wilhelm Burger, added the Menus.add(menuPath,class)
 method.
+<li> Thanks to Philippe Carl, added the RoiManager.getErrorMessage() method.
+<li> Thanks to Laurent Thomas, updated the Javadoc of the MaximumFinder.getMaxima()
+methods to make it clearer that the npoints variable of the returned Polygon is the
+number of maxima found, not the length of the xpoints variable.
+<li> Made the Toolbar.builtInTools array public.
 <li> Thanks to Mikael Eriksson, fixed a bug that caused the
 particle analyzer's "Summary" table to not be accessible in macros
 run from the command line using the -batch option.
@@ -55,6 +65,23 @@ menu to be sorted randomly.
 <li> Thanks to Philippe Carl, fixed a bug that caused
 ImagePlus.getStatistic() and ImageProcessor.getStatistic() to
 not treat one point selections the same way.
+<li> Thanks to Andrew Sonnier, fixed a bug that caused the
+particle analyzer to not be recorded if the "In situ" option was used.
+<li> Thanks to Mikael Eriksson, fixed a bug that caused the
+run(“Colors…”,options) macro function to throw an
+exception when called from a -batch command line macro.
+<li> Thanks to Stein Rorvik, fixed a bug that caused
+the Overlay.drawLine() macro function to not work
+correctly when used in conjuction with Overlay.setColor()
+and/or Overlay.setPosition().
+<li> Thanks to 'Niederle', worked around a bug that caused
+the run("Gamma...", "value=x.xx") macro function to fail in
+Fiji headless mode.
+<li> Thanks to 'fieryice12', fixed a bug that caused the
+Plot.showValues macro function to fail in batch mode.
+<li> Thanks to NorbertVischer, fixed a bug that caused
+the <i>Image&gt;Duplicate</i> command to throw
+on exception if the ROI was outside the image.
 </ul>
 
 <li> <u>1.52o 23 April 2019</u>
