@@ -4,8 +4,24 @@
 <title>Release Notes</title>
 </head>
 <body>
-Maximized image windows no longer revert to the main screen.
-<li> <u>1.52p57 17 June 2019</u>
+
+<li> <u>1.52q7 1 July 2019</u>
+<ul>
+<li> "Save changes?" dialogs on Windows and Linux now
+use "Don't Save", "Cancel" and "Save" buttons.
+<li> Thanks to Noreen Walker, the <i>Image&gt;Stacks&gt;Statistics</i>
+command and the StackStatistics class now calculate the median
+of non-float images.
+<li> Thanks to Michael Schmid, added the Plot.showValuesWithLabels()
+macro function and the Plot.getResultsTableWithLabels() method.
+Both create tables that use legend labels and/or axis labels as 
+column headings. The List, Save Data and Copy All Data
+plot window commands also now use labels.
+<li> Thanks to Jerome Mutterer, added the getValue("Length")
+macro function.
+</ul>
+
+<li> <u>1.52p 22 June 2019</u>
 <ul>
 <li> Thanks to Uwe Schmidt, improved the support for multiple screen setups:
   <ul>
@@ -35,6 +51,9 @@ the ImageProcessor.getValue(x,y) method.
 macro function and the Rotator.getAngle() method.
 <li> Added the getValue("selection.size") macro function.
 <li> Added the setOption("CopyHeadings",boolean) macro function.
+<li> Thanks to Stein Rorvik, added the Roi.setAntiAlias(boolean) macro function,
+which can be used to control antialiasing when drawing selections
+(<a href="http://wsr.imagej.net/macros/AntiAliasingDemo.txt">example</a>).
 <li> Thanks to 'MLdish', added the ParticleAnalyzer.setSummaryTable() method
 (<a href="http://wsr.imagej.net/macros/js/HeadlessSummary.js">JavaScript example</a>).
 <li> Thanks to Wilhelm Burger, added the Menus.add(menuPath,class)
