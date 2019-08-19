@@ -58,7 +58,9 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 	protected boolean compositeImage;
 	protected int width;
 	protected int height;
-	protected boolean locked = false;
+	protected boolean locked;
+	private int lockedCount;
+	private Thread lockingThread;
 	protected int nChannels = 1;
 	protected int nSlices = 1;
 	protected int nFrames = 1;
@@ -160,41 +162,77 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
     	ID = --currentID;
 	}
 
-	/** Locks the image so other threads can test to see if it
-		is in use. Returns true if the image was successfully locked.
-		Beeps, displays a message in the status bar, and returns
-		false if the image is already locked. */
-		public synchronized boolean lock() {
-			if (locked) {
-				IJ.beep();
-				IJ.showStatus("\"" + title + "\" is locked");
-				if (IJ.macroRunning())
-					IJ.wait(500);
-				return false;
-			} else {
-				locked = true;
-				if (win instanceof StackWindow) ((StackWindow)win).setSlidersEnabled(false);
-				return true;
-			}
-		}
-
-	/** Similar to lock, but doesn't beep and display an error
-		message if the attempt to lock the image fails. */
-	public synchronized boolean lockSilently() {
-		if (locked)
-			return false;
-        else {
-        	locked = true;
-			if (win instanceof StackWindow) ((StackWindow)win).setSlidersEnabled(false);
-			if (IJ.debugMode) IJ.log(title + ": lock silently");
-			return true;
-        }
+	/** Locks the image so other threads can test to see if it is in use.
+	 * One thread can lock an image multiple times, then it has to unlock
+	 * it as many times until it is unlocked. This allows nested locking
+	 * within a thread.
+	 * Returns true if the image was successfully locked.
+	 * Beeps, displays a message in the status bar, and returns
+	 * false if the image is already locked by another thread.
+	*/
+	public synchronized boolean lock() {
+		return lock(true);
 	}
 
-	/** Unlocks the image. */
+	/** Similar to lock, but doesn't beep and display an error
+	 * message if the attempt to lock the image fails.
+	*/
+	public synchronized boolean lockSilently() {
+		return lock(false);
+	}
+
+	private synchronized boolean lock(boolean loud) {
+		if (locked) {
+			if (Thread.currentThread()==lockingThread) {
+				lockedCount++; //allow locking multiple times by the same thread
+				return true;
+			} else {
+				if (loud) {
+					IJ.beep();
+					IJ.showStatus("\"" + title + "\" is locked");
+					if (IJ.debugMode) IJ.log(title + " is locked by " + lockingThread + "; refused locking by " + Thread.currentThread().getName());
+					if (IJ.macroRunning())
+						IJ.wait(500);
+				}
+				return false;
+			}
+		} else {
+			locked = true;  //we could use 'lockedCount instead, but subclasses might use
+			lockedCount = 1;
+			lockingThread = Thread.currentThread();
+			if (win instanceof StackWindow)
+				((StackWindow)win).setSlidersEnabled(false);
+			if (IJ.debugMode) IJ.log(title + ": locked" + (loud ? "" : "silently") + " by " + Thread.currentThread().getName());
+			return true;
+		}
+	}
+
+	/** Unlocks the image.
+	 * In case the image had been locked several times by the current thread,
+	 * it gets unlocked only after as many unlock operations as there were
+	 * previous lock operations.
+	*/
 	public synchronized void unlock() {
-		locked = false;
-		if (win instanceof StackWindow) ((StackWindow)win).setSlidersEnabled(true);
+		if (Thread.currentThread()==lockingThread && lockedCount>1)
+			lockedCount--;
+		else {
+			locked = false;
+			lockedCount = 0;
+			lockingThread = null;
+			if (win instanceof StackWindow)
+				((StackWindow)win).setSlidersEnabled(true);
+			if (IJ.debugMode) IJ.log(title + ": unlocked");
+		}
+	}
+
+	/** Returns 'true' if the image is locked. */
+	public boolean isLocked() {
+		return locked;
+	}
+
+	/** Returns 'true' if the image was locked on another thread. */
+	public boolean isLockedByAnotherThread() {
+		return locked && Thread.currentThread()!=lockingThread;
 	}
 
 	private void waitForImage(Image image) {
@@ -2628,11 +2666,6 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 
 	public static void removeImageListener(ImageListener listener) {
 		listeners.removeElement(listener);
-	}
-
-	/** Returns 'true' if the image is locked. */
-	public boolean isLocked() {
-		return locked;
 	}
 
 	public void setOpenAsHyperStack(boolean openAsHyperStack) {

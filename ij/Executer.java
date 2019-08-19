@@ -131,13 +131,15 @@ public class Executer implements Runnable {
 					className = className.substring(0, argStart);
 				}
 			}
-			// we have the plugin class name, let us see whether it is allowed to run it
-			ImagePlus imp = WindowManager.getCurrentImage();
-			boolean imageLocked = imp != null && imp.isLocked();
-			if (imageLocked && !allowedWithLockedImage(className)) {
-				IJ.beep();
-				IJ.showStatus(cmd + " blocked: Locked image \"" + imp.getTitle() + "\"");
-				return;
+			if (Prefs.nonBlockingFilterDialogs) {
+				// we have the plugin class name, let us see whether it is allowed to run it
+				ImagePlus imp = WindowManager.getCurrentImage();
+				boolean imageLocked = imp!=null && imp.isLockedByAnotherThread();
+				if (imageLocked && !allowedWithLockedImage(className)) {
+					IJ.beep();
+					IJ.showStatus("\""+cmd + "\" blocked because \"" + imp.getTitle() + "\" is locked");
+					return;
+				}
 			}
 			// run the plugin
 			if (IJ.shiftKeyDown() && className.startsWith("ij.plugin.Macro_Runner") && !Menus.getShortcuts().contains("*"+cmd))
@@ -176,7 +178,8 @@ public class Executer implements Runnable {
 		return className.equals("ij.plugin.Zoom") ||
 				className.equals("ij.plugin.frame.ContrastAdjuster") ||
 				className.equals("ij.plugin.SimpleCommands") ||  //includes Plugins>Utiltites>Reset (needed to reset a locked image)
-				className.equals("ij.plugin.WindowOrganizer");
+				className.equals("ij.plugin.WindowOrganizer") ||
+				className.equals("ij.plugin.URLOpener");
 	}
 
     /** Opens a .lut file from the ImageJ/luts directory and returns 'true' if successful. */

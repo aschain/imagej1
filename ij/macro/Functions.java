@@ -2033,7 +2033,7 @@ public class Functions implements MacroConstants, Measurements {
 			else
 				roi = new Line(xcoord[0], ycoord[0], xcoord[1], ycoord[1]);
 		} else if (roiType==Roi.POINT) {
-			if (!type.equals("point")) {
+			if (type!=null && !type.equals("point")) {
 				if (!floatCoordinates) {
 					xfcoord = new float[n];
 					yfcoord = new float[n];
@@ -2376,6 +2376,7 @@ public class Functions implements MacroConstants, Measurements {
 					double singleVal = getNextArg();
 					arr = new double[]{singleVal};//only 1 box
 				} else {
+					interp.putTokenBack();
 					arr = getNextArray();//>= 2 boxes
 				}
 				nBoxes = arr.length;
@@ -3862,7 +3863,21 @@ public class Functions implements MacroConstants, Measurements {
 			} else if (name.equals("addRadioButtonGroup")) {
 				addRadioButtonGroup(gd);
 			} else if (name.equals("addMessage")) {
-				gd.addMessage(getStringArg());
+				String msg = getFirstString();
+				Font font = null;
+				Color color = null;
+				if (interp.nextToken()==',') {
+					interp.getComma();
+					double fontSize = interp.getExpression();
+					if (interp.nextToken()==',') {
+						interp.getComma();
+						String colorName = interp.getString();
+						color = Colors.decode(colorName, Color.BLACK);
+					}
+					font = new Font("SansSerif", Font.PLAIN, (int)(fontSize*Prefs.getGuiScale()));	
+				}
+				interp.getRightParen();
+				gd.addMessage(msg, font, color);				
 			} else if (name.equals("addHelp")) {
 				gd.addHelp(getStringArg());
 			} else if (name.equals("addChoice")) {
@@ -4889,46 +4904,16 @@ public class Functions implements MacroConstants, Measurements {
 		} else if (key.equals("done")) {
 			return interp.done?1:0;
 		} else if (key.startsWith("Length")) {
-				return getMeasurementValue(key);
+				return IJ.getValue(getImage(), key);
 		} else {
 			String[] headings = ResultsTable.getDefaultHeadings();
 			for (int i=0; i<headings.length; i++) {
 				if (key.startsWith(headings[i]))
-					return getMeasurementValue(key);
+					return IJ.getValue(getImage(), key);
 			}
 			interp.error("Invalid key");
 			return 0.0;
 		}
-	}
-
-	double getMeasurementValue(String measurement) {
-		String options = "";
-		int index = measurement.indexOf(" ");
-		if (index>0) {
-			if (index<measurement.length()-1)
-				options = measurement.substring(index+1, measurement.length());
-			measurement = measurement.substring(0, index);
-		}
-		ImagePlus imp = getImage();
-		int measurements = ALL_STATS + SLICE;
-		if (options.contains("limit"))
-			measurements += LIMIT;
-		Calibration cal = null;
-		if (options.contains("raw")) {
-			cal = imp.getCalibration();
-			imp.setCalibration(null);
-		}
-		ImageStatistics stats = imp.getStatistics(measurements);
-		ResultsTable rt = new ResultsTable();
-		Analyzer analyzer = new Analyzer(imp, measurements, rt);
-		analyzer.saveResults(stats, imp.getRoi());
-		double value = Double.NaN;
-		try {
-			value = rt.getValue(measurement, 0);
-		} catch (Exception e) {};
-		if (cal!=null)
-			imp.setCalibration(cal);
-		return value;
 	}
 
 	double getColorValue(Color color) {
@@ -6853,7 +6838,11 @@ public class Functions implements MacroConstants, Measurements {
 		int row2 = (int)getNextArg();
 		String title = getTitle();
 		ResultsTable rt = getResultsTable(title);
+		int tableSize = rt.size();
 		rt.deleteRows(row1, row2);
+		ImagePlus imp = WindowManager.getCurrentImage();
+		if (imp!=null)
+			Overlay.updateTableOverlay(imp, row1, row2, tableSize);
 		rt.show(title);
 		return new Variable();
 	}
