@@ -890,8 +890,14 @@ public class Functions implements MacroConstants, Measurements {
 			} else {
 				if (ip instanceof ColorProcessor)
 					value = ip.getPixelInterpolated(a1, a2);
-				else
+				else {
+					ImagePlus imp = getImage();
+					Calibration cal = imp.getCalibration();
+					imp.setCalibration(null);
+					ip = imp.getProcessor();
 					value = ip.getInterpolatedValue(a1, a2);
+					imp.setCalibration(cal);
+				}
 			}
 		} else {
 			if (interp.token!=')') interp.error("')' expected");
@@ -4854,9 +4860,14 @@ public class Functions implements MacroConstants, Measurements {
 	double getValue() {
 		interp.getLeftParen();
 		if (!isStringArg()) {  // getValue(x,y)
-			int x = (int)interp.getExpression();
-			int y = (int)getLastArg();
-			return getProcessor().getPixelValue(x,y);
+			double x = interp.getExpression();
+			double y = getLastArg();
+			int ix = (int)x;
+			int iy = (int)y;
+			if (x==ix && y==iy)
+				return getProcessor().getPixelValue(ix,iy);
+			else
+				return getProcessor().getInterpolatedValue(x,y);
 		}
 		String key = getString();
 		interp.getRightParen();
@@ -6179,7 +6190,7 @@ public class Functions implements MacroConstants, Measurements {
 			interp.error("Function name expected: ");
 		String name = interp.tokenString;
 		if (name.equals("pad"))
-			return IJ.pad((int)getFirstArg(), (int)getLastArg());
+			return pad();
 		else if (name.equals("deleteRows"))
 			IJ.deleteRows((int)getFirstArg(), (int)getLastArg());
 		else if (name.equals("log"))
@@ -6201,6 +6212,21 @@ public class Functions implements MacroConstants, Measurements {
 		else
 			interp.error("Unrecognized IJ function name");
 		return null;
+	}
+	
+	private String pad() {
+		int intArg = 0;
+		String stringArg = null;
+		interp.getLeftParen();
+		if (isStringArg())
+			stringArg = getString();
+		else
+			intArg = (int)interp.getExpression();
+		int digits = (int)getLastArg();
+		if (stringArg!=null)
+			return IJ.pad(stringArg, digits);
+		else
+			return IJ.pad(intArg, digits);
 	}
 
 	private void renameResults() {
