@@ -210,7 +210,7 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
     		labels = new Hashtable();
     	if (label.length()>0)
     		label = Macro.trimKey(label.trim());
-    	if (hasLabel(label)) {                      // not a unique label?
+    	if (label.length()>0 && hasLabel(label)) {                      // not a unique label?
     		label += "_0";
     		for (int n=1; hasLabel(label); n++) {   // while still not a unique label
     			label = label.substring(0, label.lastIndexOf('_')); //remove counter
@@ -241,6 +241,8 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 	* @param columns			width of the text field. If columns is 8 or more, additional items may be added to this line with addToSameRow()
 	*/
 	public void addStringField(String label, String defaultText, int columns) {
+		if (addToSameRow && label.equals("_"))
+			label = "";
    		String label2 = label;
    		if (label2.indexOf('_')!=-1)
    			label2 = label2.replace('_', ' ');
@@ -635,6 +637,8 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 	public void addSlider(String label, double minValue, double maxValue, double defaultValue, double stepSize) {
 		if ( stepSize <= 0 ) stepSize  = 1;
 		int digits = digits(stepSize);
+		if (digits==1 && "Angle:".equals(label))
+			digits = 2;
 		double scale = 1.0 / Math.abs( stepSize );
 		if ( scale <= 0 ) scale = 1;
 		if ( defaultValue < minValue ) defaultValue = minValue;
@@ -685,6 +689,8 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 		slider.addElement(s);
 		s.addAdjustmentListener(this);
 		s.setUnitIncrement(1);
+		if (IJ.isMacOSX())
+			s.addKeyListener(this);
 
 		if (numberField==null) {
 			numberField = new Vector(5);
@@ -998,8 +1004,8 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 			return "";
 		TextField tf = (TextField)(stringField.elementAt(sfIndex));
 		theText = tf.getText();
+		String label = labels!=null?(String)labels.get((Object)tf):"";
 		if (macro) {
-			String label = (String)labels.get((Object)tf);
 			theText = Macro.getValue(macroOptions, label, theText);
 			if (theText!=null && (theText.startsWith("&")||label.toLowerCase(Locale.US).startsWith(theText))) {
 				// Is the value a macro variable?
@@ -1009,7 +1015,7 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 				if (s!=null) theText = s;
 			}
 		}
-		if (recorderOn) {
+		if (recorderOn && !label.equals("")) {
 			String s = theText;
 			if (s!=null&&s.length()>=3&&Character.isLetter(s.charAt(0))&&s.charAt(1)==':'&&s.charAt(2)=='\\')
 				s = s.replaceAll("\\\\", "/");  // replace "\" with "/" in Windows file paths
@@ -1434,8 +1440,28 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 	}
 
 	public void keyPressed(KeyEvent e) {
+		Component component = e.getComponent();
 		int keyCode = e.getKeyCode();
 		IJ.setKeyDown(keyCode);
+		if ((component instanceof Scrollbar) && (keyCode==KeyEvent.VK_LEFT||keyCode==KeyEvent.VK_RIGHT)) {
+			Scrollbar sb = (Scrollbar)component;
+			int value = sb.getValue();
+			if (keyCode==KeyEvent.VK_RIGHT)
+				sb.setValue(value+1);
+			else
+				sb.setValue(value-1);				
+			for (int i=0; i<slider.size(); i++) {
+				if (sb==slider.elementAt(i)) {
+					int index = ((Integer)sliderIndexes.get(i)).intValue();
+					TextField tf = (TextField)numberField.elementAt(index);
+					double scale = ((Double)sliderScales.get(i)).doubleValue();
+					int digits = ((Integer)sliderDigits.get(i)).intValue();
+					tf.setText(""+IJ.d2s(sb.getValue()/scale,digits));
+				}
+			}
+			notifyListeners(e);
+			return;
+		}
 		if (keyCode==KeyEvent.VK_ENTER && textArea1==null && okay!=null && okay.isEnabled()) {
 			wasOKed = true;
 			if (IJ.isMacOSX())
