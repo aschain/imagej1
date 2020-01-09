@@ -5,12 +5,54 @@
 </head>
 <body>
 
-<li> <u>1.52s73 2 December 2019</u>
+<li> <u>1.52t23 08 January 2020</u>
+<ul>
+<li> Thanks to Norbert Vischer, added support for superscripts and
+subscripts in plot axis labels
+(<a href="http://wsr.imagej.net/macros/examples/PlotWithSubscriptsAndSuperscrips.txt">example</a>). 
+<li> Thanks to Mark Rivers, the i>Help&gt;Examples&gt;JavaScript&gt;TeraByte VirtualStack</i>
+example now generates test patterns and supports multiple image types.
+<li> Added the following macro language string functions, where
+'s' is a string variable:<br>
+s.charAt(i), s.contains(s2), s.endsWith(s2), s.indexOf(s2), s.lastIndexOf(s2),
+s.length, s.matches(s2), s.replace(s1,s2), s.startsWith(s2),
+s.substring(i1,i2), s.substring(i), s.toLowerCase,
+s.toUpperCase, s.trim.
+<li> Thanks to Stephen Royle, fixed a bug on macOS that caused
+the  command-h keyboard shortcut (<i>ImageJ&gt;Hide ImageJ</i>)
+to not work.
+<li> Thanks to Mark Rivers, fixed a bug that caused the cursor
+location and pixel value to not be displayed in the status bar
+for animating stacks.
+<li> Thanks to Jeff Spector and Michael Schmid, fixed a bug that
+caused the <i>Edit&gt;Selection&gt;Line to Area</i> command
+to not work as expected.
+<li> Thanks to Norbert Vischer, fixed a bug that caused a
+misleading error message to be displayed when using the
+saveAs(format,path) macro function to save in "jpg", "png" or "gif"
+format and the file path was incorrect.
+<li> Thanks to Michael Schmid, fixed a bug that caused macro
+recording to not work correctly if "Non-blocking filter dialogs" was
+enabled in the <i>Edit&gt;Options&gt;Misc</i> dialog.
+<li> Thanks to Michael Kaul, fixed a bug that caused the
+GenericDialog.addSlider() method to not use enough
+digits to the right of the decimal point if the value
+of the 'stepSize' argument was very small.
+<li> Thanks to Michael Schmid, fixed several live profile
+plot and LineWidthAdjuster bugs.
+<li> Thanks to Dorai Iyer, fixed a 1.52s regression that caused characters
+entered using the text tool to sometimes be repeated.
+<li> Thanks to Rodrigo Goncalves and Curtis Rueden, fixed a
+1.52q regression that caused the "Movie (FFMPEG)"
+plugin to throw a NullPointerException.
+</ul>
+
+<li> <u>1.52s 10 December 2019</u>
 <ul>
 <li> Thanks to 'LPUoO', added the <i>Plugins&gt;Utilities&gt;Commands</i> 
 command, which opens a list of commonly and recently used 
 commands.
-<li> Image windows are now places just below the "Image" window.
+<li> By default, image windows now open just below the "ImageJ" window.
 <li> Thanks to Norbert Vischer, adding an exclamation mark to 
 showStatus() messages avoids status bar flicker
 (<a href="http://wsr.imagej.net/macros/examples/NonVolatileShowStatus.txt">example</a>). 
@@ -20,6 +62,8 @@ dialog displays feedback on the kernel as it is modified.
 command to the macro editor. After running this command,
 the selected macro code will run each time you press 'r', the
 shortcut for the <i>Process&gt;Repeat Command</i> command.
+<li> Thanks to Jerome Mutterer, added a "Splash Screen" code
+choice to the <i>Edit&gt;Options&gt;Startup</i> dialog.
 <li> Changed the shortcut for <i>Process&gt;Repeat Command</i>
 to 'r' and the shortcut for <i>File&gt;Revert</i> to shift-r.
 <li> Added a "Reuse 'FFT of...' window" option to the
@@ -30,17 +74,17 @@ is 90 or higher, resulting in higher quality images but larger file sizes.
 <li> Thanks to Karen Collins, improved the FITS Writer.
 <li> Added the <i>Help&gt;Examples&gt;JavaScript&gt;JPEG Quality Plot</i>
 example.
-<li> Removed the obsolete “Draw grid lines” option from the
+<li> Removed the obsolete "Draw grid lines" option from the
 <i>Edit&gt;Options&gt;Plot</i> dialog.
 <li> Thanks to Michael Schmid, the ImagePlus.updateAndDraw()
-method adds a scroll bar to the window if the stack size
-changed to greater than one.
+method adds a scroll bar to the image window if the stack size
+has changed to greater than one.
 <li> Thanks to Stein Rorvik, added the File.getDefaultDir,
 File.setDefaultDir(path), String.trim(string) and String.join(array)
 macro functions.
 <li> Thanks to Peter Haub, added the JpegWriter.disableChromaSubsampling()
 method
-(<a href="http://wsr.imagej.net/macros/js/JpegQualityTests.js">example</a>).
+(<a href="http://wsr.imagej.net/macros/js/JpegQualityTests.js">example script</a>).
 <li> Added the ImageProcessor.setFontSize() and Plot.setFontSize() methods.
 <li> Thanks to 'kefe' and Herbie, fixed a bug that caused the <i>Stack to Images</i>
 command to use slice labels as image titles even when
@@ -52,9 +96,9 @@ for the Rounded Rectangle, Multi-point and Arrow tools to generate
 "Duplicate keyword" errors when the Recorder was running.
 <li> Thanks to Peter Haub, fixed a bug that caused the Image Calculator
 to not work as expected with RGB images when using the
-"Difference" operator and "32-bit (float) result" option.
-<li> Fixed a bug that caused the "Font size" (aka "Default font size")
-setting in the <i>Edit&gt;Options&gt;Plot</i> dialog to be ignored.
+"Difference" operator and the "32-bit (float) result" option was enabled.
+<li> Fixed a bug that caused the "Font size" setting in the 
+<i>Edit&gt;Options&gt;Plots</i> dialog to be ignored.
 <li> Thanks to Stein Rorvik, fixed a bug that caused the
 run("Calibration Bar...",optons) macro function to ignore calls to
 setOption("AntialiasedText",boolean).
@@ -62,19 +106,36 @@ setOption("AntialiasedText",boolean).
 bug that caused the "thumb" on scrollbars to be hard to see.
 <li> Thanks to Stein Rorvik, fixed a bug that caused the
 <i>Analyze&gt;Set Scale</i> command to not be correctly
-recoded.
+recorded.
 <li> Thanks to Sethur, fixed a bug that caused the
 <i>Image&gt;Stacks&gt;Tools&gt;Substack Maker</i>
 command to not carry over the calibration of hyperstacks.
 <li> Thanks to Sethur, fixed bugs that caused the
-DICOM reader to not correctly open multi-frame DICOMs
-and 16-bit signed DICOMs with RescaleSlope=1
+DICOM reader to not correctly open multi-frame DICOMs,
+and 16-bit signed DICOMs, with RescaleSlope=1
 and RescaleIntercept!=0.
-<li> Thanks to Stein Rorvik, fixed a bug in the macro interpreter
+<li> Thanks to Stein Rorvik, fixed a macro interpreter bug
 that prevented array functions like newArray() and split() from
 being used as arguments to user-defined functions.
 <li> Thanks to Stein Rorvik, fixed a bug that caused the
 WIndow menu to not be updated when saving a table.
+<li> Thanks to Stein Rorvik, fixed a bug that caused the
+<i>Image&gt;Transform&gt;Translate</i> command
+to ignore overlays.
+<li> Thanks to Stein Rorvik, fixed a bug that caused right
+justified text in overlays to not be translated correctly.
+<li> Thanks to Stein Rorvik, worked around a Java bug 
+that caused the OpenDialog.setDefaultDirectory(path) method to
+sometimes not work as expected on Windows when the path
+used "/" separators.
+<li> Thanks to Stein Rorvik, fixed a bug that caused macros
+calling open("") to not be aborted when the user clicked
+"Cancel" in the file open dialog and "Use JFileChooser to open/save"
+was enabled in the <i>Edit&gt;Options&gt;Input/Output</i> dialog box.
+<li> Thanks to Nicolas De Francesco, fixed a bug that caused
+<i>Process&gt;FFT&gt;Custom Filter</i> to only process 
+the current stack slice even though "Process entire stack" 
+was checked in the dialog box.
 </ul>
 
 <li> <u>1.52r 26 October 2019</u>

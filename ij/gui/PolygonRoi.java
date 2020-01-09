@@ -89,7 +89,7 @@ public class PolygonRoi extends Roi {
 		else if (type==POINT)
 			this.type = POINT;
 		else
-			throw new IllegalArgumentException("Invalid type");
+			throw new IllegalArgumentException("PolygonRoi: Invalid type");
 	}
 
 	private void init2(int type) {
@@ -262,7 +262,7 @@ public class PolygonRoi extends Roi {
 		if (updateFullWindow)
 			{updateFullWindow = false; imp.draw();}
 	}
-	
+
 	private void drawSpline(Graphics g, float[] xpoints, float[] ypoints, int npoints, boolean closed, boolean fill, boolean isActiveOverlayRoi) {
 		if (xpoints==null || xpoints.length==0)
 			return;
@@ -297,7 +297,7 @@ public class PolygonRoi extends Roi {
 		} else
 			g2d.draw(path);
 	}
-
+	
 	public void drawPixels(ImageProcessor ip) {
 		int saveWidth = ip.getLineWidth();
 		if (getStrokeWidth()>1f)

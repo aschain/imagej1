@@ -31,6 +31,8 @@ public class NonBlockingGenericDialog extends GenericDialog implements ImageList
 		try {
 			wait();
 		} catch (InterruptedException e) { }
+		finalizeRecording();
+		resetCounters();
 	}
 
 	public synchronized void actionPerformed(ActionEvent e) {
@@ -83,10 +85,12 @@ public class NonBlockingGenericDialog extends GenericDialog implements ImageList
 	public void imageUpdated(ImagePlus imp) {}
 
 	/** Put the dialog into the foreground when the image we work on gets into the foreground */
-    public void windowActivated(WindowEvent e) {
+	@Override
+	public void windowActivated(WindowEvent e) {
 		if ((e.getWindow() instanceof ImageWindow) && e.getOppositeWindow()!=this)
 			toFront();
+		WindowManager.setWindow(this);
 	}
-
+	
 }
 
