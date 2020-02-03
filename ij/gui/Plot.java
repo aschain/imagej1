@@ -158,14 +158,13 @@ public class Plot implements Cloneable {
 	private static final int USUALLY_ENLARGE = 1, ALWAYS_ENLARGE = 2; //enlargeRange settings
 	private static final double RELATIVE_ARROWHEAD_SIZE = 0.2; //arrow heads have 1/5 of vector length
 	private static final int MIN_ARROWHEAD_LENGTH = 3;
-	private static final int MAX_ARROWHEAD_LENGTH = 20;	
+	private static final int MAX_ARROWHEAD_LENGTH = 20;
 
 	PlotProperties pp = new PlotProperties();		//size, range, formatting etc, for easy serialization
 	PlotProperties ppSnapshot;						//copy for reverting
 	Vector<PlotObject> allPlotObjects = new Vector<PlotObject>();	//all curves, labels etc., also serialized for saving/reading
 	Vector<PlotObject> allPlotObjectsSnapshot;      //copy for reverting
 	private PlotVirtualStack stack;
-	private boolean grayscaleStack;
 	/** For high-resolution plots, everything will be scaled with this number. Otherwise, must be 1.0.
 	 *  (creating margins, saving PlotProperties etc only supports scale=1.0) */
 	float scale = 1.0f;
@@ -1026,7 +1025,7 @@ public class Plot implements Cloneable {
 	public void setFontSize(int size) {
 		setFont(-1, (float)size);
 	}
-	
+
 	/** Sets the font for all following addLabel() etc. operations. The currently set font when
 	 *	displaying the plot determines the font of all labels & numbers.
 	 *  After the plot has been shown, sets the font for the numbers and the legend (if present).
@@ -1428,12 +1427,22 @@ public class Plot implements Cloneable {
 	/** Returns the plot as an ImagePlus.
 	 *	If an ImagePlus for this plot already exists, displays the plot in that ImagePlus and returns it. */
 	public ImagePlus getImagePlus() {
+		if (stack != null) {
+			if (imp != null)
+				return imp;
+			else {
+				imp = new ImagePlus(title, stack);
+				adjustCalibration(imp.getCalibration());
+				return imp;
+			}
+		}
 		if (plotDrawn)
 			updateImage();
 		else
 			draw();
 		if (imp != null) {
-			if (imp.getProcessor() != ip) imp.setProcessor(ip);
+			if (imp.getProcessor() != ip)
+				imp.setProcessor(ip);
 			return imp;
 		} else {
 			ImagePlus imp = new ImagePlus(title, ip);
@@ -1448,9 +1457,12 @@ public class Plot implements Cloneable {
 	 *	The ImagePlus is not displayed or updated unless its ImageProcessor is
 	 *  no that of the current Plot (then it gets this ImageProcessor).
 	 *  Does nothing if imp is unchanged and has the ImageProcessor of this plot.
-	 *	'imp' may be null to disconnect the plot from its ImagePlus */
+	 *  'imp' may be null to disconnect the plot from its ImagePlus.
+	 *	Does nothing for Plot Stacks. */
 	public void setImagePlus(ImagePlus imp) {
 		if (imp != null && imp == this.imp && imp.getProcessor() == ip)
+			return;
+		if (stack != null)
 			return;
 		if (this.imp != null)
 			this.imp.setProperty(PROPERTY_KEY, null);
@@ -1484,18 +1496,16 @@ public class Plot implements Cloneable {
 	}
 
 	/** Displays the plot in a PlotWindow.
-	 *  Plot stacks are shown in a StackWindow, however; in this case the return value is null.
+	 *  Plot stacks are shown in a StackWindow, not in a PlotWindow;
+	 *  in this case the return value is null (use getImagePlus().getWindow() instead).
 	 *  Also returns null in BatchMode. Note that the PlotWindow might get closed
 	 *  immediately if its 'listValues' and 'autoClose' flags are set.
 	 *  @see #update()
 	 */
 	public PlotWindow show() {
 		PlotVirtualStack stack = getStack();
-		if (stack!=null && stack.size()>1) {
-			stack.setBitDepth(grayscaleStack?8:24);
-			ImagePlus stackImp = new ImagePlus("Plot Stack",stack);
-			stackImp.show();
-			adjustCalibration(stackImp.getCalibration());
+		if (stack!=null) {
+			getImagePlus().show();
 			return null;
 		}
 		if ((IJ.macroRunning() && IJ.getInstance()==null) || Interpreter.isBatchMode()) {
@@ -1529,15 +1539,11 @@ public class Plot implements Cloneable {
 	 * N. Vischer
 	 */
 	public void addToStack() {
-		if (stack==null) {
+		if (stack==null)
 			stack = new PlotVirtualStack(getSize().width,getSize().height);
-			grayscaleStack = true;
-		}
 		draw();
 		stack.addPlot(this);
-		if (isColored())
-			grayscaleStack = false;
-		IJ.showStatus("addToStack: "+stack.size());
+		IJ.showStatus("addToPlotStack: "+stack.size());
 		allPlotObjects.clear();
 		textLoc = null;
 	}
@@ -1597,7 +1603,7 @@ public class Plot implements Cloneable {
 		if (!plotDrawn || pp.isFrozen) return;
 		getBlankProcessor();
 		drawContents(ip);
-		if (imp == null) return;
+		if (imp == null || stack != null) return;
 		adjustCalibration(imp.getCalibration());
 		imp.updateAndDraw();
 		if (ip != imp.getProcessor())
@@ -1854,7 +1860,8 @@ public class Plot implements Cloneable {
 				invertedLut = Prefs.useInvertingLut && !Interpreter.isBatchMode() && IJ.getInstance()!=null;
 				if (invertedLut) ip.invertLut();
 			}
-			if (imp != null) imp.setProcessor(ip);
+			if (imp != null && stack == null)
+				imp.setProcessor(ip);
 		}
 		if (ip instanceof ColorProcessor)
 			Arrays.fill((int[])(ip.getPixels()), 0xffffff);
@@ -1874,7 +1881,7 @@ public class Plot implements Cloneable {
 		ip.setColor(Color.black);
 		return ip;
 	}
-	
+
 	/** Calculates the margin sizes and sets the class variables accordingly */
 	void makeMarginValues() {
 		Font font = nonNullFont(pp.frame.getFont(), currentFont);
@@ -2619,7 +2626,7 @@ public class Plot implements Cloneable {
 			ip.setFont(pp.yLabel.getFont() == null ? scFont : scFont(pp.yLabel.getFont()));
 			ImageProcessor yLabel = stringToPixels(yLabelToDraw);
 			if(yLabel != null){
-				yLabel = yLabel.rotateLeft();	
+				yLabel = yLabel.rotateLeft();
 				int xRightOfYLabel = xNumberRight - maxNumWidth - sc(2);
 				int xpos = xRightOfYLabel - yLabel.getWidth() - sc(2);
 				int ypos = topMargin + (frame.height -yLabel.getHeight())/2;
@@ -2652,7 +2659,7 @@ public class Plot implements Cloneable {
 	/** draw something like 1.2 10^-9; returns the width of the string drawn.
 	 *	'Digits' should be >=0 for drawing the mantissa (=1.38 in this example), negative to draw only 10^exponent
 	 *	Currently only supports center justification and right justification (y of center line)
-	 *	Fonts baseFont, smallFont should be scaled already*/	
+	 *	Fonts baseFont, smallFont should be scaled already*/
 	int drawExpString(double value, int digits, int x, int y, int justification, int fontAscent, Font baseFont, Font smallFont) {
 		String base = "10";
 		String exponent = null;
@@ -2685,7 +2692,7 @@ public class Plot implements Cloneable {
 		ip.drawString(base, x, y+fontAscent*7/10);
 		return width;
 	}
-	
+
 	//Returns a pixelMap containting labelStr.
 	//Uses font of current ImageProcessor.
 	//Returns null for empty or blank-only strings

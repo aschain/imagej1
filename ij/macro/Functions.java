@@ -1698,6 +1698,8 @@ public class Functions implements MacroConstants, Measurements {
 	double getSelectionType() {
 		interp.getParens();
 		double type = -1;
+		if (WindowManager.getImageCount()==0)
+			return type;
 		ImagePlus imp = getImage();
 		Roi roi = imp.getRoi();
 		if (roi!=null)
@@ -7276,6 +7278,19 @@ public class Functions implements MacroConstants, Measurements {
 		if (interp.token!=WORD)
 			interp.error("Function name expected: ");
 		String name = interp.tokenString;
+		if (name.equals("getDefaultStrokeWidth")) {
+			interp.getParens();
+			return new Variable(Roi.getDefaultStrokeWidth());
+		} else if (name.equals("setDefaultStrokeWidth")) {
+			Roi.setDefaultStrokeWidth(getArg());
+			return null;
+		} else if (name.equals("getDefaultGroup")) {
+			interp.getParens();
+			return new Variable(Roi.getDefaultGroup());
+		} else if (name.equals("setDefaultGroup")) {
+			Roi.setDefaultGroup((int)getArg());
+			return null;
+		}
 		ImagePlus imp = getImage();
 		if (name.equals("paste")) {
 			interp.getParens();
@@ -7331,6 +7346,12 @@ public class Functions implements MacroConstants, Measurements {
 			interp.getParens();
 			String roiName = roi.getName();
 			return new Variable(roiName!=null?roiName:"");
+		} else if (name.equals("getGroup")) {
+			interp.getParens();
+			return new Variable(roi.getGroup());
+		} else if (name.equals("setGroup")) {
+			roi.setGroup((int)getArg());
+			return null;
 		} else if (name.equals("getProperty")) {
 			String property = roi.getProperty(getStringArg());
 			return new Variable(property!=null?property:"");
