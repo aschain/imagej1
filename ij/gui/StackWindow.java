@@ -188,14 +188,17 @@ public class StackWindow extends ImageWindow implements Runnable, AdjustmentList
 				else if (rotation<0)
 					IJ.run(imp, "Previous Slice [<]", "");
 			} else {
-				int slice = imp.getCurrentSlice() + rotation;
+				int csl = imp.getCurrentSlice();
+				int slice = csl + rotation;
 				if (slice<1)
 					slice = 1;
 				else if (slice>imp.getStack().getSize())
 					slice = imp.getStack().getSize();
-				setSlice(imp,slice);
-				imp.updateStatusbarValue();
-				SyncWindows.setZ(this, slice);
+				if(slice!=csl) {
+					setSlice(imp,slice);
+					imp.updateStatusbarValue();
+					SyncWindows.setZ(this, slice);
+				}
 			}
 		}
 	}
