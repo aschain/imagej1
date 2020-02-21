@@ -7,6 +7,7 @@ import ij.plugin.frame.Recorder;
 import ij.plugin.Colors;
 import java.awt.geom.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 
 /** This class is a rectangular ROI containing text. */
@@ -25,6 +26,7 @@ public class TextRoi extends Roi {
 	private static int size = 18;
 	private Font instanceFont;
 	private static boolean newFont = true;
+	private boolean newJustification;
 	private static boolean antialiasedText = true; // global flag used by text tool
 	private static int globalJustification;
 	private static Color defaultFillColor;
@@ -38,6 +40,7 @@ public class TextRoi extends Roi {
 	private static double defaultAngle;
 	private static boolean firstTime = true;
 	private Roi previousRoi;
+	private Graphics fontGraphics;
 
 	/** Creates a TextRoi.*/
 	public TextRoi(int x, int y, String text) {
@@ -110,12 +113,8 @@ public class TextRoi extends Roi {
 		instanceFont = font;
 		setAntiAlias(antialiasedText);
 		firstChar = false;
-		if (this.width==1 && this.height==1) {
-			ImageJ ij = IJ.getInstance();
-			Graphics g = ij!=null?ij.getGraphics():null;
-			if (g!=null)
-				updateBounds(g);
-		}
+		if (this.width==1 && this.height==1)
+			updateBounds(null);
 	}
 
 	/** @deprecated */
@@ -207,8 +206,18 @@ public class TextRoi extends Roi {
 		}
 	}
 	
-	/** Renders the text on the image. */
+	/** Renders the text on the image. Draws the text in
+	 * the foreground color if ip.setColor(Color) has
+	 * not been called.
+	 *	@see ij.process.ImageProcessor#setFont(Font)
+	 *	@see ij.process.ImageProcessor#setAntialiasedText(boolean)
+	 *	@see ij.process.ImageProcessor#setColor(Color)
+	*/
 	public void drawPixels(ImageProcessor ip) {
+		if (newFont || this.width==1 || newJustification)
+			updateBounds(null);
+		if (!ip.fillValueSet())
+			ip.setColor(Toolbar.getForegroundColor());
 		ip.setFont(instanceFont);
 		ip.setAntialiasedText(getAntiAlias());
 		FontMetrics metrics = ip.getFontMetrics();
@@ -240,8 +249,9 @@ public class TextRoi extends Roi {
 	/** Draws the text on the screen, clipped to the ROI. */
 	public void draw(Graphics g) {
 		if (IJ.debugMode) IJ.log("draw: "+theText[0]+"  "+this.width+","+this.height);
-		if (Interpreter.isBatchMode() && ic!=null && ic.getDisplayList()!=null) return;
-		if (newFont || this.width==1)
+		if (Interpreter.isBatchMode() && ic!=null && ic.getDisplayList()!=null)
+			return;
+		if (newFont || this.width==1 || newJustification)
 			updateBounds(g);
 		Color c = getStrokeColor();
 		setStrokeColor(getColor());
@@ -382,7 +392,7 @@ public class TextRoi extends Roi {
 		return getAntiAlias();
 	}
 		
-	/** Sets the 'justification' instance variable (must be LEFT, CENTER or RIGHT) */
+	/** Sets the default text tool justification (LEFT, CENTER or RIGHT). */
 	public static void setGlobalJustification(int justification) {
 		if (justification<0 || justification>RIGHT)
 			justification = LEFT;
@@ -397,12 +407,12 @@ public class TextRoi extends Roi {
 		}
 	}
 	
-	/** Returns the global (default) justification (LEFT, CENTER or RIGHT). */
+	/** Returns the default text tool justification (LEFT, CENTER or RIGHT). */
 	public static int getGlobalJustification() {
 		return globalJustification;
 	}
 
-	/** Sets the 'justification' instance variable (must be LEFT, CENTER or RIGHT) */
+	/** Sets the 'justification' instance variable (LEFT, CENTER or RIGHT) */
 	public void setJustification(int justification) {
 		if (justification<0 || justification>RIGHT)
 			justification = LEFT;
@@ -415,6 +425,7 @@ public class TextRoi extends Roi {
 			this.x = this.x - this.width/2;
 		}
 		this.justification = justification;
+		newJustification = true;
 		if (imp!=null)
 			imp.draw();
 	}
@@ -486,14 +497,10 @@ public class TextRoi extends Roi {
 		double mag = ic!=null?ic.getMagnification():1.0;
 		if (nonScalable) mag = 1.0;
 		Font font = getScaledFont();
+		if (g==null)
+			g = getFontGraphics(font);
 		newFont = false;
-		boolean nullg = g==null;
-		if (nullg) {
-			if (ic!=null)
-				g = ic.getGraphics();
-			else
-				return;
-		}
+		newJustification = false;
 		Java2.setAntialiasedText(g, getAntiAlias());
 		FontMetrics metrics = g.getFontMetrics(font);
 		int fontHeight = (int)(metrics.getHeight()/mag);
@@ -514,7 +521,6 @@ public class TextRoi extends Roi {
 				newWidth = w;
 			i++;
 		}
-		if (nullg) g.dispose();
 		newWidth += 2.0;
 		b.width = newWidth;
 		switch (justification) {
@@ -533,6 +539,17 @@ public class TextRoi extends Roi {
 		this.width = (int)Math.ceil(b.width);
 		this.height = (int)Math.ceil(b.height);
 		//IJ.log("adjustSize2: "+theText[0]+"  "+this.width+","+this.height);
+	}
+	
+	private Graphics getFontGraphics(Font font) {
+		if (fontGraphics==null) {
+			BufferedImage bi =new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
+			fontGraphics = (Graphics2D)bi.getGraphics();
+			fontGraphics.setFont(font);
+		}
+		if (this.newFont)
+			fontGraphics.setFont(font);
+		return  fontGraphics;
 	}
 	
 	void updateText() {
