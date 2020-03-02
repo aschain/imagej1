@@ -300,7 +300,7 @@ public class RGBStackMerge implements PlugIn {
 					ImageProcessor ip = stacks[c].getProcessor(index[c]+1);
 					if (keep)
 						ip = ip.duplicate();
-					stack2.addSlice(null, ip);
+					stack2.addSlice(stacks[c].getSliceLabel(index[c]+1), ip);
 					if (keep)
 						index[c]++;
 					else
