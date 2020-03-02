@@ -85,6 +85,7 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 	protected boolean wideLine;
 	protected boolean ignoreClipRect;
 	protected double flattenScale = 1.0;
+	protected static Color defaultColor;
 
 	private String name;
 	private int position;
@@ -114,7 +115,7 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 	public Roi(double x, double y, double width, double height) {
 		this(x, y, width, height, 0);
 	}
-
+	
 	/** Creates a new rounded rectangular ROI. */
 	public Roi(int x, int y, int width, int height, int cornerDiameter) {
 		setImage(null);
@@ -203,6 +204,16 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 		this.group = defaultGroup;
 		if (defaultGroup>0)
 			this.strokeColor = groupColor;
+	}
+
+	/** Creates a rectangular ROI. */
+	public static Roi create(double x, double y, double width, double height) {
+		return new Roi(x, y, width, height);
+	}
+
+	/** Creates a rounded rectangular ROI. */
+	public static Roi create(double x, double y, double width, double height, int cornerDiameter) {
+		return new Roi(x, y, width, height, cornerDiameter);
 	}
 
 	/** @deprecated */
@@ -439,6 +450,18 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 			return new Rectangle2D.Double(bounds.x, bounds.y, bounds.width, bounds.height);
 		else
 			return new Rectangle2D.Double(x, y, width, height);
+	}
+
+	/** Sets the bounds of rectangular, oval or text selections. */
+	public void setBounds(Rectangle2D.Double b) {
+		if (!(type==RECTANGLE||type==OVAL||(this instanceof TextRoi)))
+			return;
+		this.x = (int)b.x;
+		this.y = (int)b.y;
+		this.width = (int)Math.ceil(b.width);
+		this.height = (int)Math.ceil(b.height);
+		bounds = new Rectangle2D.Double(b.x, b.y, b.width, b.height);
+		cachedMask = null;
 	}
 
 	/**
@@ -1193,7 +1216,7 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 	}
 	
 	public void draw(Graphics g) {
-		Color color =  strokeColor!=null? strokeColor:ROIColor;
+		Color color =  strokeColor!=null?strokeColor:ROIColor;
 		if (fillColor!=null) color = fillColor;
 		if (Interpreter.isBatchMode() && imp!=null && imp.getOverlay()!=null && strokeColor==null && fillColor==null)
 			return;
@@ -1760,6 +1783,11 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 	 */
 	public Color getStrokeColor() {
 		return	strokeColor;
+	}
+
+	/** Sets the default stroke color. */
+	public static void setDefaultColor(Color color) {
+		 defaultColor = color;
 	}
 
 	/** Sets the fill color used to display this ROI, or set to null to display it transparently.

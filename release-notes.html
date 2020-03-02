@@ -5,8 +5,11 @@
 </head>
 <body>
 
-<li> <u>1.52u20 21 February 2020</u>
+<li> <u>1.52u29 28 February 2020</u>
 <ul>
+<li> Thanks to Nicolas De Francesco, added the
+<i>Edit&gt;Selection&gt;Fit Rectangle</i> command.
+<li> Added the <i>Help&gt;Examples&gt;JavaScript&gt;Overlay Text</i> example.
 <li> Thanks to Laurent Thomas, added  a 
 "Install Keypad Shortcuts" command to the
 ROI Menu tool. Add<br>
@@ -18,6 +21,11 @@ ROI Menu tool and the group setting in the ROI Manager's
 Properties dialog are recordable.
 <li> Added the RoiManager.setGroup(group) and
 RoiManager.selectGroup(group) macro functions.
+<li> Thanks to Ken Gilbert, added the getValue("image.size")
+macro function. (DOCUMENT)
+<li> Thanks to Volker Backer, added the ImagePlus.resize()
+method, recorded by the <i>Image&gt;Scale</i>
+and <i>Image&gt;Adjust&gt;Size</i> commands.
 <li> Thanks to Fred Damen, added the Plot.setWindowSize() method.
 <li> Thanks to Lewis Muir, fixed a bug the caused the Pixel Inspection Tool's
 red box to be included with the image when saving in GIF, JPEG or PNG format.
@@ -27,6 +35,8 @@ as expected with composite images.
 <li> Thanks to Fred Damen, fixed bugs that caused the
 TextRoi.setJustification() and TextRoi.drawPixels() methods
 to not work as expected.
+<li> Thanks to Nicolas De Francesco, fixed a bug that caused
+empty tables to not be opened correctly.
 <li> Thanks to 'sebi06', fixed a 1.52p regression that caused the
 particle analyzer to thow an exception in headless mode.
 </ul>

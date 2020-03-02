@@ -4,6 +4,7 @@ import ij.gui.*;
 import ij.process.*;
 import ij.measure.*;
 import ij.util.Tools;
+import ij.plugin.frame.Recorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
@@ -71,6 +72,27 @@ public class Scaler implements PlugIn, TextListener, FocusListener {
 		}
 		IJ.showProgress(1.0);
 	}
+	
+	/** Returns a scaled copy of this image or ROI, where the
+		 'options'  string can contain 'none', 'bilinear'. 'bicubic',
+		'average' and 'constrain'.
+	*/
+	public static ImagePlus resize(ImagePlus imp, int dstWidth, int dstHeight, int dstDepth, String options) {
+		ImageProcessor ip = imp.getProcessor();
+		if (options==null)
+			options = "";
+		if (options.contains("constrain"))
+			return new ImagePlus("Untitled", ip.resize(dstWidth));
+		int interpolation = ImageProcessor.BILINEAR;
+		if (options.contains("none"))
+			interpolation = ImageProcessor.NONE;
+		if (options.contains("bicubic"))
+			interpolation = ImageProcessor.BICUBIC;
+		ip.setInterpolationMethod(interpolation);		
+		boolean useAveraging = options.contains("average");
+		return new ImagePlus("Untitled", ip.resize(dstWidth, dstHeight, useAveraging));
+	}
+
 	
 	void createNewStack(ImagePlus imp, ImageProcessor ip) {
 		int nSlices = imp.getStackSize();
@@ -167,7 +189,7 @@ public class Scaler implements PlugIn, TextListener, FocusListener {
 					ImageRoi iroi = (ImageRoi)roi;
 					ImageProcessor processor = iroi.getProcessor();
 					processor.setInterpolationMethod(interpolationMethod);
-					processor =processor.resize(newWidth, newHeight, averageWhenDownsizing);
+					processor = processor.resize(newWidth, newHeight, averageWhenDownsizing);
 					iroi.setProcessor(processor);
 					imp2.setOverlay(new Overlay(iroi));
 				}
@@ -191,6 +213,18 @@ public class Scaler implements PlugIn, TextListener, FocusListener {
 			imp.deleteRoi();
 			imp.updateAndDraw();
 			imp.changes = true;
+		}				
+		if (Recorder.scriptMode()) {
+			String options = "";
+			if (interpolationMethod==ImageProcessor.NONE)
+				options = "none";
+			else if (interpolationMethod==ImageProcessor.BICUBIC)
+				options = "bicubic";
+			else
+				options = "bilinear";
+			if (averageWhenDownsizing)
+				options = options + " average";
+			Recorder.recordCall("imp2 = imp.resize("+newWidth+", "+newHeight+", \""+options+"\");");
 		}
 	}
 	
