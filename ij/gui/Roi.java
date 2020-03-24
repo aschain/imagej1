@@ -1853,6 +1853,7 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 		this.fillColor = roi2.fillColor;
 		this.setStrokeWidth(roi2.getStrokeWidth());
 		this.setName(roi2.getName());
+		this.group = roi2.group;
 	}
 
 	/**
@@ -2644,8 +2645,9 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 			ip.setThreshold(255, 255, ImageProcessor.NO_LUT_UPDATE);
 			ThresholdToSelection tts = new ThresholdToSelection();
 			roi2 = tts.convert(ip);
-			if (roi2 == null) return null; //empty roi if the line was outside the image
 		}
+		if (roi2==null)
+			return null;
 		transferProperties(line, roi2);
 		roi2.setStrokeWidth(0);
 		Color c = roi2.getStrokeColor();

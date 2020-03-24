@@ -85,6 +85,7 @@ public class Functions implements MacroConstants, Measurements {
 	boolean plotNoTicks;
 	boolean profileVerticalProfile;
 	boolean profileSubPixelResolution;
+	boolean waitForCompletion = true;
 
 
 	Functions(Interpreter interp, Program pgm) {
@@ -199,6 +200,7 @@ public class Functions implements MacroConstants, Measurements {
 			case SIN: case SQRT: case TAN: case ATAN: case ASIN: case ACOS:
 				value = math(type);
 				break;
+			case MATH: value = doMath(); break;
 			case MAX_OF: case MIN_OF: case POW: case ATAN2: value=math2(type); break;
 			case GET_TIME: interp.getParens(); value=System.currentTimeMillis(); break;
 			case GET_WIDTH: interp.getParens(); value=getImage().getWidth(); break;
@@ -325,6 +327,58 @@ public class Functions implements MacroConstants, Measurements {
 			getProcessor().setLineWidth(width);
 		}
 		globalLineWidth = width;
+	}
+	
+	private double doMath() {
+		interp.getToken();
+		if (interp.token!='.')
+			interp.error("'.' expected");
+		interp.getToken();
+		if (!(interp.token==WORD||interp.token==NUMERIC_FUNCTION))
+			interp.error("Function name expected: ");
+		String name = interp.tokenString;		
+		if (name.equals("min"))
+			return Math.min(getFirstArg(), getLastArg());
+		else if (name.equals("max"))
+			return Math.max(getFirstArg(), getLastArg());
+		else if (name.equals("pow"))
+			return Math.pow(getFirstArg(), getLastArg());
+		else if (name.equals("atan2"))
+			return Math.atan2(getFirstArg(), getLastArg());
+		double arg = getArg();
+		if (name.equals("ceil"))
+			return Math.ceil(arg);
+		else if (name.equals("abs"))
+			return Math.abs(arg);
+		else if (name.equals("cos"))
+			return Math.cos(arg);			
+		else if (name.equals("exp"))
+			return Math.exp(arg);
+		else if (name.equals("floor"))
+			return Math.floor(arg);			
+		else if (name.equals("log"))
+			return Math.log(arg);
+		else if (name.equals("log10"))
+			return Math.log10(arg);
+		else if (name.equals("round"))
+			return Math.round(arg);			
+		else if (name.equals("sin"))
+			return Math.sin(arg);
+		else if (name.equals("sqr"))
+			return arg*arg;			
+		else if (name.equals("sqrt"))
+			return Math.sqrt(arg);			
+		else if (name.equals("tan"))
+			return Math.tan(arg);
+		else if (name.equals("atan"))
+			return Math.atan(arg);			
+		else if (name.equals("asin"))
+			return Math.asin(arg);
+		else if (name.equals("acos"))
+			return Math.acos(arg);
+		else
+			interp.error("Unrecognized function name");
+		return Double.NaN;
 	}
 
 	final double math(int type) {
@@ -4549,6 +4603,8 @@ public class Functions implements MacroConstants, Measurements {
 			ImageConverter.setDoScaling(state);
 		else if (arg1.startsWith("copyhead"))
 			Prefs.copyColumnHeaders = state;
+		else if (arg1.equals("waitforcompletion"))
+			waitForCompletion = state;
 		//else if (arg1.startsWith("saveimageloc")) {
 		//	Prefs.saveImageLocation = state;
 		//	if (!state) Prefs.set(ImageWindow.LOC_KEY,null);
@@ -4919,7 +4975,10 @@ public class Functions implements MacroConstants, Measurements {
 		BufferedReader reader = null;
 		try {
 			Process p = Runtime.getRuntime().exec(cmd);
-			if (openingDoc) return null;
+			boolean returnImmediately = openingDoc || !waitForCompletion;
+			waitForCompletion = true;
+			if (returnImmediately)
+				return null;
 			reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			String line; int count=1;
 			while ((line=reader.readLine())!=null)  {
@@ -5992,7 +6051,8 @@ public class Functions implements MacroConstants, Measurements {
 	Variable[] sortArray() {
 		interp.getLeftParen();
 		Variable[] a = getArray();
-		interp.getRightParen();
+		boolean multipleArrays= interp.nextToken()==',';
+		int[] indexes = null;
 		int len = a.length;
 		int nNumbers = 0;
 		for (int i=0; i<len; i++) {
@@ -6002,6 +6062,8 @@ public class Functions implements MacroConstants, Measurements {
 			double[] d = new double[len];
 			for (int i=0; i<len; i++)
 				d[i] = a[i].getValue();
+			if(multipleArrays)
+				indexes = Tools.rank(d);
 			Arrays.sort(d);
 			for (int i=0; i<len; i++)
 				a[i].setValue(d[i]);
@@ -6009,12 +6071,31 @@ public class Functions implements MacroConstants, Measurements {
 			String[] s = new String[len];
 			for (int i=0; i<len; i++)
 				s[i] = a[i].getString();
-			//StringSorter.sort(s);
+			if(multipleArrays)
+				indexes = Tools.rank(s);
 			Arrays.sort(s, String.CASE_INSENSITIVE_ORDER);
 			for (int i=0; i<len; i++)
 				a[i].setString(s[i]);
-		} else
+		} else{
 			interp.error("Mixed strings and numbers");
+			return a;
+		}
+		while (interp.nextToken()==',') {
+			interp.getComma();
+			Variable[] b = getArray();
+			if(b.length != len){
+				interp.error("Arrays must have same length");
+				return a;
+			}
+			Variable[] c = new Variable[len];
+			for (int jj = 0; jj < len; jj++){
+				c[jj] = b[indexes[jj]];
+			}	
+			for (int jj = 0; jj < len; jj++){
+				b[jj] = c[jj];
+			}	
+		}
+		interp.getRightParen();
 		return a;
 	}
 
