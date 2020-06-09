@@ -5,7 +5,31 @@
 </head>
 <body>
 
-<li> <u>1.53b42  30 May 2020</u>
+<li> <u>1.53c17  7 June 2020</u>
+<ul>
+<li> The Color Picker is improved, including a new tool icon.
+<li> The main ImageJ window is 20 pixels wider.
+<li> Tool icons are bolder when the GUI scale is less the 1.5.
+<li> Thanks Jerome Mutterer, added the rainbow progress bar
+easter egg, activated by switching to the angle tool and running
+a command that uses a progress bar (e.g., a radius 50 median
+filter on a 1000x1000 image).
+<li> Thanks to Bill Christens-Barry, added the TextWindow.setFont(name,style,size)
+method for setting the font used in the Log window. For monospaced text, set
+ 'name' to "Monospaced"
+(<a href="http://wsr.imagej.net/macros/examples/MonospacedText.txt">example</a>).
+<li> Thanks to Gilles Carpentier, fixed a bug that caused NaN results
+when measuring line selections created by <i>Edit&gt;Selection&gt;Area to Line</i>
+from particle analyzer selections touching the right or
+bottom edge of the image.
+<li> Thanks to Norbert Vischer, fixed bugs that caused hyperstacks
+with a "select all" selection to not be correcty copied to
+the system clipboard.
+<li> Thanks to Joe Want, fixed a bug that caused the macro interpreter to
+sometimes generate an invalid "Numeric return value expected" message.
+</ul>
+
+<li> <u>1.53b  31 May 2020</u>
 <ul>
 <li> Thanks to Jerome Mutterer, added the "Overlay Editing Tools"
 toolset and the  "Label Maker" tool to the toolbar's  "&gt;&gt;"
@@ -20,20 +44,20 @@ are dynamically updated as the group number is changed in the
 <i>Edit&gt;Selection&gt;Properties</i> dialog.
 <li> Thanks to Jerome Mutterer, added support for
 tool icons read from image files located in the
-IJ.getDir("macros")+"toolsets/icons/" folder. Example:
-<i>macro "Test Tool - icon:833.png" { }</i>. DOCUMENT
+macros/toolsets/icons/ folder. The syntax looks like<br>
+<i>macro "Test Tool - icon:833.png" { }</i>.
 <li> Thanks to Erod Baybay, added the Roi.setPosition(slice) macro function.
 <li> Thanks to Jerome Mutterer, added the Overlay.indexAt(x,y),
 Overlay.removeRois(name) and Overlay.getBounds(index,x,y,width,height)
-macro functions. DOCUMENT
+macro functions.
 <li> Thanks to Stein Rorvik, added the Roi.setJustification(str),
 Roi.setFontSize(size), Property.setList(str) and Property.getList
-macro functions. DOCUMENT
-<li> Added the setOption("InterpolateLines",boolean) macro function. DOCUMENT
+macro functions.
+<li> Added the setOption("InterpolateLines",boolean) macro function.
 <li> Thanks to Adrian Martin, added the setOption("FlipFitsImages",true)
-macro function. DOCUMENT
+macro function.
 <li> Thanks to Laurent Thomas, added the Roi.getGroupNames
-and Roi.setGroupNames() macro functions. DOCUMENT
+and Roi.setGroupNames() macro functions.
 <li> Thanks to Jan Eglinger, moved initialization of the okay and cancel
 buttons in GenericDialog into the constructors.
 <li> Thanks to Hidenao Yamada, fixed a bug that caused the
@@ -61,7 +85,7 @@ incorrect positions to be shown in the status bar after using the
 arrow keys to move line selections.
 <li> Thanks to Stein Rorvik, fixed a 1.52t regression that caused
 the TextRoi.setJustification() method to sometimes not work
-as expected
+as expected.
 <li> Thanks to 'hwada', fixed a 1.52t regression that changed the order
 of the points returned by Line.getFloatPolygon().
 </ul>
@@ -1453,13 +1477,6 @@ small 16-bit images or selections to be much slower.
 <li> Thanks to Michael Schmid, fixed a 1.51o regression that caused the particle
 analyzer to hang when processong 32-bit images.
 </ul> 
-
-<p>
-Support is available on the
-<a href="https://imagej.nih.gov/ij/list.html">mailing list</a>
-and on the
-<a href="https://forum.image.sc/">image.sc</a> forum.
-<p>
 
 <a href="http://imagej.nih.gov/ij">Home</a>
 </body>
