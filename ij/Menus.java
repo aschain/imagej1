@@ -1632,8 +1632,10 @@ public class Menus {
 	
 	public static Font getFont() {
 		if (menuFont==null) {
-			int size = fontSize==0?12:fontSize;
+			int size = fontSize==0?13:fontSize;
 			size = (int)Math.round(size*scale);
+			if (IJ.isWindows() && scale>1.0 && size>17)
+				size = 17;  // Java resets size to 12 if you try to set it to 18 or greater
 			menuFont =  new Font("SanSerif", Font.PLAIN, size);
 		}
 		//System.out.println("Menus.getFont: "+scale+" "+fontSize+" "+menuFont);
