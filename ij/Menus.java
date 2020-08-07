@@ -49,7 +49,7 @@ public class Menus {
 	private static Menus instance;
 	private static MenuBar mbar;
 	private static CheckboxMenuItem gray8Item,gray16Item,gray32Item,
-			color256Item,colorRGBItem,RGBStackItem,HSBStackItem,LabStackItem;
+			color256Item,colorRGBItem,RGBStackItem,HSBStackItem,LabStackItem,HSB32Item;
 	private static PopupMenu popup;
 
 	private static ImageJ ij;
@@ -162,6 +162,7 @@ public class Menus {
 			imageType.add(new MenuItem("-"));
 			RGBStackItem = addCheckboxItem(imageType, "RGB Stack", "ij.plugin.Converter(\"RGB Stack\")");
 			HSBStackItem = addCheckboxItem(imageType, "HSB Stack", "ij.plugin.Converter(\"HSB Stack\")");
+			HSB32Item = addCheckboxItem(imageType, "HSB (32-bit)", "ij.plugin.Converter(\"HSB (32-bit)\")");
 			LabStackItem = addCheckboxItem(imageType, "Lab Stack", "ij.plugin.Converter(\"Lab Stack\")");
 			image.add(imageType);
 			
@@ -304,6 +305,15 @@ public class Menus {
 		submenu.addActionListener(listener);
 		menu.add(submenu);
 		
+		submenu = new Menu("Tools");
+		addExample(submenu, "Annular Selection", "Annular_Selection_Tool.ijm");		
+		addExample(submenu, "Big Cursor", "Big_Cursor_Tool.ijm");		
+		addExample(submenu, "Circle Tool", "Circle_Tool.ijm");
+		addExample(submenu, "Point Picker", "Point_Picker_Tool.ijm");		
+		addExample(submenu, "Star Tool", "Star_Tool.ijm");
+		submenu.addActionListener(listener);
+		menu.add(submenu);
+
 		submenu = new Menu("Macro");
 		addExample(submenu, "Sphere", "Sphere.ijm");
 		addExample(submenu, "Dialog Box", "Dialog_Box.ijm");
@@ -320,9 +330,6 @@ public class Menus {
 		addExample(submenu, "Synthetic Images", "Synthetic_Images.ijm");
 		addExample(submenu, "Spiral Rotation", "Spiral_Rotation.ijm");
 		addExample(submenu, "Curve Fitting", "Curve_Fitting.ijm");
-		submenu.addSeparator();
-		addExample(submenu, "Circle Tool", "Circle_Tool.ijm");
-		addExample(submenu, "Star Tool", "Star_Tool.ijm");
 		submenu.addActionListener(listener);
 		menu.add(submenu);
 
@@ -354,6 +361,8 @@ public class Menus {
 		addExample(submenu, "FFT Filter", "FFT_Filter.js");
 		addExample(submenu, "Curve Fitting", "Curve_Fitting.js");
 		addExample(submenu, "Overlay Text", "Overlay_Text.js");
+		addExample(submenu, "Crop Multiple Rois", "Crop_Multiple_Rois.js");
+		addExample(submenu, "Show all LUTs", "Show_all_LUTs.js");
 		submenu.addActionListener(listener);
 		menu.add(submenu);
 		submenu = new Menu("BeanShell");
@@ -1212,7 +1221,7 @@ public class Menus {
 		return nPlugins;
 	}
 		
-	static final int RGB_STACK=10, HSB_STACK=11, LAB_STACK=12;
+	static final int RGB_STACK=10, HSB_STACK=11, LAB_STACK=12, HSB32_STACK=13;
 	
 	/** Updates the Image/Type and Window menus. */
 	public static void updateMenus() {
@@ -1225,6 +1234,7 @@ public class Menus {
 		RGBStackItem.setState(false);
 		HSBStackItem.setState(false);
 		LabStackItem.setState(false);
+		HSB32Item.setState(false);
 		ImagePlus imp = WindowManager.getCurrentImage();
 		if (imp==null)
 			return;
@@ -1237,6 +1247,8 @@ public class Menus {
     			type = HSB_STACK;
     		else if (stack.isLab())
     			type = LAB_STACK;
+    		else if (stack.isHSB32())
+    			type = HSB32_STACK;
     	}
     	switch (type) {
     		case ImagePlus.GRAY8:
@@ -1262,6 +1274,9 @@ public class Menus {
 				break;
     		case LAB_STACK:
 				LabStackItem.setState(true);
+				break;
+    		case HSB32_STACK:
+				HSB32Item.setState(true);
 				break;
 		}
 		

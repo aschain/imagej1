@@ -55,10 +55,9 @@ import javax.swing.filechooser.*;
 						File file = chooser.getSelectedFile();
 						directory = file.getAbsolutePath();
 						defaultDir=directory;
-						if (!(directory.endsWith(File.separator)||directory.endsWith("/")))
-							directory += File.separator;
+						directory = IJ.addSeparator(directory);
 						//OpenDialog.setDefaultDirectory(directory);
-						Prefs.set("DirectoryChooser.DefaultDirectory",defaultDir);
+						Prefs.set("DirectoryChooser.DefaultDirectory",directory);
 						Prefs.savePreferences();
 					}
 				}
@@ -86,10 +85,9 @@ import javax.swing.filechooser.*;
 				File file = chooser.getSelectedFile();
 				directory = file.getAbsolutePath();
 				defaultDir=directory;
-				if (!(directory.endsWith(File.separator)||directory.endsWith("/")))
-					directory += File.separator;
+				directory = IJ.addSeparator(directory);
 				//OpenDialog.setDefaultDirectory(directory);
-				Prefs.set("DirectoryChooser.DefaultDirectory",defaultDir);
+				Prefs.set("DirectoryChooser.DefaultDirectory",directory);
 				Prefs.savePreferences();
 			}
 		} catch (Exception e) {}

@@ -1890,8 +1890,6 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 			}
 			if (imageType==COLOR_RGB)
 				ContrastAdjuster.update();
-			else if (imageType==GRAY16 || imageType==GRAY32)
-				ThresholdAdjuster.update();
 			if (!noUpdateMode)
 				updateAndRepaintWindow();
 			else
@@ -2414,9 +2412,8 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 	 * @see ij.plugin.Duplicator#crop
 	*/
 	public ImagePlus crop(String options) {
-		String msg = "crop: \"stack\", \"slice\" or a range (e.g., \"20-30\") expected";
 		int stackSize = getStackSize();
-		if (options==null || options.equals("stack"))
+		if (options==null || options.contains("stack"))
 			return (new Duplicator()).run(this);
 		else if (options.contains("whole")) {
 			Roi saveRoi = getRoi();
@@ -2424,20 +2421,74 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 			ImagePlus imp2 = crop();
 			setRoi(saveRoi);
 			return imp2;
-		} else if (options.equals("slice") || stackSize==1)
+		} else if (options.contains("slice") || stackSize==1)
 			return crop();
 		else {
 			String[] range = Tools.split(options, " -");
 			if (range.length!=2)
-				throw new IllegalArgumentException(msg);
+				return crop();
 			double s1 = Tools.parseDouble(range[0]);
 			double s2 = Tools.parseDouble(range[1]);
 			if (Double.isNaN(s1) || Double.isNaN(s2))
-				throw new IllegalArgumentException(msg);
+				return crop();
 			if (s1<1) s1 = 1;
 			if (s2>stackSize) s2 = stackSize;
 			if (s1>s2) {s1=1; s2=stackSize;}
 			return new Duplicator().run(this, (int)s1, (int)s2);
+		}
+	}
+	
+	/** Returns an array of cropped images based on the provided
+	 * list of rois. 'options' applies with stacks and can be "stack",
+	* "slice" or a range (e.g., "20-30").
+	 * @see #crop(ij.gui.Roi[])
+	*/
+	public ImagePlus[] crop(Roi[] rois, String options) {
+		int nRois = rois.length; 
+		ImagePlus[] cropImps = new ImagePlus[nRois];
+		for (int i=0; i<nRois; i++) {
+			Roi cropRoi = rois[i];
+			String name = cropRoi.getName();
+			if (options.contains("slice") && this.getStackSize()>1) {
+				int position = cropRoi.getPosition();
+				this.setSlice(position); // no effect if roi position is undefined (=0), ok
+			}
+			this.setRoi(cropRoi);
+			ImagePlus cropped = this.crop(options);
+			if (cropRoi.getType()!=Roi.RECTANGLE) {
+				Roi cropRoi2 = (Roi)cropRoi.clone();
+				cropRoi2.setLocation(0,0);
+				cropped.setRoi(cropRoi2);
+			}
+			String name2 = IJ.pad(i+1,3)+"_"+this.getTitle();
+			cropped.setTitle(name!=null?name:name2);
+			cropped.setOverlay(null);
+			cropImps[i] = cropped;
+		}
+		return cropImps;
+	}
+
+	/** Multi-roi cropping with default "slice" option. */
+	public ImagePlus[] crop(Roi[] rois) {
+		return this.crop(rois, "slice");
+	}
+
+	public void cropAndSave(Roi[] rois, String directory, String options) {
+		ImagePlus[] images = crop(rois);
+		if (options==null) options = "";
+		if (options.contains("show")) {
+			ImageStack stack = ImageStack.create(images);
+			new ImagePlus("CROPPED_"+getTitle(),stack).show();
+			return;
+		}
+		String format = "tif";
+		if (options.contains("png")) format = "png";
+		if (options.contains("jpg")) format = "jpg";
+		for (int i=0; i<images.length; i++) {
+			Rectangle bounds = rois[i].getBounds();
+			String title = IJ.pad(bounds.x,4)+"-"+IJ.pad(bounds.y,4);
+			String path = directory + title + "." + format;
+			IJ.saveAs(images[i], format, path);
 		}
 	}
 

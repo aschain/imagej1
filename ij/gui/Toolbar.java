@@ -146,7 +146,6 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 			buttonWidth = (int)((BUTTON_WIDTH-2)*dscale);
 			buttonHeight = (int)((BUTTON_HEIGHT-2)*dscale);
 			offset = (int)Math.round((OFFSET-1)*dscale);
-			//IJ.log(dscale+" "+BUTTON_WIDTH+" "+buttonWidth+" "+offset);
 		} else {
 			buttonWidth = BUTTON_WIDTH;
 			buttonHeight = BUTTON_HEIGHT;
@@ -404,17 +403,16 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 				m(12,12); d(18,18);
 				return;
 			case HAND:
-				xOffset = x+1; yOffset = y+1;
-				polyline(5,15,5,14,2,11,2,10,0,8,0,7,1,6,2,6,4,8,4,6,3,5,3,4,2,3,2,2,3,1,4,1,5,2,5,3);
-				polyline(6,5,6,1,7,0,8,0,9,1,9,5,9,1,11,1,12,2,12,6);
-				polyline(13,4,14,3,15,4,15,7,14,8,14,10,13,11,13,12,12,13,12,14,12,15);
+				xOffset = x; yOffset = y;
+				polyline(5,17,5,16,0,11,0,8,1,8,5,11,5,2,8,2,8,8,8,0,11,0,11,8,11,1,14,1,14,9,14,3,17,3,17,12,16,13,16,17);
 				return;
 			case DROPPER:
 				xOffset = x; yOffset = y;
 				g.setColor(backgroundColor);
-				g.fillRect(x+3*scale, y+3*scale, 14*scale, 14*scale);
+				g.fillRect(x+4*scale, y+4*scale, 14*scale, 14*scale);
+				g.drawRect(x, y, 13*scale, 13*scale);
 				g.setColor(foregroundColor);
-				g.fillRect(x-1, y-1, 14*scale, 14*scale);
+				g.fillRect(x+1, y+1, 12*scale, 12*scale);
 				return;
 			case ANGLE:
 				xOffset = x; yOffset = y+3;
@@ -468,7 +466,8 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 				char command = icon.charAt(pc++);
 				if (pc>=icon.length()) break;
 				switch (command) {
-					case 'B': x+=v(); y+=v(); break;  // reset base
+					case 'B': x+=v(); y+=v(); break;  // adjust base
+					case 'N': x-=v(); y-=v(); break;  // adjust base negatively
 					case 'R': g.drawRect(x+v(), y+v(), v(), v()); break;  // rectangle
 					case 'F': g.fillRect(x+v(), y+v(), v(), v()); break;  // filled rectangle
 					case 'O': g.drawOval(x+v(), y+v(), v(), v()); break;  // oval
@@ -551,6 +550,12 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 			case 'f': return 15*scale;
 			case 'g': return 16*scale;
 			case 'h': return 17*scale;
+			case 'i': return 18*scale;
+			case 'j': return 19*scale;
+			case 'k': return 20*scale;
+			case 'l': return 21*scale;
+			case 'm': return 22*scale;
+			case 'n': return 23*scale;
 			default: return 0;
 		}
 	}
@@ -964,11 +969,13 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 	}
 	
 	public static void repaintTool(int tool) {
-		if (IJ.getInstance()!=null) {
-			Toolbar tb = getInstance();
+		Toolbar tb = getInstance();
+		if (tb!=null) {
 			Graphics g = tb.getGraphics();
 			if (IJ.debugMode) IJ.log("Toolbar.repaintTool: "+tool+" "+g);
 			if (g==null) return;
+			if (dscale>1.0)
+				tb.setStrokeWidth((Graphics2D)g);
 			((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			tb.drawButton(g, tool);
 			if (g!=null) g.dispose();
@@ -1270,7 +1277,7 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 	void drawTool(int tool, boolean drawDown) {
 		down[tool] = drawDown;
 		Graphics g = this.getGraphics();
-		if (!drawDown && Prefs.antialiasedTools) {
+		if (!drawDown) {
 			Graphics2D g2d = (Graphics2D)g;
 			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		}
