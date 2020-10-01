@@ -316,6 +316,7 @@ public class Functions implements MacroConstants, Measurements {
 			case ROI: var = doRoi(); break;
 			case ROI_MANAGER2: var = doRoiManager(); break;
 			case PROPERTY: var = doProperty(); break;
+			case IMAGE: var = doImage(); break;
 			default:
 				interp.error("Variable function expected");
 		}
@@ -1278,6 +1279,14 @@ public class Functions implements MacroConstants, Measurements {
 				size = rt!=null?rt.size():0;
 			}
 		}
+		if (size==0) {
+			Window win = WindowManager.getActiveTable();
+			if (win!=null && (win instanceof TextWindow)) {
+				TextPanel tp = ((TextWindow)win).getTextPanel();
+				rt = tp.getOrCreateResultsTable();
+				size = rt!=null?rt.size():0;
+			}
+		}
 		if (size==0 && reportErrors)
 			interp.error("No results found");
 		return rt;
@@ -2192,11 +2201,7 @@ public class Functions implements MacroConstants, Measurements {
 		} else if (name.equals("getLimits")) {
 			return getPlotLimits(currentPlot);
 		} else if (name.equals("freeze")) {
-			if (interp.nextNextToken()==')') {
-				interp.getParens();
-				currentPlot.setFrozen(true);
-			} else
-				currentPlot.setFrozen(getBooleanArg());
+			currentPlot.setFrozen(getBooleanArg());
 			return Double.NaN;
 		}  else if (name.equals("addLegend") || name.equals("setLegend")) {
 			return addPlotLegend(currentPlot);
@@ -3834,9 +3839,17 @@ public class Functions implements MacroConstants, Measurements {
 		s1 = getStringFunctionArg(s1);
 		String s2 = getString();
 		String s3 = getLastString();
-		if (s2.length()==1 && s3.length()==1)
-			return s1.replace(s2.charAt(0), s3.charAt(0));
-		else {
+		if (s2.length()==1) {
+			StringBuilder sb = new StringBuilder(s1.length());
+			for (int i=0; i<s1.length(); i++) {
+				char c = s1.charAt(i);
+				if (c==s2.charAt(0))
+					sb.append(s3);
+				else
+					sb.append(c);
+			}
+			return sb.toString();
+		} else {
 			try {
 				return s1.replaceAll(s2, s3);
 			} catch (Exception e) {
@@ -4831,7 +4844,11 @@ public class Functions implements MacroConstants, Measurements {
 			return join();
 		else if (name.equals("trim"))
 			return getStringArg().trim();
-		else
+		else if (name.equals("format")) {
+			try {return String.format(getFirstString(),getLastArg());}
+			catch (Exception e) {interp.error(""+e);}
+			return null;
+		} else
 			interp.error("Unrecognized String function");
 		return null;
 	}
@@ -7792,6 +7809,9 @@ public class Functions implements MacroConstants, Measurements {
 		if (name.equals("size")) {
 			interp.getParens();
 			return new Variable(rm.getCount());
+		} else if (name.equals("selected")) {
+			interp.getParens();
+			return new Variable(rm.selected());
 		} else if (name.equals("select")) {
 			rm.select((int)getArg());
 			return null;
@@ -7903,18 +7923,61 @@ public class Functions implements MacroConstants, Measurements {
 		return sb.toString();
 	}
 	
-	boolean isStringFunction(String name) {
-		if (name.equals("getStrokeColor") || name.equals("getDefaultColor")
-		|| name.equals("getFillColor") || name.equals("getName")
-		|| name.equals("getProperty") || name.equals("getProperties")
-		|| name.equals("getType") || name.equals("getString") || name.equals("title")
-		|| name.equals("headings") || name.equals("allHeadings")
-		|| name.equals("get") || name.equals("getInfo") || name.equals("getSliceLabel")
-		|| name.equals("getDicomTag") || name.equals("getList")
-		|| name.equals("getGroupNames"))
-			return true;
-		else
-			return false;
+	static boolean isStringFunction(String name, int type) {
+		boolean isString = false;
+		switch (type) {
+			case TABLE:
+				if (name.equals("getString") || name.equals("title") || name.equals("headings")
+				|| name.equals("allHeadings"))
+					isString = true;
+				break;
+			case ROI:
+				if (name.equals("getStrokeColor") || name.equals("getDefaultColor")
+				|| name.equals("getFillColor") || name.equals("getName")
+				|| name.equals("getProperty") || name.equals("getProperties")
+				|| name.equals("getGroupNames") || name.equals("getType"))
+					isString = true;
+				break;
+			case PROPERTY:
+				if (name.equals("getProperty") || name.equals("getProperties")
+				|| (name.equals("get")&&type!=TABLE) || name.equals("getInfo")
+				|| name.equals("getList") || name.equals("setSliceLabel")
+				|| name.equals("getDicomTag"))
+					isString = true;
+				break;
+			case ROI_MANAGER2:
+				if (name.equals("getName"))
+					isString = true;
+				break;
+		}
+		return isString;
+	}
+	
+	private Variable doImage() {
+		interp.getToken();
+		if (interp.token!='.')
+			interp.error("'.' expected");
+		interp.getToken();
+		if (!(interp.token==WORD||interp.token==PREDEFINED_FUNCTION))
+			interp.error("Function name expected: ");
+		String name = interp.tokenString;
+		ImagePlus imp = getImage();
+		if (name.equals("width")) {
+			interp.getParens();
+			return new Variable(imp.getWidth());
+		} else if (name.equals("height")) {
+			interp.getParens();
+			return new Variable(imp.getHeight());
+		} else if (name.equals("copy")) {
+			interp.getParens();
+			imp.copy();
+			return null;
+		} else if (name.equals("paste")) {
+			imp.paste((int)getFirstArg(), (int)getLastArg());
+			imp.updateAndDraw();
+			return null;
+		}
+		return null;
 	}
 
 } // class Functions

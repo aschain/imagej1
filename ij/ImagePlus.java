@@ -1446,9 +1446,13 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 	*/
 	public String getProp(String key) {
 		if (imageProperties==null)
-			return null;
-		else
-			return imageProperties.getProperty(key);
+			return getStringProperty(key);
+		else {
+			String value = imageProperties.getProperty(key);
+			if (value==null)
+				value = getStringProperty(key);
+			return value;
+		}
 	}
 	
 	/** Returns the numeric property associated with the specified key
@@ -2473,22 +2477,27 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 		return this.crop(rois, "slice");
 	}
 
-	public void cropAndSave(Roi[] rois, String directory, String options) {
+	/** Saves the contents of the ROIs in this overlay as separate images,
+	 * where 'directory' is the directory path and 'format' is "tif", "png" or "jpg".
+	* Set 'format' to "show" and the images will be displayed in a stack
+	* and not saved.
+	*/
+	public void cropAndSave(Roi[] rois, String directory, String format) {
 		ImagePlus[] images = crop(rois);
-		if (options==null) options = "";
-		if (options.contains("show")) {
+		if (format==null) format = "";
+		if (format.contains("show")) {
 			ImageStack stack = ImageStack.create(images);
 			new ImagePlus("CROPPED_"+getTitle(),stack).show();
 			return;
 		}
-		String format = "tif";
-		if (options.contains("png")) format = "png";
-		if (options.contains("jpg")) format = "jpg";
+		String fileFormat = "tif";
+		if (format.contains("png")) fileFormat = "png";
+		if (format.contains("jpg")) fileFormat = "jpg";
 		for (int i=0; i<images.length; i++) {
 			Rectangle bounds = rois[i].getBounds();
 			String title = IJ.pad(bounds.x,4)+"-"+IJ.pad(bounds.y,4);
-			String path = directory + title + "." + format;
-			IJ.saveAs(images[i], format, path);
+			String path = directory + title + "." + fileFormat;
+			IJ.saveAs(images[i], fileFormat, path);
 		}
 	}
 
@@ -2540,7 +2549,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 			setCalibration(imp.getCalibration());
 	}
 
-	/** Copies attributes (name, ID, calibration, path, plot) of the specified image to this image. */
+	/** Used internally. */
 	public void copyAttributes(ImagePlus imp) {
 		if (IJ.debugMode) IJ.log("copyAttributes: "+imp.getID()+"  "+this.getID()+" "+imp+"   "+this);
 		if (imp==null || imp.getWindow()!=null)
@@ -2721,6 +2730,12 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 		}
     }
 
+	/** Copies the contents of the current selection to the internal
+		clipboard and then clears the selection. */
+	public void cut() {
+		copy(true);
+	}
+
 	/** Copies the contents of the current selection, or the entire
 		image if there is no selection, to the internal clipboard. */
 	public void copy() {
@@ -2769,8 +2784,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 		}
     }
 
-
-	 /** Inserts the contents of the internal clipboard into the active image. If there
+	 /** Inserts the contents of the internal clipboard into this image. If there
 	 is a selection the same size as the image on the clipboard, the image is inserted
 	 into that selection, otherwise the selection is inserted into the center of the image.*/
 	 public void paste() {
@@ -2790,7 +2804,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 			cr = cRoi.getBounds();
 		if (cr==null)
 			cr = new Rectangle(0, 0, w, h);
-		if (r==null || (cr.width!=r.width || cr.height!=r.height)) {
+		if (r==null || Math.abs(cr.width-r.width)>10 || Math.abs(cr.height-r.height)>10) {
 			// Create a new roi centered on visible part of image, or centered on image if clipboard is >= image
 			ImageCanvas ic = win!=null?ic = win.getCanvas():null;
 			Rectangle srcRect = ic!=null?ic.getSrcRect():new Rectangle(0,0,width,height);
@@ -2827,17 +2841,41 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 		}
 		changes = true;
     }
-
-	/** Returns the internal clipboard or null if the internal clipboard is empty. */
-	public static ImagePlus getClipboard() {
-		return clipboard;
+    
+    /** Inserts the contents of the internal clipboard at the
+    	specified location, without updating the display. */
+	 public void paste(int x, int y) {
+		if (clipboard==null)
+			return;
+		Roi roi = clipboard.getRoi();
+		boolean nonRect = roi!=null && roi.getType()!=Roi.RECTANGLE;
+		if (nonRect)
+			ip.snapshot();
+		ip.insert(clipboard.getProcessor(), x, y);
+		if (nonRect) {
+			ImageProcessor mask = roi.getMask();
+			ip.setRoi(x, y, mask.getWidth(), mask.getHeight());
+			ip.setMask(mask);
+			ip.reset(ip.getMask());
+		}
 	}
+
+    /** Returns the internal clipboard or null if the internal clipboard is empty. */
+    public static ImagePlus getClipboard() {
+        return clipboard;
+    }
 
 	/** Clears the internal clipboard. */
 	public static void resetClipboard() {
 		clipboard = null;
 	}
 	
+	/** Copies the contents of the current selection, or the entire
+		image if there is no selection, to the system clipboard. */
+	public void copyToSystem() {
+		Clipboard.copyToSystem(this);
+	}
+
 	protected void notifyListeners(final int id) {
 	    final ImagePlus imp = this;
 		EventQueue.invokeLater(new Runnable() {

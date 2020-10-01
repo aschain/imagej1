@@ -12,9 +12,8 @@ import ij.macro.Interpreter;
    // test script
    imp1 = IJ.openImage("http://imagej.nih.gov/ij/images/boats.gif")
    imp2 = IJ.openImage("http://imagej.nih.gov/ij/images/bridge.gif")
-   ic = new ImageCalculator()
-   imp3 = ic.run("Average create", imp1, imp2)
-   imp3.show()
+   imp3 = ImageCalculator.run(imp1, imp2, "add create 32-bit");
+   imp3.show();
 </pre>
 */
 public class ImageCalculator implements PlugIn {
@@ -27,6 +26,7 @@ public class ImageCalculator implements PlugIn {
 	private static boolean createWindow = true;
 	private static boolean floatResult;
 	private boolean processStack;
+	private boolean macroCall;
 	
 	public void run(String arg) {
 		int[] wList = WindowManager.getIDList();
@@ -77,31 +77,34 @@ public class ImageCalculator implements PlugIn {
 		if (img3!=null) img3.show();
 	}
 	
-	/** Performs arithmetic options on two images where the 'options' argument
-		("add","subtract", "multiply","divide", "and", "or", "xor", "min", "max", "average",
-		"difference" or "copy") specifies the operation. The 'options'  string can
-		include up to three modifiers: "create" (e.g., "add create") causes the result
-		to be stored in a new window, "32-bit" causes the result to be 32-bit
-		floating-point and "stack" causes the entire stack to be processed.
-		For example
+	/** Performs arithmetic options on two images and returns the result,
+		where  'operation' ("add","subtract", "multiply","divide", "and", 
+		"or", "xor", "min", "max", "average", "difference" or "copy")
+		specifies the operation. If 'operation' does not contain 'create'
+		or '32-bit', the result is also saved in 'imp1" and null is returned
+		if "imp1" is displayed. The 'operation' argument can include up
+		to three modifiers: "create" (e.g., "add create") causes the result
+		to be returned as a new image, "32-bit" causes the result to 
+		be returned as 32-bit floating-point image and "stack" causes
+		the entire stack to be processed. As an example,
 		<pre>
 		imp3 = ImageCalculator.run(imp1, imp2, "divide create 32-bit");
 		</pre>
 		divides 'imp1' by 'imp2' and returns the result as a new 32-bit image.
 	*/
-	public static ImagePlus run(ImagePlus img1, ImagePlus img2, String options) {
+	public static ImagePlus run(ImagePlus img1, ImagePlus img2, String operation) {
 		ImageCalculator ic = new ImageCalculator();
-		return ic.run(options, img1, img2);
+		return ic.run(operation, img1, img2);
 	}
 
-	public ImagePlus run(String options, ImagePlus img1, ImagePlus img2) {
-		if (img1==null || img2==null || options==null) return null;
-		operator = getOperator(options);
+	public ImagePlus run(String operation, ImagePlus img1, ImagePlus img2) {
+		if (img1==null || img2==null || operation==null) return null;
+		operator = getOperator(operation);
 		if (operator==-1)
 			throw new IllegalArgumentException("No valid operator");
-		createWindow = options.indexOf("create")!=-1;
-		floatResult= options.indexOf("32")!=-1 || options.indexOf("float")!=-1;
-		processStack = options.indexOf("stack")!=-1;
+		createWindow = operation.indexOf("create")!=-1;
+		floatResult= operation.indexOf("32")!=-1 || operation.indexOf("float")!=-1;
+		processStack = operation.indexOf("stack")!=-1;
 		return calculate(img1, img2, true);
 	}
 	
@@ -109,14 +112,15 @@ public class ImageCalculator implements PlugIn {
 	* @deprecated
 	* replaced by run(String,ImagePlus,ImagePlus)
 	*/
-	public void calculate(String options, ImagePlus img1, ImagePlus img2) {
-		if (img1==null || img2==null || options==null) return;
-		operator = getOperator(options);
+	public void calculate(String operation, ImagePlus img1, ImagePlus img2) {
+		if (img1==null || img2==null || operation==null) return;
+		operator = getOperator(operation);
 		if (operator==-1)
 			{IJ.error("Image Calculator", "No valid operator"); return;}
-		createWindow = options.indexOf("create")!=-1;
-		floatResult= options.indexOf("32")!=-1 || options.indexOf("float")!=-1;
-		processStack = options.indexOf("stack")!=-1;
+		createWindow = operation.indexOf("create")!=-1;
+		floatResult = operation.indexOf("32")!=-1 || operation.indexOf("float")!=-1;
+		processStack = operation.indexOf("stack")!=-1;
+		macroCall = true;
 		ImagePlus img3 = calculate(img1, img2, true);
 		if (img3!=null) img3.show();
 	}
@@ -150,6 +154,8 @@ public class ImageCalculator implements PlugIn {
 				img3 = doStackOperation(img1, img2);
 			else
 				img3 = doOperation(img1, img2);
+			if (img3==null && !macroCall && (img1.getWindow()==null))
+				img3 = img1;
 			return img3;
 		}
 		boolean stackOp = false;

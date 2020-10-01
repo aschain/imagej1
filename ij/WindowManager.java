@@ -20,6 +20,7 @@ public class WindowManager {
 	private static Vector nonImageList = new Vector();	// list of non-image windows (Frames and Dialogs)
 	private static ImageWindow currentWindow;			 // active image window
 	private static Window frontWindow;
+	private static Window frontTable;
 	private static Frame frontFrame;
 	private static Hashtable tempImageTable = new Hashtable();
 	
@@ -140,6 +141,11 @@ public class WindowManager {
 	/** Returns the front most window or null. */
 	public static Window getActiveWindow() {
 		return frontWindow;
+	}
+
+	/** Returns the Window containing the active table, or null. */
+	public static Window getActiveTable() {
+		return frontTable;
 	}
 
 	/** Obsolete; replaced by getActiveWindow. */
@@ -368,6 +374,8 @@ public class WindowManager {
 				Menus.removeWindowMenuItem(index);
 				nonImageList.removeElement(win);
 			}
+			if (win!=null && win==frontTable)
+				frontTable = null;
 		}
 		setWindow(null);
 	}
@@ -411,9 +419,11 @@ public class WindowManager {
 	public static void setWindow(Frame win) {
 		frontWindow = win;
 		frontFrame = win;
+		if (win!=null && win instanceof TextWindow && !(win instanceof Editor) && !"Log".equals(((TextWindow)win).getTitle()))
+			frontTable = win;
 		//System.out.println("Set window(F): "+(win!=null?win.getTitle():"null"));
     }
-
+    
 	/** Closes all windows. Stops and returns false if an image or Editor "save changes" dialog is canceled. */
 	public synchronized static boolean closeAllWindows() {
 		Prefs.closingAll = true;
