@@ -65,7 +65,6 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 	private int defaultLineWidth = 1;
 	private Color defaultColor;
 	private boolean firstTime = true;
-	private int[] selectedIndexes;
 	private boolean appendResults;
 	private static ResultsTable mmResults, mmResults2;
 	private int imageID;
@@ -424,7 +423,7 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 		roi.setName(label);
 		Roi roiCopy = (Roi)roi.clone();
 		if (ignorePosition && imp!=null && imp.getStackSize()>1 && imp.getWindow()!=null && isVisible()) {
-			// set ROI position to current stack position if image and RoiManager are visible
+ 			// set ROI position to current stack position if image and RoiManager are visible
 			roiCopy.setPosition(imp);
 		}
 		if (lineWidth>1)
@@ -444,7 +443,7 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 
 	void recordAdd(Color color, int lineWidth) {
 		if (Recorder.scriptMode())
-			Recorder.recordCall("rm.addRoi(imp.getRoi());");
+			Recorder.recordCall("rm.addRoi(roi);");
 		else if (color!=null && lineWidth==1)
 			Recorder.recordString("roiManager(\"Add\", \""+getHex(color)+"\");\n");
 		else if (lineWidth>1)
@@ -601,8 +600,8 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 			}
 		}
 		ImagePlus imp = WindowManager.getCurrentImage();
-		if (count>1 && index.length==1 && imp!=null)
-			imp.deleteRoi();
+		//if (count>1 && index.length==1 && imp!=null)
+		//	imp.deleteRoi();
 		updateShowAll();
 		if (record())
 			Recorder.record("roiManager", "Delete");
@@ -1462,6 +1461,7 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 		String rpName = null;
 		Font font = null;
 		int justification = TextRoi.LEFT;
+		String roiText = null;
 		double opacity = -1;
 		int pointType = -1;
 		int pointSize = -1;
@@ -1494,6 +1494,7 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 			if (rpRoi instanceof TextRoi) {
 				font = ((TextRoi)rpRoi).getCurrentFont();
 				justification = ((TextRoi)rpRoi).getJustification();
+				roiText = ((TextRoi)rpRoi).getText();
 			}
 			if (rpRoi instanceof ImageRoi)
 				opacity = ((ImageRoi)rpRoi).getOpacity();
@@ -1527,6 +1528,7 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 				if (font!=null)
 					((TextRoi)roi).setCurrentFont(font);
 				((TextRoi)roi).setJustification(justification);
+				if (n==1) ((TextRoi)roi).setText(roiText);
 				roi.setImage(null);
 			}
 			if ((roi instanceof ImageRoi) && opacity!=-1)
@@ -1549,6 +1551,7 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 			if (roi!=null && (roi instanceof TextRoi)) {
 				((TextRoi)roi).setCurrentFont(font);
 				((TextRoi)roi).setJustification(justification);
+				((TextRoi)roi).setText(roiText);
 			}
 			if (roi!=null && (roi instanceof ImageRoi) && opacity!=-1)
 				((ImageRoi)roi).setOpacity(opacity);
@@ -1601,7 +1604,7 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 		if (imp==null)
 			return;
 		Roi[] rois = getSelectedRoisAsArray();
-		if (rois.length==1) {
+		if (rois.length==1 && !IJ.isMacro()) {
 			error("More than one item must be selected, or none");
 			return;
 		}
@@ -1620,6 +1623,13 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 	}
 
 	private void combineRois(ImagePlus imp, Roi[] rois) {
+		if (rois.length==1) {
+		    Roi roi2 = (Roi)rois[0].clone();
+		    roi2.setPosition(0);
+		    roi2.setGroup(0);
+			imp.setRoi(roi2);
+			return;
+		}
 		IJ.resetEscape();
 		ShapeRoi s1=null, s2=null;
 		for (int i=0; i<rois.length; i++) {
@@ -2078,6 +2088,11 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 		return listModel!=null?listModel.getSize():0;
 	}
 
+	/** Returns the count of selected ROIs. */
+	public int selected() {
+		return getSelectedIndexes().length;
+	}
+
 	/** Returns the index of the specified Roi, or -1 if it is not found. */
     public int getRoiIndex(Roi roi) {
 		int n = getCount();
@@ -2401,7 +2416,6 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 
 	/** Assigns the ROI at the specified index to 'imp'. */
 	public void select(ImagePlus imp, int index) {
-		selectedIndexes = null;
 		if (index<0) {
 			deselect();
 			return;
@@ -2587,18 +2601,12 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 			if (indexes[i]<0) indexes[i]=0;
 			if (indexes[i]>=count) indexes[i]=count-1;
 		}
-		selectedIndexes = indexes;
 		list.setSelectedIndices(indexes);
 	}
 
 	/** Returns an array of the selected indexes. */
 	public int[] getSelectedIndexes() {
-		if (selectedIndexes!=null) {
-			int[] indexes = selectedIndexes;
-			selectedIndexes = null;
-			return indexes;
-		} else
-			return list.getSelectedIndices();
+		return list.getSelectedIndices();
 	}
 
 	/** This is a macro-callable version of getSelectedIndexes().

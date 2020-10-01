@@ -139,20 +139,21 @@ public class IJ {
 		LogStream.redirectSystem(debugMode);
 	}
 
-	/** Runs the macro contained in the string <code>macro</code>.
-		Returns any string value returned by the macro, null if the macro
-		does not return a value, or "[aborted]" if the macro was aborted
-		due to an error. The equivalent macro function is eval(). */
+	/** Runs the macro contained in the string <code>macro</code>
+		on the current thread. Returns any string value returned by
+		the macro, null if the macro does not return a value, or
+		"[aborted]" if the macro was aborted due to an error. The
+		equivalent macro function is eval(). */
 	public static String runMacro(String macro) {
 		return runMacro(macro, "");
 	}
 
-	/** Runs the macro contained in the string <code>macro</code>.
-		The optional string argument can be retrieved in the
-		called macro using the getArgument() macro function. 
-		Returns any string value returned by the macro, null if the macro
-		does not return a value, or "[aborted]" if the macro was aborted
-		due to an error.  */
+	/** Runs the macro contained in the string <code>macro</code>
+		on the current thread. The optional string argument can be
+		retrieved in the called macro using the getArgument() macro
+		function. Returns any string value returned by the macro, null
+		if the macro does not return a value, or "[aborted]" if the
+		macro was aborted due to an error.  */
 	public static String runMacro(String macro, String arg) {
 		Macro_Runner mr = new Macro_Runner();
 		return mr.runMacro(macro, arg);
@@ -854,10 +855,11 @@ public class IJ {
 		java.awt.Toolkit.getDefaultToolkit().beep();
 	}
 	
-	/**	Runs the garbage collector and returns a string something
-		like "64K of 256MB (25%)" that shows how much of 
-		the  available memory is in use. This is the string
-		displayed when the user clicks in the status bar. */
+	/**	Returns a string something like "64K of 256MB (25%)"
+	 * that shows how much of  the  available memory is in use.
+	 * This is the string displayed when the user clicks in the
+	 * status bar.
+	*/
 	public static String freeMemory() {
 		long inUse = currentMemory();
 		String inUseStr = inUse<10000*1024?inUse/1024L+"K":inUse/1048576L+"MB";
@@ -1798,8 +1800,6 @@ public class IJ {
 			if (dir==null) Macro.abort();
 		}
 		dir = addSeparator(dir);
-		if (dir!=null && isWindows())
-			dir = dir.replaceAll("/", File.separator);  // replace "/" with "\"
 		return dir;
 	}
 	
