@@ -1584,6 +1584,10 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 	first 3 three elements and the index (0-255) is returned in the last.
 	*/
 	public int[] getPixel(int x, int y) {
+		return getPixel(x,y,ip);
+	}
+	
+	public int[] getPixel(int x, int y, ImageProcessor ip) {
 		pvalue[0]=pvalue[1]=pvalue[2]=pvalue[3]=0;
 		switch (imageType) {
 			case GRAY8: case COLOR_256:
@@ -2700,7 +2704,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 		return n==(int)n?Integer.toString((int)n):IJ.d2s(n);
 	}
 
-    private String getValueAsString(int x, int y) {
+    protected String getValueAsString(int x, int y) {
     	if (win!=null && win instanceof PlotWindow)
     		return "";
 		Calibration cal = getCalibration();

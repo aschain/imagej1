@@ -1583,9 +1583,10 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 			s2 = (ShapeRoi)this;
 		else
 			s2 = new ShapeRoi(this);
-		if (previousRoi.modState==ADD_TO_ROI)
-			s1.or(s2);
-		else
+		if (previousRoi.modState==ADD_TO_ROI) {
+			if(IJ.altKeyDown())s1.and(s2);
+			else s1.or(s2);
+		}else
 			s1.not(s2);
 		previousRoi.modState = NO_MODS;
 		Roi roi2 = s1.trySimplify();
