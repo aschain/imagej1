@@ -76,7 +76,7 @@ public class Functions implements MacroConstants, Measurements {
 	boolean autoContrast;
 	static WaitForUserDialog waitForUserDialog;
 	int pasteMode;
-	boolean expandableArrays;
+	boolean expandableArrays = true;
 	int plotWidth;
 	int plotHeight;
 	int plotFontSize;
@@ -4842,6 +4842,8 @@ public class Functions implements MacroConstants, Measurements {
 			return join();
 		else if (name.equals("trim"))
 			return getStringArg().trim();
+		else if (name.equals("pad"))
+			return pad();
 		else if (name.equals("format")) {
 			try {return String.format(getFirstString(),getLastArg());}
 			catch (Exception e) {interp.error(""+e);}

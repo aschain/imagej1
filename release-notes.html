@@ -5,12 +5,33 @@
 </head>
 <body>
 
-<li> <u>1.53g11  6 November 2020</u>
+<li> <u>1.53g  4 December 2020</u>
 <ul>
+<li> Thanks to Jerome Mutterer, added a "Run" button to Editor
+ windows when the file name ends with ".ijm", ".js", ".bsh" or ".py".
+ <li> The "Overlay Masks" option in the particle anayzer now
+ displays masks in colors taken from the Glasbey LUT.
+ <li> Thanks to J Xiong, added "Overlay" and  "Composite ROIs"
+ checkboxes to the particle analyzer
+ (<a href="http://wsr.imagej.net/macros/MeasureWithOrWithoutHoles.ijm">example</a>).
+ <li> Thanks to Michael Doube, added an IntProcessor class that provides
+ support for signed 32-bit int images
+  (<a href="http://wsr.imagej.net/macros/js/CreateAndDisplayIntImage.js">example</a>).
+ <li> Thanks to Christian Tischer, the Recorder supports Python.
+ <li> Thanks to 'Eljonco', the "ExpandableArrays" macro option
+ is now enabled by default.
+ <l> Thanks to Peter Haub, added the String.pad(n,length)
+ macro function.
+ <li> Thanks to Wilhelm Burger, added the addEnumChoice() and
+ getNextEnumChoice() methods to the GenericDialog class
+ (<a href="http://wsr.imagej.net/plugins/GenericDialog_With_Enums.java">example</a>).
+<li> Thanks to 'davidC', added the ij.gui.HistogramPlot class.
 <li> Thanks to Stein Rorvik, added the ImageCanvas.setLongClickDelay()
 and Toolbar.setLongClickDelay() methods.
 <li> Thanks to 'Dr. Njitram', added the recordable
 SubstackMaker.run(imp,rangeOrList) method.
+<li> Thanks to Albert Cardona, modified the ImageJ.keyPressed() method
+so that, if the KeyEvent is consumed, it returns immediately.
 <li> Thanks to Wei Ouyang, replaced the "Duplicate..." command
 in the default image contextual menu with "Duplicate Image",
 which ignores any selection and duplicates the entire image.
@@ -23,6 +44,33 @@ work with stacks opened using
 <li> Thanks to 'muniak' and 'mountain_man', fixed a bug that
 caused the Scaler.resize() method to return an image with
 a calibration of Inf x Inf.
+<li> Thanks to Stein Rorvik, fixed a bug that caused a list of 12 'w' letters
+to appear after the Group entry in the ROI Properties dialog when it
+was called from a macro.
+<li> Thanks to 'davidC', fixed a bug that caused batch mode macros that
+created hundreds of histograms to fail.
+<li> Thanks to 'chrk139', fixed a bug that caused the drawOval() and fillOval()
+macro functions to not work for images larger than 2^29 pixels.
+<li> Thanks to Laurent Thomas, fixed a bug where changing
+the group attribute from a group&gt;0 to 0 in
+the <i>ROI Manager&gt;Properties</i> dialog did
+not work as expected.
+<li> Thanks to Gilles Vanwalleghem, fixed a bug that caused the
+run(“Reduce Dimensionality…”) macro function to throw a
+null pointer exception in Fiji headless mode.
+<li> Thanks to Laurent Thomas and Hollandi Reka, fixed a bug
+that caused the ROI group of saved composite selections
+to not be restored.
+<li> Thanks to Martin Hohne, fixed a bug that caused the getValue("X")
+and getValue("Y") macro functions to not work as expected with
+line selections.
+<li> Thanks to J Xiong, fixed a v1.50 regression that caused the 
+particle analyzer to not work as expected when when using the
+“Exclude on edges” option and a composite selection.
+<li> Thanks to Fred Damen, fixed a 1.53c regression that caused
+the GenericDialog.getFont() method to sometimes return null.
+<li> Fixed a regression that caused the particle analyzer to
+sometimes fail on MacOS.
 </ul>
 
 <li> <u>1.53f  25 October 2020</u>

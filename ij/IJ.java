@@ -648,10 +648,9 @@ public class IJ {
 			cal = imp.getCalibration();
 			imp.setCalibration(null);
 		}
-		ImageStatistics stats = imp.getStatistics(measurements);
 		ResultsTable rt = new ResultsTable();
 		Analyzer analyzer = new Analyzer(imp, measurements, rt);
-		analyzer.saveResults(stats, imp.getRoi());
+		analyzer.measure();
 		double value = Double.NaN;
 		try {
 			value = rt.getValue(measurement, 0);
@@ -1027,7 +1026,6 @@ public class IJ {
 	}
 	
 	public static void setKeyDown(int key) {
-		if (debugMode) IJ.log("setKeyDown: "+key);
 		switch (key) {
 			case KeyEvent.VK_CONTROL:
 				controlDown=true;
@@ -1057,7 +1055,6 @@ public class IJ {
 	}
 
 	public static void setKeyUp(int key) {
-		if (debugMode) IJ.log("setKeyUp: "+key);
 		switch (key) {
 			case KeyEvent.VK_CONTROL: controlDown=false; break;
 			case KeyEvent.VK_META: if (isMacintosh()) controlDown=false; break;
@@ -2231,9 +2228,13 @@ public class IJ {
 	 public static ImagePlus createImage(String title, String type, int width, int height, int depth) {
 		type = type.toLowerCase(Locale.US);
 		int bitDepth = 8;
-		if (type.contains("16")) bitDepth = 16;
-		if (type.contains("24")||type.contains("rgb")) bitDepth = 24;
-		if (type.contains("32")) bitDepth = 32;
+		if (type.contains("16"))
+			bitDepth = 16;
+		boolean signedInt = type.contains("32-bit int");
+		if (type.contains("32"))
+			bitDepth = 32;
+		if (type.contains("24") || type.contains("rgb") || signedInt)
+			bitDepth = 24;
 		int options = NewImage.FILL_WHITE;
 		if (bitDepth==16 || bitDepth==32)
 			options = NewImage.FILL_BLACK;
@@ -2246,6 +2247,8 @@ public class IJ {
 		else if (type.contains("noise") || type.contains("random"))
 			options = NewImage.FILL_NOISE;
 		options += NewImage.CHECK_AVAILABLE_MEMORY;
+		if (signedInt)
+			options += NewImage.SIGNED_INT;
 		return NewImage.createImage(title, width, height, depth, bitDepth, options);
 	}
 
