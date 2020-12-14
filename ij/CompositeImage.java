@@ -1,6 +1,7 @@
 package ij;
 import ij.process.*;
 import ij.plugin.frame.*;
+import ij.gui.PlotWindow;
 import ij.io.FileInfo;
 import java.awt.*;
 import java.awt.image.*;
@@ -103,7 +104,8 @@ public class CompositeImage extends ImagePlus {
 	
 	@Override
 	protected String getValueAsString(int x, int y) {
-		if("".equals(super.getValueAsString(x, y)))return("");
+		if (win!=null && win instanceof PlotWindow)
+    		return "";
 		Calibration cal = getCalibration();
     	int type = getType();
 		String res="";
@@ -111,18 +113,18 @@ public class CompositeImage extends ImagePlus {
 	    	int[] v = getPixel(x, y, cip[ch]);
 			switch (type) {
 				case GRAY8: case GRAY16:
-					double cValue = cal.getCValue(v[0]);
+					double cValue = ((cal==null)?v[0]:cal.getCValue(v[0]));
 					if (cValue==v[0]) {
-	    				res=res+((ch==1)?", value=":", ") + v[0];
+	    				res=res+((ch==0)?", value=":", ") + v[0];
 	    				break;
 					}else {
-	    				res+=(ch==1?", value=":", ") + IJ.d2s(cValue) + " ("+v[0]+")";
+	    				res+=(ch==0?", value=":", ") + IJ.d2s(cValue) + " ("+v[0]+")";
 	    				break;
 					}
 	    		case GRAY32:
 	    			double value = Float.intBitsToFloat(v[0]);
 	    			String s = (int)value==value?IJ.d2s(value,0)+".0":IJ.d2s(value,4,7);
-	    			res+=(ch==1?", value=":", ")  + s;
+	    			res+=(ch==0?", value=":", ")  + s;
 	    			break;
 	    		default: if(ch==(getC()-1))res=super.getValueAsString(x, y);
 			}
