@@ -112,7 +112,8 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 			setForeground(SystemColor.controlText);
 			setBackground(SystemColor.control);
 		}
-setForeground(Color.black);
+		//if (IJ.isMacOSX() && System.getProperty("java.vendor").contains("Azul"))
+		//	setForeground(Color.black);  // work around bug on Azul Java 8 on Apple Silicon
 		GridBagLayout grid = new GridBagLayout();
 		c = new GridBagConstraints();
 		setLayout(grid);
@@ -1431,7 +1432,7 @@ setForeground(Color.black);
 
 	@Override
 	public void setFont(Font font) {
-		super.setFont(!fontSizeSet&&Prefs.getGuiScale()!=1.0?font.deriveFont((float)(font.getSize()*Prefs.getGuiScale())):font);
+		super.setFont(!fontSizeSet&&Prefs.getGuiScale()!=1.0&&font!=null?font.deriveFont((float)(font.getSize()*Prefs.getGuiScale())):font);
 		fontSizeSet = true;
 	}
 	
@@ -1754,13 +1755,14 @@ setForeground(Color.black);
 
 	void showHelp() {
 		if (helpURL.startsWith("<html>")) {
+			String title = getTitle()+" "+helpLabel;
 			if (this instanceof NonBlockingGenericDialog)
-				new HTMLDialog("", helpURL, false); // non blocking
+				new HTMLDialog(title, helpURL, false); // non blocking
 			else
-				new HTMLDialog(this, "", helpURL); //modal
+				new HTMLDialog(this, title, helpURL); //modal
 		} else {
-			String macro = "run('URL...', 'url="+helpURL+"');";
-			new MacroRunner(macro);
+			String macro = "call('ij.plugin.BrowserLauncher.open', '"+helpURL+"');";
+			new MacroRunner(macro); // open on separate thread using BrowserLauncher
 		}
 	}
 
