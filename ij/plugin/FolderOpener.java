@@ -22,6 +22,7 @@ public class FolderOpener implements PlugIn {
 	private static boolean staticSortFileNames = true;
 	private static boolean staticOpenAsVirtualStack;
 	private boolean convertToRGB;
+	private boolean convertToGrayscale;  //unused
 	private boolean sortFileNames = true;
 	private boolean sortByMetaData = true;
 	private boolean openAsVirtualStack;
@@ -132,12 +133,19 @@ public class FolderOpener implements PlugIn {
 		if (arg==null) {
 			if (!showDialog()) return;
 		}
-		String[] list = (new File(directory)).list();
+		File file = new File(directory);
+		String[] list = file.list();
 		if (list==null) {
-			IJ.error("File>Import>Image Sequence", "Directory not found: "+directory);
-			return;
+			String parent = file.getParent();
+			file = new File(parent);
+			list = file.list();
+			if (list!=null)
+				directory = parent;
+			else {
+				IJ.error("File>Import>Image Sequence", "Directory not found: "+directory);
+				return;
+			}
 		}
-
 		//remove subdirectories from list
 		ArrayList fileList = new ArrayList();
 		for (int i=0; i<list.length; i++) {
@@ -619,7 +627,7 @@ public class FolderOpener implements PlugIn {
 		return list;
 	}
 	
-	private static boolean containsRegex(String name, String regex, boolean legacy) {
+	public static boolean containsRegex(String name, String regex, boolean legacy) {
 		boolean contains = false;
 		try {
 			if (legacy)

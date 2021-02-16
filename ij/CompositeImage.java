@@ -1,11 +1,11 @@
 package ij;
 import ij.process.*;
-import ij.gui.*;
-import ij.plugin.*;
 import ij.plugin.frame.*;
+import ij.gui.PlotWindow;
 import ij.io.FileInfo;
 import java.awt.*;
 import java.awt.image.*;
+import ij.measure.Calibration;
 
 public class CompositeImage extends ImagePlus {
 
@@ -102,6 +102,36 @@ public class CompositeImage extends ImagePlus {
 		return img;
 	}
 	
+	@Override
+	protected String getValueAsString(int x, int y) {
+		if (win!=null && win instanceof PlotWindow)
+    		return "";
+		Calibration cal = getCalibration();
+    	int type = getType();
+		String res="";
+		for(int ch=0; ch<getNChannels(); ch++) {
+	    	int[] v = getPixel(x, y, cip[ch]);
+			switch (type) {
+				case GRAY8: case GRAY16:
+					double cValue = ((cal==null)?v[0]:cal.getCValue(v[0]));
+					if (cValue==v[0]) {
+	    				res=res+((ch==0)?", value=":", ") + v[0];
+	    				break;
+					}else {
+	    				res+=(ch==0?", value=":", ") + IJ.d2s(cValue) + " ("+v[0]+")";
+	    				break;
+					}
+	    		case GRAY32:
+	    			double value = Float.intBitsToFloat(v[0]);
+	    			String s = (int)value==value?IJ.d2s(value,0)+".0":IJ.d2s(value,4,7);
+	    			res+=(ch==0?", value=":", ")  + s;
+	    			break;
+	    		default: if(ch==(getC()-1))res=super.getValueAsString(x, y);
+			}
+		}
+		return res;
+    }
+	
 	public void updateChannelAndDraw() {
 		if (!customLuts) singleChannel = true;
 		updateAndDraw();
@@ -196,7 +226,7 @@ public class CompositeImage extends ImagePlus {
 	public synchronized void updateImage() {
 		int imageSize = width*height;
 		int nChannels = getNChannels();
-		int redValue, greenValue, blueValue;
+		//int redValue, greenValue, blueValue;
 		int ch = getChannel();
 		
 		//IJ.log("updateImage: "+ch+"/"+nChannels+" "+currentSlice+" "+currentFrame);
@@ -374,6 +404,7 @@ public class CompositeImage extends ImagePlus {
 		return new LUT(r, g, b);
 	}
 
+	/** Returns the color used to display the image subtitle and "B&C" histogram. */
 	public Color getChannelColor() {
 		if (lut==null || mode==GRAYSCALE)
 			return Color.black;
