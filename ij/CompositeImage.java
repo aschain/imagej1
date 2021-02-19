@@ -104,12 +104,13 @@ public class CompositeImage extends ImagePlus {
 	
 	@Override
 	protected String getValueAsString(int x, int y) {
+		if(cip==null || cip.length==1)return super.getValueAsString(x, y);
 		if (win!=null && win instanceof PlotWindow)
     		return "";
 		Calibration cal = getCalibration();
     	int type = getType();
 		String res="";
-		for(int ch=0; ch<getNChannels(); ch++) {
+		for(int ch=0; ch<cip.length; ch++) {
 	    	int[] v = getPixel(x, y, cip[ch]);
 			switch (type) {
 				case GRAY8: case GRAY16:
