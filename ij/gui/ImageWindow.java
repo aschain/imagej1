@@ -321,7 +321,7 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 				if (len>4 && label.charAt(len-4)=='.' && !Character.isDigit(label.charAt(len-1)))
 					label = label.substring(0,len-4);
 				if (label.length()>60)
-					label = label.substring(0, 60);
+					label = label.substring(0, 60)+"...";
 				s = "\""+label + "\"; ";
 			}
 		}
