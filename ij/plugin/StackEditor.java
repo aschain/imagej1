@@ -107,7 +107,8 @@ public class StackEditor implements PlugIn {
 			frames++;
 		} else if (choice.equals("slice")) { // add slice to all volumes
 			for (int t=frames; t>=1; t--) {
-				int index = imp.getStackIndex(channels, z1, t);
+				//int index = imp.getStackIndex(channels, z1, t);
+				int index = (t-1)*channels*slices + (z1)*channels;
 				if (prepend)
 					index = (t-1)*channels*slices;
 				for (int i=0; i<channels; i++) {
