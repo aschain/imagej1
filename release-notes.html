@@ -5,7 +5,7 @@
 </head>
 <body>
 
-<li> <u>1.53i25 1 March 2021</u>
+<li> <u>1.53i 24 March 2021</u>
 <ul>
 <li> Thanks to Jerome Mutterer, added the
  "Apply LUTs" checkbox to the command finder
@@ -15,29 +15,36 @@ or selection range, in Editor, Table or Log windows,
 is displayed in the status bar. The total number of lines is
 displayed after <i>Select All</i>.
 <li> Thanks to Norbert Vischer, ImageJ now corrects the orientation of
-phone camera photos. This does not work on Fiji because it is
+phone camera photos. Does not work on Fiji because it is
 missing Exif_Reader.jar.
+<li> Improved the Plugins>Utilities>Benchmark command. It now
+suppresses subordinate status bar messages and displays
+subordinate progress bars as dots. 
 <li> Thanks to Peter Haub, the particle analyzer displays
 "ParticleAnalyzer: threshold has not set; assumed to be min-max"
 in the Log window if it was not called from a macro and a
 threshold was not set.
 <li> Thanks to Laurent Thomas, <i>File&gt;Save As&gt;Image Sequence</i>,
-with "Use slice labels as names" enabled, now supports file names as
+when "Use slice labels as names" is enabled, now supports file names as
 long as 111 characters, excluding the extension.
+<li> Thanks to Michael Schmid, ImageJ displays "horizontal" in the
+image info line of column average plots and "vertical" with
+row average plots.
 <li> Thanks to Jerome Mutterer, added the showStatus(message,options)
 macro function and the IJ.showStatus(message,options) method
  (<a href="http://wsr.imagej.net/macros/FlashingStatusMessages.txt">example</a>).
-<li> Added the Overlay.update(index) macro function. DOCUMENT
-<li> Added the ImagePlus.setBackgroundColor() method,
+<li> Added the Overlay.update(index) macro function.
+<li> Added the ImagePlus.setBorderColor() method,
 used by <i>Image&gt;Color&gt;Split Channels</i> to
 colorize image borders.
-<li> Thanks to Laurent Thomas, added the ImageStack.getShortStackLabel(n,max)
-method.
+<li> Thanks to Laurent Thomas, added the ImageStack.getShortStackLabel(n,max),
+Zoom.toSelection(imp), Zoom.set(imp,mag) and Zoom.set(imp,mag,x,y)
+methods.
 <li> Thanks to Herbie Gluender, fixed a bug that caused the status bar
 to stop being updated after activating an overlay selection.
-<li> Thanks to Fred Damen, fixed a bug with one slice stacks where the slice label
-is not displayed on the image window info line or in the <i>Image&gt;Show Info</i>
-window.
+<li> Thanks to Fred Damen, fixed a bug with one slice stacks that caused the
+slice label to not be displayed on the image info line or in the
+<i>Image&gt;Show Info</i> window.
 <li> Thanks to Antoneta, fixed a bug with the <i>Flatten</i> command that caused
 multi-point selections on stacks to lose counter information.
 <li> Thanks to Herbie Gluender, fixed a bug that caused unexpected overlay
@@ -53,9 +60,22 @@ wrong position.
 <li> Thanks to Laurent Thomas, fixed a bug that caused the
 ContrastEnhancer.stretchHistogram() methoid to not work as
 expected with stacks.
+<li> Thanks to Michael Schmid, fixed a bug that caused
+WaitForUserDialogs to not be scaled on high-resolution
+screens.
+<li> Thanks to Stein Rorvik, fixed a macro interpreter bug that caused
+if statements using string functions to sometimes fail
+(e.g., "if (getTitle.length>10) ...").
+<li> Thanks to Norbert Vischer, fixed a bug that caused the
+first column of tables copied to the clipboard to be missing
+if the table did not have row numbers and the
+"Copy row numbers" option in
+<i>Edit&gt;Options&gt;Input/Output</i> was not enabled.
 <li> Thanks to Shayna Sosnowik, fixed a 1.53g regression that caused
 the "Properties..." command in the ROI Manager to not work as 
-expected when changing the stroke color. 
+expected when changing the stroke color.
+<li> Thanks to Stein Rorvik, fixed a 1.53i regression that caused
+the str.trim() macro function to sometimes fail.
 </ul>
 
 <li> <u>1.53h 04 February 2021</u>
