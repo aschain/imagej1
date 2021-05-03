@@ -298,6 +298,8 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 		nothing if there is no window associated with
 		this image (i.e. show() has not been called).*/
 	public synchronized void updateAndDraw() {
+		if (win==null)
+			return;
 		if (stack!=null && !stack.isVirtual() && currentSlice>=1 && currentSlice<=stack.size()) {		
 			if (stack.size()>1 && win!=null && !(win instanceof StackWindow)) {
 				setStack(stack);	//adds scroll bar if stack size has changed to >1
@@ -422,7 +424,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 	/** ImageCanvas.paint() calls this method when the
 		ImageProcessor has generated a new image. */
 	public void updateImage() {
-		if (ip!=null)
+		if (ip!=null && win!=null)
 			img = ip.createImage();
 	}
 
@@ -543,7 +545,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 			img = ip.createImage();
 		return img;
 	}
-
+	
 	/** Returns a copy of this image as an 8-bit or RGB BufferedImage.
 	 * @see ij.process.ShortProcessor#get16BitBufferedImage
 	 */
@@ -3350,6 +3352,10 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
     
     public void setBorderColor(Color borderColor) {
     	this.borderColor = borderColor;
+    }
+    
+    public boolean windowActivated() {
+    	return this.activated;
     }
         
 }
