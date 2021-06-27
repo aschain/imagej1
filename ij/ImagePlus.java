@@ -298,8 +298,10 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 		nothing if there is no window associated with
 		this image (i.e. show() has not been called).*/
 	public synchronized void updateAndDraw() {
-		if (win==null)
+		if (win==null) {
+			img = null;
 			return;
+		}
 		if (stack!=null && !stack.isVirtual() && currentSlice>=1 && currentSlice<=stack.size()) {		
 			if (stack.size()>1 && win!=null && !(win instanceof StackWindow)) {
 				setStack(stack);	//adds scroll bar if stack size has changed to >1
@@ -424,13 +426,18 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 	/** ImageCanvas.paint() calls this method when the
 		ImageProcessor has generated a new image. */
 	public void updateImage() {
-		if (ip!=null && win!=null)
+		if (win==null) {
+			img = null;
+			return;
+		}
+		if (ip!=null)
 			img = ip.createImage();
 	}
 
 	/** Closes the window, if any, that is displaying this image. */
 	public void hide() {
 		if (win==null) {
+			img = null;
 			Interpreter.removeBatchModeImage(this);
 			return;
 		}
@@ -2071,7 +2078,10 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 					}
 				}
 				if (Prefs.pointAutoNextSlice && getStackSize()>1) {
+					boolean order = Prefs.reverseNextPreviousOrder;
+					Prefs.reverseNextPreviousOrder = true;
 					IJ.run(this, "Next Slice [>]", "");
+					Prefs.reverseNextPreviousOrder = order;
 					deleteRoi();
 				}
 				break;
@@ -2835,7 +2845,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 			cr = cRoi.getBounds();
 		if (cr==null)
 			cr = new Rectangle(0, 0, w, h);
-		if (r==null || Math.abs(cr.width-r.width)>10 || Math.abs(cr.height-r.height)>10) {
+		if (r==null || (cr.width!=r.width || cr.height!=r.height)) {
 			// Create a new roi centered on visible part of image, or centered on image if clipboard is >= image
 			ImageCanvas ic = win!=null?ic = win.getCanvas():null;
 			Rectangle srcRect = ic!=null?ic.getSrcRect():new Rectangle(0,0,width,height);

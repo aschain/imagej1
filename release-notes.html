@@ -5,25 +5,64 @@
 </head>
 <body>
 
-<li> <u>1.53j31 30 April 2021</u>
+<li> <u>1.53k14 26 June 2021</u>
 <ul>
+<li> Thanks to Alan Brooks, added the MacAdapter9 plugin,
+which supports drag and drop on the ImageJ application,
+and the ImageJ>About ImageJ command, on Java 9 or
+later on macOS.
+<li> Thanks to Romain Guiet, the ROI Manager's
+“Associate ‘Show All’ ROIs with slices” option is
+now enabled by default.
+<li> Thanks to Gilles Carpentier, the particle analyzer now assumes
+the threshold is 255 unless "Black background" is not set,
+the image does not have an inverted LUT and fewer than
+half the pixels have a value of zero, in which case
+the threshold is set to zero.
+<li> Thanks to 'pdd2110', added the Property.setSliceLabel(label) method. DOCUMENT
+<li> Thanks to 'Oodegard', fixed a bug that caused the
+"Auto-next slice" option of the point tool to not
+work as expected with hyperstacks.
+<li> Thanks to Michael Schmid, fixed a bug that caused
+NaN values in tables read from a file to be read
+as Strings instead of numbers.
+<li> Thanks to Gabriel Landini and Michael Schmid, fixed a bug
+that caused the "Top Hat" filter to fail when applying it to a
+stack one slice at a time.
+<li> Thanks to Laurent Thomas, fixed a bug that caused the
+<i>Image&gt;Stacks&gt;Set Slice</i> command to not
+work as expected with hyperstacks.
+<li> Thanks to Laurent Thomas, fixed a bug that caused hyperstacks
+to be displayed incorrectly if the Z or T sliders where 
+moved quickly and the images were slow to load.
+<li> Thanks to Michael Schmid, fixed a bug that sometimes caused
+the WindowManager.getIDList() method to throw an exception.
+</ul>
+
+<li> <u>1.53j 13 May 2021</u>
+<ul>
+<li> Thanks to 'VolkerH', the table created by
+<i>Image&gt;Overlay&gt;List Elements</i> now
+displays row numbers and arrow selection 'X' and 'Y'
+values are the coordinates of the arrow tip.
 <li> Thanks to Stein Rorvik, added the Color.setForegroundValue()
-and Color.setBackgroundValue() macro functions and the    DOCUMENT
+and Color.setBackgroundValue() macro functions and the
 Toolbar.setForegroundValue(), Toolbar.setBackgroundValue(),
 ImageProcessor.setGlobalForegroundColor() and
 ImageProcessor.setGlobalBackgroundColor() methods.
-<li> Thanks to Norbert Vischer, added the IJ.checksum() macro  DOCUMENT
+<li> Thanks to Norbert Vischer, added the IJ.checksum() macro
 function, which returns the MD5 (or SHA-256) checksum from
 a string or file
 (<a href="http://wsr.imagej.net/macros/ChecksumTest.txt">example</a>).
 <li> Thanks to Michael Schmid, added the
-Fit.doWeightedFit(equation,x,y,weights[,initialGuesses])   DOCUMENT
+Fit.doWeightedFit(equation,x,y,weights[,initialGuesses])
 macro function.
+<li> Thanks to Norbert Vischer, added the Plot.removeNaNs macro function.
+<li> Thanks to Laurent Thomas, added support for scrollbars in 
+GenericDialog TextAreas.
 <li> Thanks to Fred Damen, added the Zoom.in(imp), Zoom.out(imp),
 Zoom.unzoom(imp) and Zoom.maximize(imp) methods.
-<li> Thanks to Laurent Thomas, added support for scrollbars in 
-GenericDialog TextAreas
-(<a href="http://wsr.imagej.net/macros/js/GenericDialogScrollbars.js">example</a>).
+<li> Thanks to John Dunsmuir, added the PointRoi.addPoint(x,y,position) method.
 <li> Thanks to Fred Damen, fixed bugs that caused programmatic image
 window zooming to not work reliably
 (<a href="http://wsr.imagej.net/macros/js/ZoomTest.js">example</a>).
@@ -49,12 +88,21 @@ when the "Use titles as labels" option was not enabled.
 <i>File&gt;Import&gt;Image Sequence</i> command to fail
 if the folder contained a ".h5" file.
 <li> Thanks to Jerome Mutterer, fixed bugs that caused the
-Stack.setDisplayMode(), Stack.setSlice() and Stack.setFrame()
-macro functions to not work as expected in
-batch mode, and the ImagePlus.setDisplayMode(),
-ImagePlus.setZ() and ImagePlus.setSetT() methods
-to not work as expected when the image was
-not displayed.
+Stack.setDisplayMode(), Stack.setSlice(), Stack.setFrame()
+and Stack.setPosition() macro functions to not work as expected
+in batch mode, and the ImagePlus.setDisplayMode(),
+ImagePlus.setZ(), ImagePlus.setSetT() and
+ImagePlus.setPosition() methods to not work as expected when
+the image was not displayed.
+<li> Thanks to Nicolas Montes, fixed a bug that caused the
+particle analyzer to throw an exception when both the
+"Composite ROIs" and "Show: Outlines" options where used.
+<li> Thanks to Christian Kremser, fixed a 1.53i regression
+that caused macro statements like "n=Dialog.getNumber()+1"
+to generate and error.
+<li> Thanks to Christian Tischer, fixed a regression that
+caused the ROI Manager to not set the hyperstack position
+of ROIs without a c,z,t position.
 
 </ul>
 
