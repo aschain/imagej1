@@ -372,6 +372,26 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 			saveLabel(panel, label);
 	}
 
+	/**
+	 * Add button to the dialog
+	 * @param label button label
+	 * @param listener listener to handle the action when pressing the button
+	*/
+	public void addButton(String label, ActionListener listener) {
+		if (GraphicsEnvironment.isHeadless())
+			return;
+		Button button = new Button(label);
+		button.addActionListener(listener);
+		button.addKeyListener(this);		
+		GridBagLayout layout = (GridBagLayout)getLayout();
+		Panel panel = new Panel();
+		addPanel(panel);
+		GridBagConstraints constraints = layout.getConstraints(panel);
+		remove(panel);
+		layout.setConstraints(button, constraints);
+		add(button);
+	}
+
 	/** Adds a popup menu that lists the currently open images.
 	 * Call getNextImage() to retrieve the selected
 	 * image. Based on the addImageChoice()
@@ -1357,6 +1377,10 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 			String cmd = Recorder.getCommand();
 			if (cmd!=null && cmd.equals("Calibrate..."))
 				text2 = text2.replace('\n',' ');
+			if (cmd!=null && cmd.equals("Convolve...")){
+				if (!text2.endsWith("\n"))
+					text2 += "\n";
+			}
 			text2 = Recorder.fixString(text2);
 			Recorder.recordOption(key, text2);
 		}
