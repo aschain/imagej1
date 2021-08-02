@@ -195,7 +195,8 @@ public class ImageCalculator implements PlugIn {
 		ImagePlus img3 = null;
 		int size1 = img1.getStackSize();
 		int size2 = img2.getStackSize();
-		if (size1>1 && size2>1 && size1!=size2) {
+		int chs1=img1.getNChannels(), chs2=img2.getNChannels();
+		if (size1>1 && size2>1 && size1!=size2 && !(chs1==chs2 && chs2==img2.getStackSize()) && !(chs1==chs2 && img2.getNSlices()==img1.getNSlices() && img2.getStackSize()==chs2*img2.getNSlices())) {
 			IJ.error("Image Calculator", "'Image1' and 'image2' must be stacks with the same\nnumber of slices, or 'image2' must be a single image.");
 			return null;
 		}
