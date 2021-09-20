@@ -74,13 +74,9 @@ import javax.swing.filechooser.*;
 			JFileChooser chooser = new JFileChooser();
 			chooser.setDialogTitle(title);
 			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-<<<<<<< HEAD
-			if(defaultDir==null) defaultDir = Prefs.get("DirectoryChooser.DefaultDirectory",OpenDialog.getDefaultDirectory());
-=======
 			chooser.setDragEnabled(true);
 			chooser.setTransferHandler(new DragAndDropHandler(chooser));
-			String defaultDir = OpenDialog.getDefaultDirectory();
->>>>>>> upstream/master
+			String defaultDir = Prefs.get("DirectoryChooser.DefaultDirectory",OpenDialog.getDefaultDirectory());
 			if (defaultDir!=null) {
 				File f = new File(defaultDir);
 				if (IJ.debugMode)
