@@ -272,9 +272,11 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
     		return;
         if (textGap!=0) {
 			Insets insets = super.getInsets();
+			Color savec = null;
 			if (imp.isComposite()) {
 				CompositeImage ci = (CompositeImage)imp;
 				if (ci.getMode()==IJ.COMPOSITE) {
+					savec = g.getColor();
 					Color c = ci.getChannelColor();
 					if (Color.green.equals(c))
 						c = new Color(0,180,0);
@@ -287,6 +289,8 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 				g.setFont(font);
 			}
 			g.drawString(createSubtitle(), insets.left+5, insets.top+TEXT_GAP);
+			if (savec!=null)
+				g.setColor(savec);
 		}
     }
     
@@ -310,7 +314,7 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 			}
     		s += "; ";
 		} else {
-			String label = (String)imp.getProperty("Label");
+			String label = imp.getProp("Slice_Label");
 			if (label==null && imp.isStack())
 				label = imp.getStack().getSliceLabel(1);
 			if (label!=null && label.length()>0) {

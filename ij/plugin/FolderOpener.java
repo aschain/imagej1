@@ -14,14 +14,13 @@ import ij.plugin.frame.Recorder;
 
 /** Implements the File/Import/Image Sequence command, which
 	opens a folder of images as a stack. */
-public class FolderOpener implements PlugIn {
+public class FolderOpener implements PlugIn, TextListener {
 	private static final int MAX_SEPARATE = 100;
 	private static final String DIR_KEY = "import.sequence.dir";
 	private static final String[] types = {"default", "16-bit", "32-bit", "RGB"};
 	private static String[] excludedTypes = {".txt",".lut",".roi",".pty",".hdr",".java",".ijm",".py",".js",".bsh",".xml",".rar",".h5",".doc",".xls"};
 	private static boolean staticSortFileNames = true;
 	private static boolean staticOpenAsVirtualStack;
-	private boolean convertToRGB;
 	private boolean convertToGrayscale;  //unused
 	private boolean sortFileNames = true;
 	private boolean sortByMetaData = true;
@@ -43,6 +42,7 @@ public class FolderOpener implements PlugIn {
 	private int step = 1;
 	private double scale = 100.0;
 	private boolean openAsSeparateImages;
+	private TextField dirField, filterField, startField, countField, stepField;
 
 	
 	/** Opens the images in the specified directory as a stack. Displays
@@ -107,9 +107,9 @@ public class FolderOpener implements PlugIn {
 		boolean isMacro = Macro.getOptions()!=null;
 		if (!directorySet)
 			directory = null;
-		if (arg!=null && !arg.equals("")) {
+		if (arg!=null && !arg.equals(""))
 			directory = arg;
-		} else {
+		else {
 			if (!isMacro) {
 				sortFileNames = staticSortFileNames;
 				openAsVirtualStack = staticOpenAsVirtualStack;
@@ -133,9 +133,13 @@ public class FolderOpener implements PlugIn {
 		if (arg==null) {
 			if (!showDialog()) return;
 		}
+		if (directory==null || directory.length()==0) {
+			error("No directory specified.     ");
+			return;
+		}
 		File file = new File(directory);
 		if (!file.exists()) {
-			IJ.error("File>Import>Image Sequence", "Directory not found: "+directory);
+			error("Directory not found: "+directory);
 			return;
 		}
 		String[] list = file.list();
@@ -146,7 +150,7 @@ public class FolderOpener implements PlugIn {
 			if (list!=null)
 				directory = parent;
 			else {
-				IJ.error("File>Import>Image Sequence", "Directory not found: "+directory);
+				error("Directory not found: "+directory);
 				return;
 			}
 		}
@@ -175,7 +179,16 @@ public class FolderOpener implements PlugIn {
 			title = title.substring(0, title.length()-1);
 		
 		list = trimFileList(list);
-		if (list==null) return;
+		if (list==null)
+			return;
+		String pluginName = "Sequence Reader";
+		if (legacyRegex!=null)
+			pluginName += "(legacy)";
+		list = getFilteredList(list, filter, pluginName);
+		if (list==null)
+			return;
+		if (sortFileNames || IJ.isMacOSX())
+			list = StringSorter.sortNumerically(list);
 		if (IJ.debugMode) IJ.log("FolderOpener: "+directory+" ("+list.length+" files)");
 		int width=0, height=0, stackSize=1;
 		ImageStack stack = null;
@@ -209,20 +222,14 @@ public class FolderOpener implements PlugIn {
 				}
 			}
 			if (width==0) {
-				IJ.error("Sequence Reader", "This folder does not appear to contain\n"
+				error("This folder does not appear to contain\n"
 				+ "any TIFF, JPEG, BMP, DICOM, GIF, FITS or PGM files.\n \n"
 				+ "   \""+directory+"\"");
 				return;
 			}
-			String pluginName = "Sequence Reader";
-			if (legacyRegex!=null)
-				pluginName += "(legacy)";
-			list = getFilteredList(list, filter, pluginName);
-			if (list==null)
-				return;
 			IJ.showStatus("");
 			t0 = System.currentTimeMillis();
-			if (sortFileNames || dicomImages || IJ.isMacOSX())
+			if (dicomImages && !IJ.isMacOSX() && !sortFileNames)
 				list = StringSorter.sortNumerically(list);
 
 			if (this.nFiles<1)
@@ -259,13 +266,13 @@ public class FolderOpener implements PlugIn {
 						width = stackWidth;
 						height = stackHeight;
 					}
-					if (bitDepth==0) bitDepth = imp.getBitDepth();
+					if (bitDepth==0)
+						bitDepth = imp.getBitDepth();
 					fi = imp.getOriginalFileInfo();
 					ImageProcessor ip = imp.getProcessor();
 					min = ip.getMin();
 					max = ip.getMax();
 					cal = imp.getCalibration();
-					if (convertToRGB) bitDepth = 24;
 					ColorModel cm = imp.getProcessor().getColorModel();
 					if (openAsVirtualStack) {
 						if (stackSize>1) {
@@ -345,10 +352,6 @@ public class FolderOpener implements PlugIn {
 								label2 += ":"+slice;
 						}
 						ip = inputStack.getProcessor(slice);
-						if (convertToRGB) {
-							ip = ip.convertToRGB();
-							bitDepth2 = 24;
-						}
 						if (bitDepth2!=bitDepth) {
 							if (dicomImages && bitDepth==16 && bitDepth2==32 && this.scale==100) {
 								ip = ip.convertToFloat();
@@ -429,7 +432,7 @@ public class FolderOpener implements PlugIn {
 				int idx = this.start-1;
 				if (idx<0 || idx>=list.length)
 					idx = 0;
-				imp2.setProperty("Label", list[idx]);
+				imp2.setProp("Slice_Label", list[idx]);
 				if (info1!=null)
 					imp2.setProperty("Info", info1);
 			}
@@ -475,6 +478,10 @@ public class FolderOpener implements PlugIn {
 			String dir = Recorder.fixPath(directory);
    			Recorder.recordCall("imp = FolderOpener.open(\""+dir+"\", \""+options+"\");");
 		}
+	}
+	
+	private void error(String msg) {
+		IJ.error("Import>Image Sequence", msg);
 	}
 	
 	private void openAsSeparateImages(ImagePlus imp) {
@@ -537,13 +544,14 @@ public class FolderOpener implements PlugIn {
 				this.bitDepth = 24;
 		}
 		String countStr = "---";
-		if (directorySet) {
+		if (!directorySet)
+			directory = Prefs.get(DIR_KEY, IJ.getDir("downloads")+"stack/");
+		if (directory!=null && !IJ.isMacro()) {			
 			File f = new File(directory);
 			String[] names = f.list();
-			names = (new FolderOpener()).trimFileList(names);
-			countStr = ""+names.length;
-		} else
-			directory = Prefs.get(DIR_KEY, IJ.getDir("downloads")+"stack/");
+			names = trimFileList(names);
+			countStr = names!=null?""+names.length:"---";
+		}
 		GenericDialog gd = new GenericDialog("Import Image Sequence");
 		gd.setInsets(5, 0, 0);
 		gd.addDirectoryField("Dir:", directory);		
@@ -556,6 +564,19 @@ public class FolderOpener implements PlugIn {
 		gd.addNumericField("Start:", this.start, 0, 6, "");
 		gd.addStringField("Count:", countStr, 6);
 		gd.addNumericField("Step:", this.step, 0, 6, "");
+		if (!IJ.isMacro() && !GraphicsEnvironment.isHeadless()) {
+			Vector v = gd.getStringFields();
+			dirField = (TextField)v.elementAt(0);
+			dirField.addTextListener(this);
+			filterField = (TextField)v.elementAt(1);
+			filterField.addTextListener(this);
+			countField = (TextField)v.elementAt(2);
+			v = gd.getNumericFields();
+			startField = (TextField)v.elementAt(0);
+			startField.addTextListener(this);
+			stepField = (TextField)v.elementAt(1);
+			stepField.addTextListener(this);
+		}
 		gd.addNumericField("Scale:", this.scale, 0, 6, "%");
 		gd.addCheckbox("Sort names numerically", sortFileNames);
 		gd.addCheckbox("Use virtual stack", openAsVirtualStack);
@@ -684,6 +705,8 @@ public class FolderOpener implements PlugIn {
 
 	/** Removes names that start with "." or end with ".db", ".txt", ".lut", "roi", ".pty", ".hdr", ".py", etc. */
 	public String[] trimFileList(String[] rawlist) {
+		if (rawlist==null)
+			return null;
 		int count = 0;
 		for (int i=0; i< rawlist.length; i++) {
 			String name = rawlist[i];
@@ -738,6 +761,25 @@ public class FolderOpener implements PlugIn {
 	*/
 	public String[] sortFileList(String[] list) {
 		return StringSorter.sortNumerically(list);
+	}
+	
+	public void textValueChanged(TextEvent e) {
+		if (dirField==null)
+			return;
+		String dir = dirField.getText();
+		File f = new File(dir);
+		String[] names = f.list();
+		names = trimFileList(names);
+		names = getFilteredList(names, filterField.getText(), null);
+		int count = names!=null?names.length:0;
+		double start = Tools.parseDouble(startField.getText(), Double.NaN);
+		if (!Double.isNaN(start) && start>1)
+			count = count - ((int)start-1);
+		double step = Tools.parseDouble(stepField.getText(), Double.NaN);
+		if (!Double.isNaN(step) && step>1)
+			count = count/(int)step;
+		String countStr = count>0?""+count:"---";
+		countField.setText(countStr);
 	}
 
 } // FolderOpener
