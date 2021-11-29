@@ -175,6 +175,7 @@ public class Opener {
 		that ImageJ's File/Open command uses to open files if
 		"Open/Save Using JFileChooser" is checked in EditOptions/Misc. */
 	public void openMultiple() {
+		LookAndFeel saveLookAndFeel = Java2.getLookAndFeel();
 		Java2.setSystemLookAndFeel();
 		// run JFileChooser in a separate thread to avoid possible thread deadlocks
 		try {
@@ -213,6 +214,7 @@ public class Opener {
 			if (i==0 && !error)
 				Menus.addOpenRecentItem(path);
 		}
+		Java2.setLookAndFeel(saveLookAndFeel);
 	}
 	
 	/**
@@ -368,7 +370,11 @@ public class Opener {
 				else
 					return null;
 			case UNKNOWN: case TEXT:
-				return openUsingHandleExtraFileTypes(path);
+				imp = openUsingBioFormats(path);
+				if (imp!=null)
+					return imp;
+				else
+					return openUsingHandleExtraFileTypes(path);
 			default:
 				return null;
 		}
@@ -387,11 +393,14 @@ public class Opener {
 		File f = new File(path);
 		if (!f.exists())
 			return null;
+		int nImages = WindowManager.getImageCount();
 		int[] wrap = new int[] {this.fileType};
 		ImagePlus imp = openWithHandleExtraFileTypes(path, wrap);
 		if (imp!=null && imp.getNChannels()>1)
 			imp = new CompositeImage(imp, IJ.COLOR);
 		this.fileType = wrap[0];
+		if (imp==null && (this.fileType==UNKNOWN||this.fileType==TIFF) && WindowManager.getImageCount()==nImages)
+			IJ.error("Opener", "Unsupported format or file not found:\n"+path);
 		return imp;
 	}
 	
@@ -715,7 +724,7 @@ public class Opener {
 		} 
 		if (img==null)
 			return null;
-		if (img.getColorModel().hasAlpha()) {
+		if (img.getColorModel().hasAlpha() && img.getType()!=BufferedImage.TYPE_4BYTE_ABGR) {
 			int width = img.getWidth();
 			int height = img.getHeight();
 			BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -1157,8 +1166,7 @@ public class Opener {
 			if (imp.getStackSize()==3 && imp.getNChannels()==3 && imp.getBitDepth()==8)
 				imp = imp.flatten();
 			return imp;
-		} catch(Exception e) {
-		}
+		} catch(Exception e) {}
 		return null;
 	}
 
