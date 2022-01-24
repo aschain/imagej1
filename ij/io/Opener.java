@@ -42,6 +42,7 @@ public class Opener {
 	private static boolean openUsingPlugins;
 	private static boolean bioformats;
 	private String url;
+	private boolean useHandleExtraFileTypes;
 
 	static {
 		Hashtable commands = Menus.getCommands();
@@ -98,8 +99,10 @@ public class Opener {
 		ImagePlus imp = null;
 		if (path.endsWith(".txt"))
 			this.fileType = JAVA_OR_TEXT;
-		else
+		else {
+			useHandleExtraFileTypes = true;
 			imp = openImage(path);
+		}
 		if (imp==null && isURL)
 			return;
 		if (imp!=null) {
@@ -370,7 +373,12 @@ public class Opener {
 				else
 					return null;
 			case UNKNOWN: case TEXT:
-				imp = openUsingBioFormats(path);
+				imp = null;
+				if (name.endsWith(".lsm"))
+					useHandleExtraFileTypes = true; // use LSM_Reader to opem .lsm files
+				if (!useHandleExtraFileTypes)
+					imp = openUsingBioFormats(path);
+				useHandleExtraFileTypes = false;
 				if (imp!=null)
 					return imp;
 				else
@@ -1163,12 +1171,41 @@ public class Opener {
 			if (images==null || images.length==0)
 				return null;
 			ImagePlus imp = images[0];
-			if (imp.getStackSize()==3 && imp.getNChannels()==3 && imp.getBitDepth()==8)
-				imp = imp.flatten();
 			return imp;
 		} catch(Exception e) {}
 		return null;
 	}
+	
+	/*
+	public static boolean isRGBStack(ImagePlus imp) {
+		if (imp==null)
+			return false;
+		boolean rgb = imp.getStackSize()==3 && imp.getNChannels()==3 && imp.getBitDepth()==8;
+		if (!rgb)
+			return false;
+		for (int i=1; i<=3; i++) {
+			imp.setSlice(i);
+			LUT lut = imp.getProcessor().getLut();
+			if (lut==null) {
+				rgb = false;
+				break;
+			}
+			byte[] bytes = lut.getBytes();				
+			if (bytes==null) {
+				rgb = false;
+				break;
+			}
+			if (!((i==0 && (bytes[255]&255)==255 && (bytes[511]&255)==0 && (bytes[767]&255)==0)
+			|| (i==1 && (bytes[255]&255)==0 && (bytes[511]&255)==255 && (bytes[767]&255)==0)
+			|| (i==2 && (bytes[255]&255)==0 && (bytes[511]&255)==0 && (bytes[767]&255)==255))) {
+				rgb = false;
+				break;
+			}
+		}
+		imp.setSlice(1);
+		return rgb;
+	}
+	*/
 
 	/** Opens a lookup table (LUT) and returns it as a LUT object, or returns null if there is an error.
 	 * @see ij.ImagePlus#setLut
