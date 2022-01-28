@@ -6,7 +6,7 @@
     <!-- First, ensure the build directory exists. -->
     <mkdir dir="build" />
     <!-- Build everything; add debug="on" to debug -->
-    <javac srcdir="./ij" destdir="build" optimize="on" source="1.8" target="1.8" debug="on" includeantruntime="false" encoding="utf-8">
+    <javac srcdir="./ij" destdir="build" optimize="on" source="1.6" target="1.6" debug="on" includeantruntime="false" encoding="utf-8">
     </javac>
   </target>
   
@@ -32,10 +32,21 @@
 
 
   <target name="run" depends="build" description="Build and run ImageJ.">
-    <copy file="ij.jar" toDir=".." />
-    <java maxmemory="640m" jar="ij.jar" fork="yes" />
+    <exec executable="java" outputproperty="ver">
+        <arg value="-cp"/>
+	<arg value="./ij.jar"/>
+        <arg value="ij.ImageJ"/>
+        <arg value="-eval"/>
+	<arg value="return getVersion();"/>
+        <arg value="-batchpath"/>
+    </exec>
+    <move file="ij.jar" tofile="ij-${ver}.jar"/>
+  	<exec executable="../copyToFiji.sh">
+  		<arg value="jars"/>
+  		<arg value="ij"/>
+  		<arg value="./ij-${ver}.jar"/>
+  	</exec>
   </target>
-    
 
   <target name="run2" depends="build" description="Build and run ImageJ.">
     <!-- Run in ImageJ directory -->
