@@ -1934,7 +1934,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 		return position;
 	}
 
-	/** Displays the specified stack image, where 1<=n<=stackSize.
+	/** Displays the specified stack image, where {@literal 1<=n<=stackSize}.
 	 * Does nothing if this image is not a stack.
 	 * @see #setPosition
 	 * @see #setC
@@ -2001,7 +2001,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 		}
 	}
 
-	/** Displays the specified stack image (1<=n<=stackSize)
+	/** Displays the specified stack image ({@literal 1<=n<=stackSize})
 		without updating the display. */
 	public void setSliceWithoutUpdate(int n) {
 		noUpdateMode = true;
