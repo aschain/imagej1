@@ -41,10 +41,9 @@
         <arg value="-batchpath"/>
     </exec>
     <move file="ij.jar" tofile="ij-${ver}.jar"/>
-  	<exec executable="../copyToFiji.sh">
-  		<arg value="jars"/>
-  		<arg value="ij"/>
-  		<arg value="./ij-${ver}.jar"/>
+  	<exec executable="bash">
+  		<arg value="-c"/>
+  		<arg value="../copyToFiji.sh jars ij ./ij-${ver}.jar"/>
   	</exec>
   </target>
 
