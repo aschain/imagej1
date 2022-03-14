@@ -4597,7 +4597,7 @@ public class Functions implements MacroConstants, Measurements {
 				for(int i=0;i<args.length;i++) {
 					double value = Tools.parseDouble((String)args[i]);
 					if (!Double.isNaN(value)) {
-						args[i] = new Integer((int)value);
+						args[i] = Integer.valueOf((int)value);
 						argClasses[i] = int.class;
 					} else
 						argClasses[i] = args[i].getClass();
@@ -7111,6 +7111,8 @@ public class Functions implements MacroConstants, Measurements {
 			return new Variable(getResult(getRT(null)));
 		else if (name.equals("getColumn"))
 			return getColumn();
+		else if (name.equals("columnExists"))
+			return columnExists();
 		else if (name.equals("getString"))
 			return new Variable(getResultString(getRT(null)));
 		else if (name.equals("set"))
@@ -7366,6 +7368,12 @@ public class Functions implements MacroConstants, Measurements {
 		return column;
 	}
 
+	private Variable columnExists() {
+		String col = getFirstString();
+		ResultsTable rt = getResultsTable(getTitle());
+		return new Variable(rt.columnExists(col)?1:0);
+	}
+	
 	private Variable renameColumn() {
 		String oldName = getFirstString();
 		String newName = getNextString();
