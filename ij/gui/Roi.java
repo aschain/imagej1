@@ -1719,7 +1719,7 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 			ImageProcessor ip = imp.getProcessor();
 			ip.reset();
 			int xoffset=0, yoffset=0;
-			Roi croi = clipboard.getRoi();
+			Roi croi = clipboard!=null?clipboard.getRoi():null;
 			if (croi!=null) {
 				Rectangle r = croi.getBounds();
 				if (r.x<0) xoffset=-r.x;
