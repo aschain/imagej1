@@ -1,12 +1,16 @@
 .DS_Store
+*~
+
+# Builds
+*.class
+/*.jar
+/build/
+/target/
+
+# Eclipse
 /.classpath
 /.project
 /.settings/
-/target/
-*.class
-*.jar
-*~
-/build/
-build/
-\build
-\build\
+
+# IntelliJ IDEA
+/.idea/
