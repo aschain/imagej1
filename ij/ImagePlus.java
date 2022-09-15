@@ -1220,7 +1220,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
     	return size;
 	}
 
-	/** If this is a stack, returns the number of slices, else returns 1. */
+	/** Returns the number of stack images. */
 	public int getStackSize() {
 		if (stack==null || oneSliceStack)
 			return 1;
@@ -1276,9 +1276,11 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 		dimensionsSet = true;
 	}
 
-	/** Returns 'true' if this image is a hyperstack. */
+	/** Returns 'true' if this image has more
+	 * than three dimensions.
+	*/
 	public boolean isHyperStack() {
-		return isDisplayedHyperStack() || (openAsHyperStack&&getNDimensions()>3);
+		return getNDimensions()>3;
 	}
 
 	/** Returns the number of dimensions (2, 3, 4 or 5). */
@@ -1513,8 +1515,11 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 			imageProperties = new Properties();
 		if (value==null || value.length()==0)
 			imageProperties.remove(key);
-		else
+		else {
 			imageProperties.setProperty(key, value);
+			if (key.equals("CompositeProjection"))
+				Channels.updateChannels();
+		}
 	}
 	
 	/** Saves a persistent numeric propery. The property is
@@ -3081,7 +3086,9 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 	}
 
 	/** Sets the display range of the current channel. With non-composite
-	    images it is identical to ip.setMinAndMax(min, max). */
+	 * images it is identical to ip.setMinAndMax(min, max).
+	 * Call updateAndDraw() to update the display.
+	*/
 	public void setDisplayRange(double min, double max) {
 		if (ip!=null)
 			ip.setMinAndMax(min, max);
@@ -3181,15 +3188,13 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 
 	/** Flattens all slices of this stack or HyperStack.<br>
 	 * @throws UnsupportedOperationException if this image<br>
-	 * does not have an overlay and the RoiManager overlay is null<br>
-	 * or Java version is less than 1.6.
+	 * does not have an overlay and the RoiManager overlay is null.<br>
+	 * Non-RGB stacks are converted to RGB.<br>
 	 * Copied from OverlayCommands and modified by Marcel Boeglin
 	 * on 2014.01.08 to work with HyperStacks.
 	 */
 	public void flattenStack() {
 		if (IJ.debugMode) IJ.log("flattenStack");
-		if (getStackSize()==1)
-			throw new UnsupportedOperationException("Image stack required");
 		boolean composite = isComposite();
 		if (getBitDepth()!=24)
 			new ImageConverter(this).convertToRGB();
@@ -3420,6 +3425,21 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
     	return setIJMenuBar && Prefs.setIJMenuBar;
     }
 
+    /** Returns 'true' if this ImagePlus contains an ImageStack.
+	 * @see #getStackSize
+	 * @see #getNChannels
+	 * @see #getNSlices
+	 * @see #getNFrames
+	 * @see #getNDimensions	 
+    */
+    public boolean hasImageStack() {
+    	return stack!=null;
+    }
+
+	/**
+	* @deprecated
+	* Replaced by ImagePlus.hasImageStack()
+	*/
     public boolean isStack() {
     	return stack!=null;
     }

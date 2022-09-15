@@ -8,6 +8,7 @@ import ij.gui.*;
 import ij.util.*;
 import ij.plugin.filter.GaussianBlur;
 import ij.plugin.Binner;
+import ij.plugin.Colors;
 import ij.process.AutoThresholder.Method;
 import ij.Prefs;
 import ij.measure.Measurements;
@@ -406,6 +407,18 @@ public abstract class ImageProcessor implements Cloneable {
 	/** Sets the default fill/draw value to the pixel
 		value closest to the specified color. */
 	public abstract void setColor(Color color);
+	
+	/* Sets the fill/draw color, where 'color' is
+	 * "white", "black", "blue", etc., or a hex value
+	 * like "#ff0000".
+	*/
+	public void setColor(String color) {
+		setColor(Colors.decode(color, Color.white));
+	}
+
+	/** Sets the background fill/draw color. */
+	public void setBackgroundColor(Color color) {
+	}
 
 	/** Sets the default fill/draw value. */
 	public void setColor(int value) {
@@ -862,8 +875,8 @@ public abstract class ImageProcessor implements Cloneable {
 		else {
 			if ((roi instanceof PointRoi) && roi.size()==1) {
 				setMask(null);
-				FloatPolygon p = roi.getFloatPolygon();
-				setRoi((int)p.xpoints[0], (int)p.ypoints[0], 1, 1);
+				Polygon p = roi.getPolygon();
+				setRoi(p.xpoints[0], p.ypoints[0], 1, 1);
 			} else {
 				setMask(roi.getMask());
 				setRoi(roi.getBounds());
@@ -1118,6 +1131,15 @@ public abstract class ImageProcessor implements Cloneable {
 			data[i] = getPixel(x, y++);
 	}
 
+	/** Returns the pixel values down the column starting at (x,y). */
+	public float[] getColumn(int x, int y, float[] data, int length) {
+		if (data==null)
+			data = new float[length];
+		for (int i=0; i<length; i++)
+			data[i] = getf(x, y++);
+		return data;
+	}
+
 	/** Inserts the pixels contained in 'data' into a
 		horizontal line starting at (x,y). */
 	public void putRow(int x, int y, int[] data, int length) {
@@ -1135,11 +1157,15 @@ public abstract class ImageProcessor implements Cloneable {
 	/** Inserts the pixels contained in 'data' into a
 		column starting at (x,y). */
 	public void putColumn(int x, int y, int[] data, int length) {
-		//if (x>=0 && x<width && y>=0 && (y+length)<=height)
-		//	((ShortProcessor)this).putColumn2(x, y, data, length);
-		//else
-			for (int i=0; i<length; i++)
-				putPixel(x, y++, data[i]);
+		for (int i=0; i<length; i++)
+			putPixel(x, y++, data[i]);
+	}
+
+	/** Inserts the pixels contained in 'data' into a
+		column starting at (x,y). */
+	public void putColumn(int x, int y, float[] data, int length) {
+		for (int i=0; i<length; i++)
+			setf(x, y++, data[i]);
 	}
 
 	/**
@@ -1914,7 +1940,31 @@ public abstract class ImageProcessor implements Cloneable {
 	public void putPixel(int x, int y, int[] iArray) {
 		putPixel(x, y, iArray[0]);
 	}
-
+	
+	/*
+	public int[] getRGBValue(int index, int[] rgb) {
+		if (rgb==null) rgb = new int[3];
+		if (this instanceof ColorProcessor)
+			return rgb;
+		if (rLUT1==null) {
+			if (cm==null)
+				makeDefaultColorModel();
+			baseCM = cm;
+			IndexColorModel m = (IndexColorModel)cm;
+			rLUT1 = new byte[256]; gLUT1 = new byte[256]; bLUT1 = new byte[256];
+			m.getReds(rLUT1); m.getGreens(gLUT1); m.getBlues(bLUT1);
+		}
+		int min2=(int)getMin(), max2=(int)getMax();
+		double scale = 256.0/(max2-min2+1);
+		double value = getf(index)-min2;
+		if (value<0.0) value = 0.0;
+		int v = (int)(value*scale+0.5);
+		if (v>255) v = 255;
+		rgb[0]=rLUT1[v]; rgb[1]=gLUT1[v]; rgb[2]=bLUT1[v];		
+		return rgb;
+	}
+	*/
+	
 	/** Uses the current interpolation method (bilinear or bicubic)
 		to find the pixel value at real coordinates (x,y). */
 	public abstract double getInterpolatedPixel(double x, double y);
@@ -2660,7 +2710,7 @@ public abstract class ImageProcessor implements Cloneable {
 					rgbPixels[i] = reds[index] | greens[index] | blues[index];
 				}
 				break;
-			case SUM_PROJECTION: // default up to v1.53o
+			case SUM_PROJECTION:
 				for (int i=0; i<size; i++) {
 					int pixel = rgbPixels[i];
 					redValue = (pixel&0x00ff0000) + reds[bytes[i]&0xff];
@@ -2672,7 +2722,7 @@ public abstract class ImageProcessor implements Cloneable {
 					rgbPixels[i] = redValue | greenValue | blueValue;
 				}
 				break;
-			case MAX_PROJECTION: // default with v1.53o and later
+			case MAX_PROJECTION:
 				for (int i=0; i<size; i++) {
 					int pixel = rgbPixels[i];
 					int index = bytes[i]&0xff;

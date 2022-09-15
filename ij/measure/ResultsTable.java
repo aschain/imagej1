@@ -68,6 +68,7 @@ public class ResultsTable implements Cloneable {
 	private boolean columnDeleted;
 	private boolean renameWhenSaving;
 	private boolean saveColumnHeaders = !Prefs.dontSaveHeaders;
+	public boolean isResultsTable;
 
 
 	/** Constructs an empty ResultsTable with the counter=0, no columns
@@ -229,7 +230,7 @@ public class ResultsTable implements Cloneable {
 	 *    rt.addValue("Cos(n)", Math.cos(n));
 	 * }
 	 * rt.show("Sine/Cosine Table");
-	 * <pre>
+	 * </pre>
 	 * @see #addRow
 	 * @see #addValue(String,String)
 	 * @see #size
@@ -1046,8 +1047,11 @@ public class ResultsTable implements Cloneable {
 		title = windowTitle;
 		if (!windowTitle.equals("Results") && this==Analyzer.getResultsTable())
 			IJ.log("ResultsTable.show(): the system ResultTable should only be displayed in the \"Results\" window.");
-		if (windowTitle.equals("Results") && !showRowNumbersSet)
-			showRowNumbers(true);
+		if (windowTitle.equals("Results")) {
+			if(!showRowNumbersSet)
+				showRowNumbers(true);
+			isResultsTable = true;
+		}
 		String tableHeadings = getColumnHeadings();		
 		TextPanel tp;
 		boolean newWindow = false;
@@ -1086,7 +1090,8 @@ public class ResultsTable implements Cloneable {
 				int height = 300;
 				if (size()>15) height = 400;
 				if (size()>30 && width>300) height = 500;
-				win = new TextWindow(windowTitle, "", width, height);
+				String wtitle = windowTitle + (isResultsTable&&showRowNumbers?"(Results)":"");
+				win = new TextWindow(wtitle, "", width, height);
 				cloneNeeded = true;
 			}
 			tp = win.getTextPanel();
@@ -1201,6 +1206,9 @@ public class ResultsTable implements Cloneable {
 		String[] headings = lines[0].split(cellSeparator);
 		if (headings.length<1)
 			throw new IOException("This is not a tab or comma delimited text file.");
+		String zeroWidthSpace = "\uFEFF";
+		if (headings[0].startsWith(zeroWidthSpace))
+			headings[0] = headings[0].substring(1, headings[0].length());
 		int numbersInHeadings = 0;
 		for (int i=0; i<headings.length; i++) {
 			if (headings[i].equals("NaN") || !Double.isNaN(Tools.parseDouble(headings[i])))
@@ -1319,7 +1327,7 @@ public class ResultsTable implements Cloneable {
 	}
 
 	public boolean saveAndRename(String path) {
-		if (!"Results".equals(title))
+		if (title!=null && !title.equals("Results"))
 			renameWhenSaving = true;
 		boolean ok = save(path);
 		renameWhenSaving = false;
@@ -1377,6 +1385,7 @@ public class ResultsTable implements Cloneable {
 	public synchronized Object clone() {
 		try { 
 			ResultsTable rt2 = (ResultsTable)super.clone();
+			rt2.isResultsTable = isResultsTable;
 			rt2.headings = new String[headings.length];
 			for (int i=0; i<=lastColumn; i++)
 				rt2.headings[i] = headings[i];
@@ -1648,6 +1657,10 @@ public class ResultsTable implements Cloneable {
 				return +1;
 			return  (dValue < e.dValue) ? -1 : ( (dValue > e.dValue) ? 1 : 0 );
 		}
+	}
+	
+	public void setIsResultsTable(boolean isResultsTable) {
+		this.isResultsTable = isResultsTable;
 	}
 		
 }

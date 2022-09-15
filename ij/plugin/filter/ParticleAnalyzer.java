@@ -173,13 +173,24 @@ public class ParticleAnalyzer implements PlugInFilter, Measurements {
 
 			
 	/** Constructs a ParticleAnalyzer.
-		@param options	a flag word created by Oring SHOW_RESULTS, EXCLUDE_EDGE_PARTICLES, etc.
-		@param measurements a flag word created by ORing constants defined in the Measurements interface
-		@param rt		a ResultsTable where the measurements will be stored
-		@param minSize	the smallest particle size in pixels
-		@param maxSize	the largest particle size in pixels
-		@param minCirc	minimum circularity
-		@param maxCirc	maximum circularity
+	 * @param options	a flag word created by Oring SHOW_RESULTS, EXCLUDE_EDGE_PARTICLES, etc.
+	 * @param measurements a flag word created by ORing constants defined in the Measurements interface
+	 * @param rt		a ResultsTable where the measurements will be stored
+	 * @param minSize	the smallest particle size in pixels
+	 * @param maxSize	the largest particle size in pixels
+	 * @param minCirc	minimum circularity
+	 * @param maxCirc	maximum circularity
+	 * <pre>
+	 * // JavaScript example
+	 * imp = IJ.openImage("https://imagej.net/images/blobs.gif");
+	 * IJ.setAutoThreshold(imp, "Default"); 
+	 * rt = new ResultsTable();
+	 * options = ParticleAnalyzer.SHOW_NONE;
+	 * measurements = Measurements.AREA + Measurements.PERIMETER;
+	 * pa = new ParticleAnalyzer(options, measurements, rt, 0, Double.MAX_VALUE, 0, 1);
+	 * pa.analyze(imp);
+	 * rt.show("Results");
+  	 * </pre>
 	*/
 	public ParticleAnalyzer(int options, int measurements, ResultsTable rt, double minSize, double maxSize, double minCirc, double maxCirc) {
 		this.options = options;
@@ -810,13 +821,18 @@ public class ParticleAnalyzer implements PlugInFilter, Measurements {
 			level1 = 255;
 			level2 = 255;
 			fillColor = 64;
-			if (!Prefs.blackBackground && !imp.isInvertedLut()) {
+			if (!Prefs.blackBackground && !invertedLut) {
 				level1 = 0;
 				level2 = 0;
 				fillColor = 192;
 			}
-			if (!IJ.isMacro())
-				IJ.log("ParticleAnalyzer: threshold not set; assumed to be "+(int)level1+"-"+(int)level2);
+			if (!IJ.isMacro()) {
+				boolean blackBackground = imageType==BYTE && Prefs.blackBackground && level1==255 && level1==level2;
+				if (!blackBackground) {
+					String suffix = !Prefs.blackBackground?" (\"Black background\" not set)":"";
+					IJ.log("ParticleAnalyzer: threshold not set; assumed to be "+(int)level1+"-"+(int)level2+suffix);
+				}
+			}
 		} else {
 			level1 = t1;
 			level2 = t2;

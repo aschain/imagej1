@@ -5,9 +5,174 @@
 </head>
 <body>
 
-<li> <u>1.53q15 27 March 2022</u>
+<li> <u>1.53u9 7 September 2022</u>
 <ul>
-<li> Thanks to 'muniak', the <li>Process&gt;Enhance Contrast</li>
+<li> Added the ImageProcessor.setColor(String) method
+<li> Thanks to Tiago Ferreira, fixed a bug that caused toolbar
+contextual menus to ignore the <i>Edit&gt;Options&gt;Appearance</i>
+GUI scale setting.
+<li> Thanks to Jan Brocher, fixed a bug that caused the "Results" menu
+in a table to disappear if the table was renamed.
+<li> Thanks to Rene Ramekers, fixed a bug that caused
+<i>File&gt;Import&gt;TIFF Virtual Stack</i> to not correctly 
+calibrate TIFF stacks not created by ImageJ. 
+<li> Thanks to Mark Hiner, fixed a 1.53t regression that caused
+the <i>Image&gt;Stacks&gt;Z Project</i> command to ignore the last
+slice when doing "Average" projection of 32-bit stacks.
+<li> Thanks to Jerome Mutterer, fixed a 1.53o regression that caused
+unexpected error messages when double clicking on a line in a table or
+in the ROI Manager when a custom action was not defined
+(<a href="http://wsr.imagej.net/macros/TableAndRoiManagerActions.ijm">example</a>).
+</ul>
+
+<li> <u>1.53t 24 August 2022</u>
+<ul>
+<li> Thanks to Michael Schmid, the <i>Analyze&gt;Tools&gt;Analyze Line Graph</i>
+command is greatly enhanced:
+  <ul>
+  <li> Works on all image types.
+  <li> Spatial calibration is read correctly.
+  <li> Reads values for each x value in pixels.
+  <li> Without calibration, the values are pixel coordinates, not pixel coordinates + 0.5.
+  <li> Tries to follow the curves, even if curves cross each other.
+  <li> Plots (and lists) different curves as different data sets.
+  <li> Honors non-rectangular selections instead of deleting them.
+  <li> Produces somewhat usable output even without a selection or any editing.
+  </ul>
+<li> Thanks to Thomas Laurent, the String.format() macro function now
+accepts a variable number of numeric arguments.
+<li> Thanks to Stein Rorvik, the <i>Image&gt;Stacks&gt;Tools&gt;Reduce</i>
+command produces a virtual stack if the source is a virtual stack
+created using <i>File&gt;Import&gt;Image Sequence</i> or
+<i>File&gt;Import&gt;Stack from List</i>.
+<li> Thanks to Nicolas De Francesco, the <i>Image&gt;Color&gt;Invert LUTs</i>
+command (used by the "Channels" tool) works with non-linear LUTs.
+<li> Thanks to Volko Straub, the <i>Image&gt;Stacks&gt;Z Project</i>
+command ignores NaNs when doing "Average" projection of
+32-bit stacks.
+<li> Thanks to 'Danielle_Z', ImageJ now opens compressed BMP images.
+<li> Thanks to Philippe Carl, the ROI Manager's "Labels"
+checkbox is no longer enabled on Windows when clicking on
+"Show All" and ROIs are now automatically updated in the ROI Manager
+after being modified by holding down the shift or alt key.
+<li> Thanks to Dennis Chang and Michael Schmid, added the is("FFT")
+macro function.
+<li> Thanks to 'Leonicolash' and Volker Backer, fixed a bug that
+caused the Table.sort() macro function to fail after
+using saveAs("Results", path).
+<li> Thanks to Daniel Leswasserman, fixed a bug that sometimes caused
+the "Dir:" field of the <i>File&gt;Import&gt;Image Sequence</i> dialog
+to be too wide.
+<li> Thanks to Michael Schmid, fixed a bug that caused the
+Roi.getImageID() method to throw a NullPointerException.
+<li> Fixed a bug that caused sample images to not open
+on Windows 10 with Java 1.8.0_172.
+<li> Thanks to Christophe Leterrier, fixed a bug that caused
+32-bit to 16-bit conversions of multichannel images to not
+work as expected.
+<li> Thanks to Stein Rorvik, fixed a bug that caused the
+<i>File&gt;Import&gt;Stack From List</i> command to not
+preserve EXIF data.
+<li> Thanks to Stein Rorvik, fixed several bugs related to scaling of
+stacks with overlays.
+<li> Thanks to Fred Damen, fixed a 1.52u regression that caused
+getStatistics().mean values of single point selections
+to be incorrect.
+<li> Thanks to Mark Hiner, fixed a 1.53h regression that sometimes 
+caused line selection bounds to be too large.
+</ul>
+
+<li> <u>1.53s 19 May 2022</u>
+<ul>
+<li> Thanks to Stein Rorvik, added the
+<i>Edit&gt;Selection&gt;Translate</i> command, the ROI Manager <i>Scale</i> and
+<i>Rotate</i> commands, and the RoiManager.scale(), RoiManager.rotate(),
+RoiManager.translate(), RoiManager.selectByName() and RoiManager.getIndex()
+macro functions.
+<li> Thanks to Fred Damen, added the <i>Image&gt;HyperStacks&gt;Make Subset</i>
+command, an alias for the <i>Image&gt;Stacks&gt;Tools&gt;Make Substack</i>
+command.
+<li> Thanks to Fred Damen, GenericDialog sliders are mouse wheel controllable
+and TextFields on Linux are not as tall.
+<li> Thanks to Wilhelm Burger, the ClassChecker no longer
+deletes files and only runs when the <i>Compile and Run</i>
+command is used.
+<li> Thanks to Stein Rorvik, added the Dialog.addImageChoice(label,default)
+macro function.
+<li> Thanks to Michael Schmid, fixed several plot legand issues
+(<a href="http://wsr.imagej.net/macros/PlotLegendTest.txt">example</a>).
+<li> Thanks to Laurent Thomas, units of imported tiffs are
+converted to microns if the pixel width is <= 0.001 cm
+(previously it was <= 0.0001 cm).
+<li> Thanks to Lance Davidson, ImageJ now correctly opens CSV
+files that start with a 0xFEFF character (zero width no-break space).
+<li> Thanks to Tiago Ferreira, fixed a bug that caused commands 
+and keyboard shortcuts installed by StartupMacros.txt in the
+<i>Plugins&gt;Macros</i> menu to be deleted when a macro tool
+was added to the toolbar.
+<li> Thanks to 'DentedDuck', fixed a bug that caused the
+<i>Image&gt;Transform&gt;Rotate</i> command to increase the image
+width or height by one pixel if the angle was 0 or 90 degrees
+and "Enlage image" was checked.
+<li> Thanks to Norbert Vischer, fixed a bug that caused an
+exception to occur when duplicating a stack and the "Range:"
+field was empty.
+<li> Thanks to Fred Damen, fixed a bug that caused the
+<i>Image&gt;Stacks&gt;Tools&gt;Make Substack</i> command
+to not work correctly with stacks with nSlices=1 and
+nFrames&gt;1.
+<li> Thanks to Michael Schmid, fixed a bug that caused point
+selection bounds to be too wide and tall by 1 pixel
+(<a href="http://wsr.imagej.net/macros/PointBounds.ijm">example</a>).
+<li> Thanks to Stein Rorvik, fixed a bug that caused the
+toString(number,decimalPlaces) macro function to not work
+as expected.
+<li> Thanks to Ellie Cho and 'Research_Associate', fixed a 1.53h
+regression that caused ROIs to not be drawn on images 
+displayed using setBatchMode("show").
+</ul>
+
+<li> <u>1.53r 21 April 2022</u>
+<ul>
+<li> Added a "Help" button to the <i>Channels</i> dialog.
+<li> The <i>Image&gt;Type&gt;RGB Stack</i> command converts
+multi-channel composite images into RGB stacks
+(<a href="http://wsr.imagej.net/macros/CompositeProjection.ijm">example</a>).
+<li> Set the "ClipWhenSumming" image property "true" and the
+<i>Image&gt;Stacks&gt;Z Project</i> command will clip at 255
+when summing RGB stacks
+(<a href="http://wsr.imagej.net/macros/CompositeProjection.ijm">example</a>).
+<li> Added the <i>Image&gt;Color&gt;Invert LUTs</i> command.
+<li> Thanks to Bram van den Broek, restored the "Don't reset range"
+option to the <i>Threshold</i> dialog.
+<li> Thanks to Alan Brooks, the "Fill with background color"
+option of the <i>Image&gt;Transform&gt;Rotate</i> command
+is now available with 16 and 32 bit images.
+<li> Thanks to Philippe Carl, press shift+alt+n to create a
+text window with "Run" and "Install" buttons, and a language
+drop down menu.
+<li> Thanks to Stein Rorvik, added the ImageJ.getStatusBarText() method.
+<li> Thanks to Wilhelm Burger, added versions of the ImageProcessor
+getColumn() and putColumn() methods that accept float[] arguments.
+<li> Thanks to Alan Brooks, added the
+ImageProcessor.setBackgroundColor(Color) method.
+<li> Thanks to Stein Rorvik, fixed a bug that caused values
+to not be displayed correctly in <i>Image&gt;Math&gt;</i> dialogs
+if "Decimal places" in the <i>Analyze&gt;Set Measurement</i>
+was set to 9.
+<li> Thanks to Abbas Haghshenas and Nicolas De Francesco, fixed
+a 1.54p regression that caused the "OK" button in dialog boxes
+to be left-aligned on Windows.
+</ul>
+
+<li> <u>1.53q 30 March 2022</u>
+<ul>
+<li> Thanks to Kevin Terretaz, added the More&gt;Invert LUTs command
+to the "Channels" dialog.
+<li> Thanks to Olivier Burri, ImageJ calculates the perimeter of a
+"polygon" ROI the same way as a "traced" ROI if it appears to have
+been created by edge tracing.
+<li> Thanks to 'muniak', the <i>Process&gt;Enhance Contrast</i>
 dialog displays values using 2 decimal places.
 <li> Thanks to Norbert Vischer, replaced, in the ImageJ source,
 deprecated new Integer(intOrString) and new Double(intOrString)
@@ -17,15 +182,14 @@ and Double.valueOf(intOrString).
 to the TextPanel class
 (<a href="http://wsr.imagej.net/macros/SetTablePosition.ijm">example</a>).
 <li> Thanks to Fred Damen, fixed a bug that caused bin starts in tables
-created by clicking on “List” in histogram windows to be rounded
+created by clicking on "List" in histogram windows to be rounded
 to integers.
-<li> Thanks to Herbie Gluender, fixed a bug that caused Undo of rotated
+<li> Thanks to Herbie Gluender, fixed a bug that caused <i>Undo</i> of rotated
 images with overlays to not work as expected.
 <li> Thanks to Michael Schmid, fixed a regression that caused some
 PNG images to open as stacks.
 <li> Thanks to Christophe Leterrier, fixed a 1.53p regression that caused the
 run("Table...",options) macro function to fail.
-
 </ul>
 
 <li> <u>1.53p 4 March 2022</u>
@@ -73,11 +237,11 @@ roi.setPosition(c,z,t).
 <li> Thanks to Kenta Shimamoto and Christoph Gohlke,
 fixed a bug that caused tiff images larger than 2 GB
 to open upside down.
-<li> Thanks to Thomas Laurent, fixed a bug that caused
+<li> Thanks to Laurent Thomas, fixed a bug that caused
 a double-click on the rectangle ROI icon in the toolbar
 to display both the "ROI Defaults" dialog and
 the right-click menu.
-<li> Thanks to Thomas Laurent, fixed a bug that caused
+<li> Thanks to Laurent Thomas, fixed a bug that caused
 the IJ.openUrlAsString() method to not correctly interpret
 special characters
 <li> Fixed a 1.53j regression that caused activation

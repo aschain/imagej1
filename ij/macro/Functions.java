@@ -4007,10 +4007,15 @@ public class Functions implements MacroConstants, Measurements {
 				String defaultDir = getLastString();
 				gd.addDirectoryField(label, defaultDir);
 			} else if (name.equals("addImageChoice")) {
-				String label = getStringArg();
+				String label = getFirstString();
+				String defaultImage = null;
+				if (interp.nextToken()==',')
+					defaultImage = getLastString();
+				else
+					interp.getRightParen();
 				if (WindowManager.getImageCount()==0)
 					interp.error("No images");
-				gd.addImageChoice(label, null);
+				gd.addImageChoice(label, defaultImage);
 			} else if (name.equals("addFile")) {
 				String label = getFirstString();
 				String defaultPath = getLastString();
@@ -4831,6 +4836,8 @@ public class Functions implements MacroConstants, Measurements {
 		} else if (arg.startsWith("line")) {
 			Roi roi = getImage().getRoi();
 			state = roi!=null?roi.isLine():false;
+		} else if (arg.startsWith("fft")) {
+			state = getImage().getProperty("FHT")!=null;
 		} else
 			interp.error("Invalid argument");
 		return state?1.0:0.0;
@@ -4915,12 +4922,24 @@ public class Functions implements MacroConstants, Measurements {
 			return getStringArg().trim();
 		else if (name.equals("pad"))
 			return pad();
-		else if (name.equals("format")) {
-			try {return String.format(getFirstString(),getLastArg());}
-			catch (Exception e) {interp.error(""+e);}
-			return null;
-		} else
+		else if (name.equals("format"))
+			return format();
+		else
 			interp.error("Unrecognized String function");
+		return null;
+	}
+	
+	private String format() {
+		try {
+			String command = getFirstString();
+			ArrayList<Double> params = new ArrayList<Double>();
+			while (interp.nextToken()==',')
+				params.add(getNextArg());
+			interp.getRightParen();
+			return String.format(command, params.toArray());
+		} catch (Exception e) {
+			interp.error(""+e);
+		}
 		return null;
 	}
 
@@ -5527,7 +5546,13 @@ public class Functions implements MacroConstants, Measurements {
 	}
 
 	String doToString() {
-		String s = getFirstString();
+		interp.getLeftParen();
+		if (interp.nextNextToken()==',') {//1.53t bug fix
+			double n = interp.getExpression();
+			int digits = (int)getLastArg();
+			return IJ.d2s(n, digits);
+		}
+		String s = getString();
 		interp.getToken();
 		if (interp.token==',') {
 			double value = Tools.parseDouble(s);
@@ -6122,9 +6147,10 @@ public class Functions implements MacroConstants, Measurements {
 		Variable[] a = getArray();
 		interp.getRightParen();
 		StringBuilder sb = joinArray(a, ", ");
+		String str = sb.toString();
 		if (prefix!=null)
-			sb.append(prefix+" ");
-		interp.log(sb.toString());
+			str = prefix+" "+str;
+		interp.log(str);
 		return null;
 	}
 
@@ -7995,6 +8021,9 @@ public class Functions implements MacroConstants, Measurements {
 		} else if (name.equals("select")) {
 			rm.select((int)getArg());
 			return null;
+		} else if (name.equals("selectByName")) {
+			rm.select(rm.getIndex(getStringArg()));
+			return null;
 		} else if (name.equals("setGroup")) {
 			int group = (int)getArg();
 			if (group<0 || group>255)
@@ -8007,12 +8036,28 @@ public class Functions implements MacroConstants, Measurements {
 		} else if (name.equals("getName")) {
 			String roiName = rm.getName((int)getArg());
 			return new Variable(roiName!=null?roiName:"");
+		} else if (name.equals("getIndex")) {
+			return new Variable(rm.getIndex(getStringArg()));
 		} else if (name.equals("setPosition")) {
 			int position = (int)getArg();
 			rm.setPosition(position);
 			return null;
 		} else if (name.equals("multiCrop")) {
 			rm.multiCrop(getFirstString(),getLastString());
+			return null;
+		} else if (name.equals("scale")) {
+			rm.scale(getFirstArg(),getNextArg(), getLastArg()==1?true:false);
+			return null;
+		} else if (name.equals("rotate")) {
+			double angle = getFirstArg();
+			if (interp.nextToken()==')') {
+				interp.getRightParen();
+				rm.rotate(angle);
+			} else
+				rm.rotate(angle, getNextArg(), getLastArg());
+			return null;
+		} else if (name.equals("translate")) {
+			rm.translate(getFirstArg(),getLastArg());
 			return null;
 		} else
 			interp.error("Unrecognized RoiManager function");

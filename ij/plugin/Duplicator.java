@@ -96,7 +96,10 @@ public class Duplicator implements PlugIn, TextListener, ItemListener {
 		imp2.setTitle(newTitle);
 		imp2.setProp("UniqueName","true");
 		if (roi!=null && roi.isArea() && roi.getType()!=Roi.RECTANGLE) {
-			Roi roi2 = (Roi)cropRoi(imp, roi).clone();
+			Roi roi2 = cropRoi(imp, roi);
+			if (roi2==null)
+				return;
+			roi2 = (Roi)roi2.clone();
 			roi2.setLocation(0, 0);
 			imp2.setRoi(roi2);
 		}
@@ -296,7 +299,7 @@ public class Duplicator implements PlugIn, TextListener, ItemListener {
 		if (info!=null)
 			imp2.setProperty("Info", info);
 		imp2.setProperties(imp.getPropertiesAsArray());
-		if (imp.isStack()) {
+		if (imp.hasImageStack()) {
 			ImageStack stack = imp.getStack();
 			String label = stack.getSliceLabel(imp.getCurrentSlice());
 			if (label!=null) {
@@ -497,8 +500,11 @@ public class Duplicator implements PlugIn, TextListener, ItemListener {
 			duplicateStack = gd.getNextBoolean();
 			if (duplicateStack) {
 				String[] range = Tools.split(gd.getNextString(), " -");
-				double d1 = gd.parseDouble(range[0]);
-				double d2 = range.length==2?gd.parseDouble(range[1]):Double.NaN;
+				double d1=1, d2=stackSize;
+				if (range!=null && range.length>0) {
+					d1 = gd.parseDouble(range[0]);
+					d2 = range.length==2?gd.parseDouble(range[1]):Double.NaN;
+				}
 				first = Double.isNaN(d1)?1:(int)d1;
 				last = Double.isNaN(d2)?stackSize:(int)d2;
 				if (first<1) first = 1;
@@ -662,6 +668,8 @@ public class Duplicator implements PlugIn, TextListener, ItemListener {
 		if (imp==null)
 			return roi;
 		Rectangle b = roi.getBounds();
+		if (b.width==0 || b.height==0)
+			return null; // zero area
 		int w = imp.getWidth();
 		int h = imp.getHeight();
 		if (b.x<0 || b.y<0 || b.x+b.width>w || b.y+b.height>h) {

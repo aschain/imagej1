@@ -26,7 +26,10 @@ public class NewPlugin implements PlugIn {
     	type = -1;
     	if (arg.startsWith("text")||arg.equals("")) {
     		type = TEXT_FILE;
-    		name = "Untitled.txt";
+    		if (IJ.altKeyDown())
+    			name = "Untitled.ijm";
+    		else
+    			name = "Untitled.txt";
     	} else if (arg.equals("macro")) {
     		type = MACRO;
     		name = "Macro.ijm";
@@ -122,6 +125,7 @@ public class NewPlugin implements PlugIn {
 		text += "\t}\n";
 		text += "\n";
 		text += "}\n";
+		text = text.replaceAll("\\t","    ");
 		ed.create(pluginName, text);
 	}
 	

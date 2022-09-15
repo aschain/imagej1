@@ -18,7 +18,7 @@ public class VirtualStack extends ImageStack {
 	private String[] labels;
 	private int bitDepth;
 	private int delay;
-	private Properties  properties;
+	private Properties properties;
 	private boolean generateData;
 	private int[] indexes;  // used to translate non-CZT hyperstack slice numbers
 
@@ -331,6 +331,22 @@ public class VirtualStack extends ImageStack {
 		int n2 = (indexes!=null&&indexes.length==getSize()) ? indexes[n-1]+1 : n;
 		//IJ.log("translate: "+n+" "+n2+" "+getSize()+" "+(indexes!=null?indexes.length:null));
 		return n2;
+	}
+	
+	/** Reduces the number of slices in this stack by a factor. */
+	public void reduce(int factor) {
+		if (factor<2 || nSlices/factor<1 || names==null)
+			return;
+		nSlices = nSlices/factor;
+		for (int i=0; i<nSlices; i++) {
+			names[i] = names[i*factor];
+			labels[i] = labels[i*factor];
+		}
+		ImagePlus imp = WindowManager.getCurrentImage();
+		if (imp!=null) {
+			imp.setSlice(1);
+			imp.updateAndRepaintWindow();
+		}
 	}
 
 } 
