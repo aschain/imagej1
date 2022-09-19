@@ -43,16 +43,16 @@
   <target name="run" depends="build" description="Build and run ImageJ.">
     <exec executable="java" outputproperty="ver">
         <arg value="-cp"/>
-	<arg value="${build.dir}/${jarfile}"/>
+	<arg value="./${jarfile}"/>
         <arg value="ij.ImageJ"/>
         <arg value="-eval"/>
 	<arg value="return getVersion();"/>
         <arg value="-batchpath"/>
     </exec>
-    <move file="${build.dir}/${jarfile}" tofile="${build.dir}/ij-${ver}.jar"/>
+    <move file="${jarfile}" tofile="ij-${ver}.jar"/>
   	<exec executable="bash">
   		<arg value="-c"/>
-  		<arg value="../copyToFiji.sh jars ij ${build.dir}/ij-${ver}.jar"/>
+  		<arg value="../copyToFiji.sh jars ij ./ij-${ver}.jar"/>
   	</exec>
   </target>
 
