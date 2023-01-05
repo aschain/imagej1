@@ -30,7 +30,9 @@ public abstract class ImageProcessor implements Cloneable {
 	/** Value of pixels included in masks. */
 	public static final int BLACK = 0xFF000000;
 
-	/** Value returned by getMinThreshold() when thresholding is not enabled. */
+	/** Value returned by getMinThreshold() when image is not thresholded.
+	 * @see #isThreshold
+	*/
 	public static final double NO_THRESHOLD = -808080.0;
 
 	/** Left justify text. */
@@ -473,10 +475,10 @@ public abstract class ImageProcessor implements Cloneable {
 			setValue(value);
 	}
 
-	/** Returns the smallest displayed pixel value. */
+	/** Returns the minimum displayed pixel value. */
 	public abstract double getMin();
 
-	/** Returns the largest displayed pixel value. */
+	/** Returns the maximum displayed pixel value. */
 	public abstract double getMax();
 
 	/** This image will be displayed by mapping pixel values in the
@@ -767,7 +769,10 @@ public abstract class ImageProcessor implements Cloneable {
 	}
 
 	/** Returns the lower threshold level. Returns NO_THRESHOLD
-		if thresholding is not enabled. */
+	 * if thresholding is not enabled.
+	 * @see ImageProcessor#isThreshold
+	 * @see ij.ImagePlus#isThreshold
+	*/
 	public double getMinThreshold() {
 		return minThreshold;
 	}
@@ -775,6 +780,13 @@ public abstract class ImageProcessor implements Cloneable {
 	/** Returns the upper threshold level. */
 	public double getMaxThreshold() {
 		return maxThreshold;
+	}
+	
+	/** Returns 'true' if this image is thresholded.
+	 * @see ij.ImagePlus#isThreshold
+	*/
+	public boolean isThreshold() {
+		return getMinThreshold()!=ImageProcessor.NO_THRESHOLD;
 	}
 
 	/** Returns the LUT update mode, which can be RED_LUT, BLACK_AND_WHITE_LUT,
@@ -1940,31 +1952,7 @@ public abstract class ImageProcessor implements Cloneable {
 	public void putPixel(int x, int y, int[] iArray) {
 		putPixel(x, y, iArray[0]);
 	}
-	
-	/*
-	public int[] getRGBValue(int index, int[] rgb) {
-		if (rgb==null) rgb = new int[3];
-		if (this instanceof ColorProcessor)
-			return rgb;
-		if (rLUT1==null) {
-			if (cm==null)
-				makeDefaultColorModel();
-			baseCM = cm;
-			IndexColorModel m = (IndexColorModel)cm;
-			rLUT1 = new byte[256]; gLUT1 = new byte[256]; bLUT1 = new byte[256];
-			m.getReds(rLUT1); m.getGreens(gLUT1); m.getBlues(bLUT1);
-		}
-		int min2=(int)getMin(), max2=(int)getMax();
-		double scale = 256.0/(max2-min2+1);
-		double value = getf(index)-min2;
-		if (value<0.0) value = 0.0;
-		int v = (int)(value*scale+0.5);
-		if (v>255) v = 255;
-		rgb[0]=rLUT1[v]; rgb[1]=gLUT1[v]; rgb[2]=bLUT1[v];		
-		return rgb;
-	}
-	*/
-	
+		
 	/** Uses the current interpolation method (bilinear or bicubic)
 		to find the pixel value at real coordinates (x,y). */
 	public abstract double getInterpolatedPixel(double x, double y);
@@ -2120,7 +2108,22 @@ public abstract class ImageProcessor implements Cloneable {
 		supported. */
 	public abstract void applyTable(int[] lut);
 
-	/** Inverts the image or ROI. */
+	/** Inverts the image or ROI.
+	 * <p>
+	 * With 8-bit images, p=255-p.
+	 * <p>
+	 * With RGB images, converts each pixel to
+	 * three 8-bit pixels and uses p=255-p.
+	 * <p>
+	 * With 16-bit images, p=65535-p, or p=255-p,
+	 * p=1024-p, etc. if an "Unsigned 16-bit range"
+	 * is set using the "Set" option of the
+	 * Image&gt;Adjust&gt;Brightness/Contrast dialog.
+	 * <p>
+	 * With 32-bit images, p=max-(p-min), where 'min'
+	 * and 'max' are the minimum and maximum displayed
+	 * pixel values.
+	*/
 	public void invert() {process(INVERT, 0.0);}
 
 	/** Adds 'value' to each pixel in the image or ROI. */
@@ -2232,6 +2235,13 @@ public abstract class ImageProcessor implements Cloneable {
 	/** Returns a new processor containing an image
 		that corresponds to the current ROI. */
 	public abstract ImageProcessor crop();
+
+	/** Sets pixels less than 'level1' or greater than
+	 * 'level2' to 0 and all other pixels to 255.
+	 * Only works with 8-bit images.
+	*/
+	public void threshold(int level1, int level2) {
+	}
 
 	/** Sets pixels less than or equal to level to 0 and all other
 		pixels to 255. Only works with 8-bit and 16-bit images. */

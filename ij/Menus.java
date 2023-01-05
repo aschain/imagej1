@@ -78,9 +78,9 @@ public class Menus {
 	private static int userPluginsIndex; // First user plugin or submenu in Plugins menu
 	private static boolean addSorted;
 	private static int defaultFontSize = IJ.isWindows()?15:0;
-	private static int fontSize = Prefs.getInt(Prefs.MENU_SIZE, defaultFontSize);
-	private static Font menuFont;
+	private static int fontSize;
 	private static double scale = 1.0;
+	private static Font cachedFont;
 
 	static boolean jnlp; // true when using Java WebStart
 	public static int setMenuBarCount;
@@ -90,12 +90,13 @@ public class Menus {
 		String title = ij!=null?ij.getTitle():null;
 		applet = appletInstance;
 		instance = this;
+		fontSize = Prefs.getInt(Prefs.MENU_SIZE, defaultFontSize);
 	}
 
 	String addMenuBar() {
 		scale = Prefs.getGuiScale();
-		if ((scale>=1.5&&scale<2.0) || (scale>=2.5&&scale<3.0))
-			scale = (int)Math.round(scale);
+		//if ((scale>=1.5&&scale<2.0) || (scale>=2.5&&scale<3.0))
+		//	scale = (int)Math.round(scale);
 		nPlugins = nMacros = userPluginsIndex = 0;
 		addSorted = installingJars = duplicateCommand = false;
 		error = null;
@@ -116,6 +117,7 @@ public class Menus {
 		addOpenRecentSubMenu(file);
 		Menu importMenu = getMenu("File>Import", true);		
 		Menu showFolderMenu = new Menu("Show Folder");
+		fixFontSize(showFolderMenu);
 		file.add(showFolderMenu);
 		addPlugInItem(showFolderMenu, "Image", "ij.plugin.SimpleCommands(\"showdirImage\")", 0, false);
 		addPlugInItem(showFolderMenu, "Plugins", "ij.plugin.SimpleCommands(\"showdirPlugins\")", 0, false);
@@ -241,13 +243,13 @@ public class Menus {
 		addPlugInItem(help, "ImageJ Website...", "ij.plugin.BrowserLauncher", 0, false);
 		help.addSeparator();
 		addPlugInItem(help, "Dev. Resources...", "ij.plugin.BrowserLauncher(\""+IJ.URL+"/developer/index.html\")", 0, false);
-		addPlugInItem(help, "Macro Functions...", "ij.plugin.BrowserLauncher(\""+IJ.URL+"/developer/macro/functions.html\")", 0, false);
+		addPlugInItem(help, "Macro Functions...", "ij.plugin.BrowserLauncher(\"https://wsr.imagej.net/developer/macro/functions.html\")", 0, false);
 		Menu examplesMenu = getExamplesMenu(ij);
 		addPlugInItem(examplesMenu, "Open as Panel", "ij.plugin.SimpleCommands(\"opencp\")", 0, false);
 		help.add(examplesMenu);
 		help.addSeparator();
 		addPlugInItem(help, "Update ImageJ...", "ij.plugin.ImageJ_Updater", 0, false);
-		addPlugInItem(help, "Release Notes...", "ij.plugin.BrowserLauncher(\"http://wsr.imagej.net/notes.html\")", 0, false);
+		addPlugInItem(help, "Release Notes...", "ij.plugin.BrowserLauncher(\"https://wsr.imagej.net/notes.html\")", 0, false);
 		addPlugInItem(help, "Refresh Menus", "ij.plugin.ImageJ_Updater(\"menus\")", 0, false);
 		help.addSeparator();
 		Menu aboutMenu = getMenu("Help>About Plugins", true);
@@ -394,6 +396,7 @@ public class Menus {
 		menu.add(item);
 		item.addItemListener(ij);
 		item.setState(Prefs.autoRunExamples);
+		fixFontSize(menu);
 		return menu;
 	}
 	
@@ -401,6 +404,7 @@ public class Menus {
 		MenuItem item = new MenuItem(label);
 		menu.add(item);
 		item.setActionCommand(command);
+		fixFontSize(item);
 	}
 
 	void addOpenRecentSubMenu(Menu menu) {
@@ -438,6 +442,7 @@ public class Menus {
 		} else
 			menu.add(item);
 		item.addActionListener(ij);
+		fixFontSize(item);
 	}
 	
 	void addPlugInItem(Menu menu, String label, String className, int shortcut, boolean shift) {
@@ -477,6 +482,7 @@ public class Menus {
 		}
 		if (name.equals("Lookup Tables") && applet==null)
 			addLuts(submenu);
+		fixFontSize(submenu);
 		return submenu;
 	}
 	
@@ -873,6 +879,9 @@ public class Menus {
 			}
 			menus.put(menuName, result);
 		}
+		//System.out.println("menuName: "+menuName);
+		if (IJ.isWindows() && menuName!=null && menuName.contains(">"))
+			fixFontSize(result);
 		return result;
 	}
 
@@ -927,6 +936,7 @@ public class Menus {
         		if (entry.getName().endsWith("plugins.config"))
 					return jarFile.getInputStream(entry);
 			}
+			jarFile.close();
 		}
     	catch (Throwable e) {
     		IJ.log(jar+": "+e);
@@ -958,15 +968,14 @@ public class Menus {
 						name = className;
 					name = name.replace('_', ' ');
 					className = className.replace('/', '.');
-					//if (className.indexOf(".")==-1 || Character.isUpperCase(className.charAt(0)))
 					sb.append(plugins + ", \""+name+"\", "+className+"\n");
 				}
 			}
+			jarFile.close();
 		}
     	catch (Throwable e) {
     		IJ.log(jar+": "+e);
     	}
-		//IJ.log(""+(sb!=null?sb.toString():"null"));
 		if (sb==null)
 			return null;
 		else
@@ -1165,7 +1174,7 @@ public class Menus {
 		if (!force && itemExists)  // duplicate command?
 			command = command + " Plugin";
 		MenuItem item = new MenuItem(command);
-		if(force)
+		if (force)
 			addItemSorted(menu,item,0);
 		else
 			addOrdered(menu, item);
@@ -1180,7 +1189,7 @@ public class Menus {
 		MenuItem mi;
 		popup = new PopupMenu("");
 		if (fontSize!=0 || scale>1.0)
-			popup.setFont(getFont());
+			popup.setFont(getCachedFont());
 		while (true) {
 			count++;
 			s = Prefs.getString("popup" + (count/10)%10 + count%10);
@@ -1374,6 +1383,7 @@ public class Menus {
 		CheckboxMenuItem item = new CheckboxMenuItem(name+" "+size);
 		item.setActionCommand("" + imp.getID());
 		window.add(item);
+		fixFontSize(item);
 		item.addItemListener(ij);
 	}
 	
@@ -1641,19 +1651,31 @@ public class Menus {
 		0 if the default font size is being used or if this is a Macintosh. */
 	public static int getFontSize() {
 		return fontSize;
-		//return IJ.isMacintosh()?0:fontSize;
 	}
 	
 	public static Font getFont() {
-		if (menuFont==null) {
-			int size = fontSize==0?13:fontSize;
-			size = (int)Math.round(size*scale);
-			if (IJ.isWindows() && scale>1.0 && size>17)
-				size = 17;  // Java resets size to 12 if you try to set it to 18 or greater
-			menuFont =  new Font("SanSerif", Font.PLAIN, size);
-		}
-		//System.out.println("Menus.getFont: "+scale+" "+fontSize+" "+menuFont);
+		return getFont(true);
+	}
+
+	public static Font getFont(boolean checkSize) {
+		int size = fontSize==0?13:fontSize;
+		if (size<7)
+			size = 7;
+		if (scale>1.0 && !checkSize)
+			size = 13;
+		int size0 = size;
+		size = (int)Math.round(size*scale);
+		//if (cachedFont==null) System.out.println("getFont: "+size0+" "+size+" "+fontSize+" "+scale+" "+checkSize);
+		if (checkSize && IJ.isWindows() && size>17)
+			size = 17; // On Windows, the menu bar font size is set 12 if you set it to >17
+		Font menuFont =  new Font("SanSerif", Font.PLAIN, size);
 		return menuFont;
+	}
+
+	public static Font getCachedFont() {
+		if (cachedFont==null)
+			cachedFont = getFont(false);
+		return cachedFont;
 	}
 
 	/** Called once when ImageJ quits. */
@@ -1708,6 +1730,12 @@ public class Menus {
 		menuPath = menuPath.substring(0, index);
 		pluginsTable.put(label, plugin);
 		addItem(getMenu(menuPath), label, 0, false);
+	}
+	
+	/** Work around Windows bug that limits menu bar sub-menu to 17 points. */
+	private static void fixFontSize(MenuItem item) {
+		if (IJ.isWindows() && item!=null)
+			item.setFont(getCachedFont());
 	}
 	
 }

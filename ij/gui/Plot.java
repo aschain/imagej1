@@ -613,12 +613,12 @@ public class Plot implements Cloneable {
 	/** Sets the length of the major tick in pixels.
 	 *	Call update() thereafter to make the change visible (if the image is shown already). */
 	public void setTickLength(int tickLength) {
-			tickLength = tickLength;
+			this.tickLength = tickLength;
 	}
 
 	/** Sets the length of the minor tick in pixels. */
 	public void setMinorTickLength(int minorTickLength) {
-			minorTickLength = minorTickLength;
+			this.minorTickLength = minorTickLength;
 	}
 
 	/** Sets the flags that control the axes format.
@@ -1827,6 +1827,7 @@ public class Plot implements Cloneable {
 
 	/** Calibrated coordinates to integer pixel coordinates */
 	private int scaleX(double x) {
+		if (Double.isNaN(x)) return -1;
 		if (xMin == xMax) {
 			if (x==xMin) return xBasePxl;
 			else return x>xMin ? Integer.MAX_VALUE : Integer.MIN_VALUE;
@@ -1840,6 +1841,7 @@ public class Plot implements Cloneable {
 	/** Converts calibrated coordinates to pixel coordinates. In contrast to the image calibration, also
 	 *	works with log axes */
 	private int scaleY(double y) {
+		if (Double.isNaN(y)) return -1;
 		if (yMin == yMax) {
 			if (y==yMin) return yBasePxl;
 			else return y>yMin ? Integer.MAX_VALUE : Integer.MIN_VALUE;
@@ -3193,6 +3195,7 @@ public class Plot implements Cloneable {
 					break;
 				}
 			case PlotObject.LINE:
+				if (Double.isNaN(plotObject.x) || Double.isNaN(plotObject.y)) break;
 				ip.setClipRect(frame);
 				ip.drawLine(scaleX(plotObject.x), scaleY(plotObject.y), scaleX(plotObject.xEnd), scaleY(plotObject.yEnd));
 				ip.setClipRect(null);
@@ -3287,13 +3290,20 @@ public class Plot implements Cloneable {
 
 	/** Draw the symbol for the data point number 'pointIndex' (pointIndex < 0 when drawing the legend) */
 	void drawShape(PlotObject plotObject, int x, int y, int shape, int size, int pointIndex) {
-		if (shape == DIAMOND) size = (int)(size*1.21);
+		if (ip==null)
+			return;
+		int lineWidth = ip.getLineWidth();
+		if (shape == DIAMOND)
+			size = (int)(size*1.21);
 		int xbase = x-sc(size/2);
 		int ybase = y-sc(size/2);
 		int xend = x+sc(size/2);
 		int yend = y+sc(size/2);
-		if (ip==null)
-			return;
+		if (lineWidth>3) {
+			int newLineWidth = 3;
+			ip.setLineWidth(newLineWidth);
+		}
+		//IJ.log("drawShape: "+size+" "+size);
 		switch(shape) {
 			case X:
 				ip.drawLine(xbase,ybase,xend,yend);
@@ -3367,6 +3377,7 @@ public class Plot implements Cloneable {
 				}
 				break;
 		}
+		ip.setLineWidth(lineWidth);
 	}
 
 	/** Fill the area of the symbols for data points (except for shape=DOT)
@@ -4332,7 +4343,12 @@ class PlotObject implements Cloneable, Serializable {
 
 	/** Size of the markers for an XY_DATA object with markers */
 	int getMarkerSize() {
-		return lineWidth<=1 ? 5 : 7;
+		if (lineWidth<=1)
+			return 5;
+		else if (lineWidth<=3)
+			return 7;
+		else
+			return (int)(lineWidth+4);
 	}
 
 	/** Sets the font. Also writes font properties for serialization. */

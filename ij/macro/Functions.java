@@ -51,7 +51,7 @@ public class Functions implements MacroConstants, Measurements {
 	boolean resultsPending;
 	Overlay offscreenOverlay;
 	Overlay overlayClipboard;
-	Roi roiClipboard;
+	static Roi roiClipboard;
 	GeneralPath overlayPath;
 	boolean overlayDrawLabels;
 	ResultsTable currentTable;
@@ -2344,6 +2344,7 @@ public class Functions implements MacroConstants, Measurements {
 		Variable yvar = getLastArrayVariable();
 		float[] xvalues = new float[0];
 		float[] yvalues = new float[0];
+		IJ.wait(100); //https://forum.image.sc/t/plot-getvalues-returns-odd-results/72673
 		ImagePlus imp = getImage();
 		ImageWindow win = imp.getWindow();
 		if (imp.getProperty("XValues")!=null) {
@@ -2692,10 +2693,8 @@ public class Functions implements MacroConstants, Measurements {
 			currentPlot.addHorizontalErrorBars(y);
 		else if (errorBars != null)
 			currentPlot.addPoints(x, y, errorBars, what);
-		else if (what==Plot.CUSTOM)
-			currentPlot.add(shape, x, y);
 		else
-			currentPlot.addPoints(x, y, what);
+			currentPlot.add(shape, x, y);
 		if (label != null)
 			currentPlot.setLabel(-1, label);
 		return Double.NaN;
@@ -4086,6 +4085,8 @@ public class Functions implements MacroConstants, Measurements {
 				gd.addChoice(prompt, choices, defaultChoice);
 			} else if (name.equals("setInsets")) {
 				gd.setInsets((int)getFirstArg(), (int)getNextArg(), (int)getLastArg());
+			} else if (name.equals("addImage")) {
+				gd.addImage(IJ.openImage(getStringArg()));
 			} else if (name.equals("addToSameRow")) {
 				interp.getParens();
 				gd.addToSameRow();
@@ -4924,7 +4925,10 @@ public class Functions implements MacroConstants, Measurements {
 			return pad();
 		else if (name.equals("format"))
 			return format();
-		else
+		else if (name.equals("setFontSize")) {
+			getProcessor().setFontSize((int)getArg());
+			return null;
+		} else
 			interp.error("Unrecognized String function");
 		return null;
 	}
@@ -7715,6 +7719,7 @@ public class Functions implements MacroConstants, Measurements {
 		ImagePlus imp = getImage();
 		if (name.equals("paste")) {
 			interp.getParens();
+			//IJ.log("paste: "+roiClipboard);
 			if (roiClipboard!=null)
 				getImage().setRoi((Roi)roiClipboard.clone());
 			return null;
@@ -7722,7 +7727,7 @@ public class Functions implements MacroConstants, Measurements {
 			return setSplineAnchors(imp, false);
 		else if (name.equals("setPolylineSplineAnchors"))
 			return setSplineAnchors(imp, true);
-		else if (name.equals("remove")) {
+		else if (name.equals("remove")||name.equals("selectNone")) {
 			getImage().deleteRoi();
 			return null;
 		}
@@ -7740,6 +7745,7 @@ public class Functions implements MacroConstants, Measurements {
 		} else if (name.equals("copy")) {
 			interp.getParens();
 			roiClipboard = getImage().getRoi();
+			//IJ.log("copy: "+roiClipboard);
 			if (roiClipboard!=null)
 				roiClipboard = (Roi)roiClipboard.clone();
 			return null;
@@ -7855,6 +7861,10 @@ public class Functions implements MacroConstants, Measurements {
 			return null;
 		} else if (name.equals("setUnscalableStrokeWidth")) {
 			roi.setUnscalableStrokeWidth(getArg());
+			return null;
+		} else if (name.equals("translate")) {
+			roi.translate(getFirstArg(),getLastArg());
+			imp.draw();
 			return null;
 		} else
 			interp.error("Unrecognized Roi function");
@@ -8229,6 +8239,10 @@ public class Functions implements MacroConstants, Measurements {
 		} else if (name.equals("title") || name.equals("name")) {
 			interp.getParens();
 			return new Variable(imp.getTitle());
+		} else if (name.equals("removeScale")) {
+			interp.getParens();
+			imp.removeScale();
+			return null;
 		} else
 			interp.error("Unrecognized Image function");
 		return null;

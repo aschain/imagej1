@@ -430,19 +430,80 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 	/**
 	 * Adds a group of choices to the dialog with menu items taken from the
 	 * <code>enum</code> class of the specified default item (enum constant).
-	 * The default item is automatically set. Calls the original (string-based)
+	 * Calls the original (string-based)
 	 * {@link GenericDialog#addChoice(String, String[], String)} method.
+	 * Usage example:
+	 * <pre>
+	 * import ij.process.AutoThresholder.Method;
+	 * ...
+	 * Method method = Method.Otsu;
+	 * 
+	 * GenericDialog gd = new GenericDialog("Select AutoThresholder Method");
+	 * gd.addEnumChoice("All threshold methods", method);
+	 * ...
+	 * gd.showDialog();
+	 * ...
+	 * method = gd.getNextEnumChoice(Method.class);
+	 * </pre>
 	 * 
 	 * @param <E> the generic enum type containing the items to chose from
 	 * @param label the label displayed for this choice group
 	 * @param defaultItem the menu item initially selected
+	 * 
+	 * @see #addEnumChoice(String, Enum[], Enum)
+	 * @see #getNextEnumChoice(Class)
 	 */
-	public <E extends Enum<E>> void addEnumChoice(String label, Enum<E> defaultItem) {
+	public <E extends Enum<E>> void addEnumChoice(String label, E defaultItem) {
 		Class<E> enumClass = defaultItem.getDeclaringClass();	
 		E[] enums = enumClass.getEnumConstants();
 		String[] items = new String[enums.length];
 		for (int i = 0; i < enums.length; i++) {
 			items[i] = enums[i].name();
+		}
+		this.addChoice(label, items, defaultItem.name());
+	}
+	
+	/**
+	 * Adds a group of choices to the dialog with menu items taken from the supplied
+	 * array of <code>enum</code> elements. This allows to present only a subset of
+	 * enum choices in a specified order. A default item (enum constant) must be
+	 * specified which, if {@code null} of not contained in the enum array, is
+	 * replaced by the first element of the enum array. Calls the original
+	 * (string-based) {@link GenericDialog#addChoice(String, String[], String)}
+	 * method. Usage example:
+	 * <pre>
+	 * import ij.process.AutoThresholder.Method;
+	 * ...
+	 * Method[] selectMethods = {Method.Triangle, Method.Otsu, Method.Huang};
+	 * Method method = Method.Otsu;
+	 * 
+	 * GenericDialog gd = new GenericDialog("Select AutoThresholder Method");
+	 * gd.addEnumChoice("Select threshold methods", selectMethods, method);
+	 * ...
+	 * gd.showDialog();
+	 * ...
+	 * method = gd.getNextEnumChoice(Method.class);
+	 * </pre>
+	 * 
+	 * @param <E> the generic enum type containing the items to choose from
+	 * @param label the label displayed for this choice group
+	 * @param enumArray an array of enum items (of type E)
+	 * @param defaultItem the menu item initially selected (of type E, may be {@code null})
+	 * 
+	 * @see #addEnumChoice(String, Enum)
+	 * @see #getNextEnumChoice(Class)
+	 */
+	public <E extends Enum<E>> void addEnumChoice(String label, E[] enumArray, E defaultItem) {
+		String[] items = new String[enumArray.length];
+		boolean contained = false;	// to check if defaultItem is contained in enumArray
+		for (int i = 0; i < enumArray.length; i++) {
+			if (enumArray[i] == defaultItem) {
+				contained = true;
+			}
+			items[i] = enumArray[i].name();
+		}
+		if (!contained) {
+			defaultItem = enumArray[0];
 		}
 		this.addChoice(label, items, defaultItem.name());
 	}
@@ -989,6 +1050,8 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 
 	/** Adds an image to the dialog. */
 	public void addImage(ImagePlus image) {
+		if (image==null)
+			return;
 		ImagePanel imagePanel = new ImagePanel(image);
 		addPanel(imagePanel);
 		if (imagePanels==null)
@@ -1513,7 +1576,7 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 	}
 	
 	/** Reset the counters before reading the dialog parameters */
-	void resetCounters() {
+	public void resetCounters() {
 		nfIndex = 0;		// prepare for readout
 		sfIndex = 0;
 		cbIndex = 0;
@@ -1522,7 +1585,7 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 		radioButtonIndex = 0;
 		invalidNumber = false;
 	}
-
+	
 	/** Returns the Vector containing the numeric TextFields. */
 	public Vector getNumericFields() {
 		return numberField;

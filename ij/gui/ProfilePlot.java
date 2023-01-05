@@ -42,10 +42,18 @@ public class ProfilePlot {
 			return;
 		}
 		int roiType = roi.getType();
-		if (!(roi.isLine() || roiType==Roi.RECTANGLE)) {
+		boolean rotatedRect = roi!=null && (roi instanceof RotatedRectRoi);
+		if (!(roi.isLine()||roiType==Roi.RECTANGLE||rotatedRect)) {
 			IJ.error("Line or rectangular selection required.");
 			return;
 		}
+		if (rotatedRect) {
+			double[] p = ((RotatedRectRoi)roi).getParams();
+			roi = new Line(p[0], p[1], p[2], p[3]);
+			roi.setStrokeWidth(p[4]);
+			roi.setImage(imp);
+			roiType = Roi.LINE;
+		}		
 		Calibration cal = imp.getCalibration();
 		xInc = cal.pixelWidth;
 		units = cal.getUnits();

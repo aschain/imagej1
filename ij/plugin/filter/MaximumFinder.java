@@ -120,7 +120,7 @@ public class MaximumFinder implements ExtendedPlugInFilter, DialogListener {
     public int showDialog(ImagePlus imp, String command, PlugInFilterRunner pfr) {
         ImageProcessor ip = imp.getProcessor();
         ip.resetBinaryThreshold(); // remove any invisible threshold set by Make Binary or Convert to Mask
-        thresholded = ip.getMinThreshold()!=ImageProcessor.NO_THRESHOLD;
+        thresholded = ip.isThreshold();
         String options = Macro.getOptions();
         if  (options!=null && options.indexOf("noise=") >= 0) { // ensure compatibility with old macros
             oldMacro = true;                                    // specifying "noise=", not "prominence="
@@ -223,7 +223,8 @@ public class MaximumFinder implements ExtendedPlugInFilter, DialogListener {
         }
         ByteProcessor outIp = null;
         boolean strictMode = oldMacro ? excludeOnEdges : strict;
-        outIp = findMaxima(ip, tolerance, strictMode, threshold, outputType, excludeOnEdges, false); //process the image
+		boolean isEDM = imp!=null && imp.getBitDepth()==32 && imp.getTitle().startsWith("EDM of ");
+        outIp = findMaxima(ip, tolerance, strictMode, threshold, outputType, excludeOnEdges, isEDM); //process the image
         if (outIp == null) return;              //cancelled by user or previewing or no output image
         if (!Prefs.blackBackground)             //normally, output has an inverted LUT, "active" pixels black (255) - like a mask
             outIp.invertLut();

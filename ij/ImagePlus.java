@@ -618,7 +618,8 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 			int type = bi.getType();
 			boolean rgb = type==BufferedImage.TYPE_3BYTE_BGR||type==BufferedImage.TYPE_INT_RGB
 				||type==BufferedImage.TYPE_4BYTE_ABGR||type==BufferedImage.TYPE_BYTE_INDEXED
-				||type==BufferedImage.TYPE_INT_ARGB||type==BufferedImage.TYPE_CUSTOM;
+				||type==BufferedImage.TYPE_INT_ARGB||type==BufferedImage.TYPE_CUSTOM
+				||type==BufferedImage.TYPE_INT_BGR;
 			if (IJ.debugMode) IJ.log("setImage: type="+type+", bands="+nBands+", rgb="+rgb);
 			if (nBands>1 && !rgb) {
 				ImageStack biStack = new ImageStack(bi.getWidth(), bi.getHeight());			
@@ -1408,7 +1409,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 	public void setTypeToColor256() {
 		if (imageType==ImagePlus.GRAY8) {
 			ImageProcessor ip2 = getProcessor();
-			if (ip2!=null && ip2.getMinThreshold()==ImageProcessor.NO_THRESHOLD && ip2.isColorLut() && !ip2.isPseudoColorLut()) {
+			if (ip2!=null && !ip2.isThreshold() && ip2.isColorLut() && !ip2.isPseudoColorLut()) {
 				imageType = COLOR_256;
 				typeSet = true;
 			}
@@ -2185,6 +2186,18 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 		if (ip!=null)
 			ip.resetRoi();
 		draw();
+	}
+	
+	/** Removes the spatial scaling of this image. */
+	public void removeScale() {
+		Calibration cal = getCalibration();
+		cal.pixelWidth = 1.0;
+		cal.pixelHeight = 1.0;
+		cal.pixelDepth = 1.0;
+		cal.setUnit("pixel");
+		ImageWindow win = getWindow();
+		if (win!=null)
+			win.repaint();
 	}
 
 	public boolean okToDeleteRoi() {
@@ -3127,7 +3140,9 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 		this.defaultMax = max;
 	}
 
-	/** Returns 'true' if this image is thresholded. */
+	/** Returns 'true' if this image is thresholded.
+	 * @see ij.process.ImageProcessor#isThreshold
+	*/
 	public boolean isThreshold() {
 		return ip!=null && ip.getMinThreshold()!=ImageProcessor.NO_THRESHOLD;
 	}

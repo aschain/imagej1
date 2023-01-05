@@ -287,6 +287,17 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 		subPixel = true;
 	}
 
+	public void translate(double dx, double dy) {
+		boolean intArgs = (int)dx==dx && (int)dy==dy;
+		if (subPixelResolution() || !intArgs) {
+			Rectangle2D r = getFloatBounds();
+			setLocation(r.getX()+dx, r.getY()+dy);
+		} else {
+			Rectangle r = getBounds();
+			setLocation(r.x+(int)dx, r.y+(int)dy);
+		}
+	}
+
 	/** Sets the ImagePlus associated with this ROI.
 	 *  <code>imp</code> may be null to remove the association to an image. */
 	public void setImage(ImagePlus imp) {
@@ -2262,12 +2273,12 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 
 	/** Returns 'true' if this is a line selection. */
 	public boolean isLine() {
-		return type>=LINE && type<=FREELINE;
+		return type>=LINE && type<=ANGLE;
 	}
 
 
 	/** Return 'true' if this is a line or point selection. */
-	protected boolean isLineOrPoint() {
+	public boolean isLineOrPoint() {
 		return isLine() || type==POINT;
 	}
 
@@ -2705,16 +2716,14 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 		if (line==null || !line.isLine())
 			throw new IllegalArgumentException("Line selection required");
 		double lineWidth = line.getStrokeWidth();
+		if (lineWidth<1.0)
+			lineWidth = 1.0;
 		Roi roi2 = null;
 		if (line.getType()==Roi.LINE) {
-			if (lineWidth<=1.0)
-				lineWidth = 1.0000001;
-			FloatPolygon p = ((Line)line).getFloatPolygon(lineWidth);
-			roi2 = new PolygonRoi(p, Roi.POLYGON);
+			FloatPolygon p = ((Line)line).getFloatPoints();
+			roi2 = new RotatedRectRoi(p.xpoints[0],p.ypoints[0],p.xpoints[1],p.ypoints[1],lineWidth);
 			line.setStrokeWidth(lineWidth);
 		} else {
-			if (lineWidth<1)
-				lineWidth = 1;
 			Rectangle bounds = line.getBounds();
 			double width = bounds.x+bounds.width + lineWidth;
 			double height = bounds.y+bounds.height + lineWidth;

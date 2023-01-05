@@ -35,11 +35,13 @@ public class IJ {
 	public static Font font10 = new Font("SansSerif", Font.PLAIN, 10);
 	/** SansSerif, plain, 12-point font */
 	public static Font font12 = ImageJ.SansSerif12;
+	/** SansSerif, plain, 14-point font */
+	public static Font font14 = ImageJ.SansSerif14;
 	
 	/** Image display modes */
 	public static final int COMPOSITE=1, COLOR=2, GRAYSCALE=3;
 	
-	public static final String URL = "http://imagej.nih.gov/ij";
+	public static final String URL = "http://imagej.net/ij";
 	public static final int ALL_KEYS = -1;
 	
 	/** Use setDebugMode(boolean) to enable/disable debug mode. */
@@ -1082,6 +1084,11 @@ public class IJ {
 		return shiftDown;
 	}
 	
+	/* Sets the specified key "down", where 'key'
+	 * is KeyEvent.VK_CONTROL, KeyEvent.VK_META, 
+	 * KeyEvent.VK_ALT, KeyEvent.VK_SHIFT,
+	 * KeyEvent.VK_SPACE or KeyEvent.VK_ESCAPE.
+	*/
 	public static void setKeyDown(int key) {
 		switch (key) {
 			case KeyEvent.VK_CONTROL:
@@ -1111,6 +1118,11 @@ public class IJ {
 		}
 	}
 
+	/* Sets the specified key "up", where 'key'
+	 * is KeyEvent.VK_CONTROL, KeyEvent.VK_META, 
+	 * KeyEvent.VK_ALT, KeyEvent.VK_SHIFT,
+	 * KeyEvent.VK_SPACE or IJ.ALL_KEYS (-1).
+	*/
 	public static void setKeyUp(int key) {
 		switch (key) {
 			case KeyEvent.VK_CONTROL: controlDown=false; break;
@@ -1701,12 +1713,12 @@ public class IJ {
 				
 		}
 		Wand w = new Wand(ip);
-		double t1 = ip.getMinThreshold();
-		if (t1==ImageProcessor.NO_THRESHOLD || (ip.getLutUpdateMode()==ImageProcessor.NO_LUT_UPDATE&& tolerance>0.0)) {
+		if (!ip.isThreshold() || (ip.getLutUpdateMode()==ImageProcessor.NO_LUT_UPDATE&& tolerance>0.0)) {
 			w.autoOutline(x, y, tolerance, imode);
 			smooth = false;
-		} else
-			w.autoOutline(x, y, t1, ip.getMaxThreshold(), imode);
+		} else {
+			w.autoOutline(x, y, ip.getMinThreshold(), ip.getMaxThreshold(), imode);
+		}
 		if (w.npoints>0) {
 			Roi previousRoi = img.getRoi();
 			Roi roi = new PolygonRoi(w.xpoints, w.ypoints, w.npoints, Roi.TRACED_ROI);

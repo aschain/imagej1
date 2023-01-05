@@ -246,6 +246,7 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 	private PopupMenu newPopupMenu() {
 		PopupMenu popup = new PopupMenu();
 		GUI.scalePopupMenu(popup);
+		//System.out.println("newPopupMenu: "+popup.getFont());
 		return popup;
 	}
 	
@@ -496,7 +497,6 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 		if (null==g) return;
 		icon = icons[tool];
 		if (icon==null) return;
-		this.icon = icon;
 		int x1, y1, x2, y2;
 		pc = 0;
 		if (icon.trim().startsWith("icon:")) {
@@ -947,6 +947,7 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 			if (instance.icons[i]!=null && instance.icons[i].contains("C123"))
 				repaintTool(i);  // some of this tool's icon is drawn in the foreground color
 		}
+		ColorPicker.update();
 		if (!IJ.isMacro()) setRoiColor(c);
 	}
 
@@ -959,6 +960,7 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 			backgroundColor = c;
 			backgroundValue = Double.NaN;
 			repaintTool(DROPPER);
+			ColorPicker.update();
 			IJ.notifyEventListeners(IJEventListener.BACKGROUND_COLOR_CHANGED);
 		}
 	}

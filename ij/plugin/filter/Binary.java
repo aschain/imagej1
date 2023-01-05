@@ -32,6 +32,7 @@ public class Binary implements ExtendedPlugInFilter, DialogListener {
     int foreground, background;
     int flags = DOES_8G | DOES_8C | SUPPORTS_MASKING | PARALLELIZE_STACKS | KEEP_PREVIEW | KEEP_THRESHOLD;
     int nPasses;
+    static double medianRadius = 3;
 
     public int setup(String arg, ImagePlus imp) {
         this.arg = arg;
@@ -43,6 +44,8 @@ public class Binary implements ExtendedPlugInFilter, DialogListener {
             if (!(ip instanceof ByteProcessor)) return NO_IMAGE_REQUIRED;
             if (!((ByteProcessor)ip).isBinary()) return NO_IMAGE_REQUIRED;
         }
+        if (arg.equals("median"))
+			medianRadius = IJ.getNumber("Radius:", medianRadius);
         return flags;
     }
 
@@ -77,7 +80,7 @@ public class Binary implements ExtendedPlugInFilter, DialogListener {
             return operation.equals(NO_OPERATION) ? DONE : IJ.setupDialog(imp, flags);
         } else {   //no dialog, 'arg' is operation type
             if (!((ByteProcessor)imp.getProcessor()).isBinary()) {
-                IJ.error("8-bit binary (black and white only) image required.");
+                IJ.error("8-bit binary (0 and 255 only) image required.");
                 return DONE;
             }
             return IJ.setupDialog(imp, flags);
@@ -87,7 +90,7 @@ public class Binary implements ExtendedPlugInFilter, DialogListener {
     public boolean dialogItemChanged (GenericDialog gd, AWTEvent e) {
         iterations = (int)gd.getNextNumber();
         count = (int)gd.getNextNumber();
-        boolean bb = Prefs.blackBackground;
+		boolean bb = Prefs.blackBackground;
         Prefs.blackBackground = gd.getNextBoolean();
         if (Prefs.blackBackground!=bb)
         	ThresholdAdjuster.update();
@@ -117,7 +120,9 @@ public class Binary implements ExtendedPlugInFilter, DialogListener {
         foreground = ip.isInvertedLut() ? 255-fg : fg;
         background = 255 - foreground;
         ip.setSnapshotCopyMode(true);
-        if (arg.equals("outline"))
+        if (arg.equals("median"))
+            median(ip);
+        else if (arg.equals("outline"))
             outline(ip);
         else if (arg.startsWith("fill"))
             fill(ip, foreground, background);
@@ -160,6 +165,12 @@ public class Binary implements ExtendedPlugInFilter, DialogListener {
         ((ByteProcessor)ip).outline();
         if (Prefs.blackBackground) ip.invert();
     }
+
+    void median(ImageProcessor ip) {
+    	ip.resetThreshold();
+		new RankFilters().rank(ip, medianRadius, RankFilters.MEAN);
+		ip.threshold(128,255);
+	}
 
 	void skeletonize(ImageProcessor ip) {
 		int fg = Prefs.blackBackground?255:0;
