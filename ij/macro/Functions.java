@@ -4735,6 +4735,8 @@ public class Functions implements MacroConstants, Measurements {
 			PlotWindow.interpolate = state;
 		else if (arg1.equals("flipfitsimages"))
 			FITS_Reader.flipImages(state);
+		else if (arg1.startsWith("monospaced"))
+			TextWindow.setMonospaced(state);
 		//else if (arg1.startsWith("saveimageloc")) {
 		//	Prefs.saveImageLocation = state;
 		//	if (!state) Prefs.set(ImageWindow.LOC_KEY,null);
@@ -6718,9 +6720,10 @@ public class Functions implements MacroConstants, Measurements {
 		}
 		Overlay overlay = imp.getOverlay();
 		int size = overlay!=null?overlay.size():0;
-		if (overlay==null && name.equals("size"))
+		if (overlay==null && name.equals("size")) {
+			interp.getParens();
 			return 0.0;
-		else if (name.equals("hidden"))
+		} else if (name.equals("hidden"))
 			return overlay!=null && imp.getHideOverlay()?1.0:0.0;
 		else if (name.equals("addSelection") || name.equals("addRoi"))
 			return overlayAddSelection(imp, overlay);
@@ -6741,9 +6744,10 @@ public class Functions implements MacroConstants, Measurements {
 		}
 		if (overlay==null)
 			interp.error("No overlay");
-		if (name.equals("size")||name.equals("getSize"))
+		if (name.equals("size")||name.equals("getSize")) {
+			interp.getParens();
 			return size;
-		else if (name.equals("copy")) {
+		} else if (name.equals("copy")) {
 			interp.getParens();
 			overlayClipboard = getImage().getOverlay();
 			return Double.NaN;
