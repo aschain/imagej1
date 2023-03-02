@@ -134,6 +134,7 @@ public class CompositeImage extends ImagePlus {
 		return res;
     }
 	
+	@Override
 	public void updateChannelAndDraw() {
 		if (!customLuts) singleChannel = true;
 		updateAndDraw();
