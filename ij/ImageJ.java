@@ -638,9 +638,6 @@ public class ImageJ extends Frame implements ActionListener,
 	}
 
 	public void keyReleased(KeyEvent e) {
-		if (IJ.debugMode) IJ.log("keyReleased: code=" + e.getKeyCode() + " (" + KeyEvent.getKeyText(e.getKeyCode())
-		+ "), char=\"" + e.getKeyChar() + "\" (" + (int)e.getKeyChar() + "), flags="
-		+ KeyEvent.getKeyModifiersText(e.getModifiers()));
 		IJ.setKeyUp(e.getKeyCode());
 	}
 			

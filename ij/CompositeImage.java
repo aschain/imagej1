@@ -1,7 +1,7 @@
 package ij;
 import ij.process.*;
-import ij.plugin.frame.*;
 import ij.gui.PlotWindow;
+import ij.plugin.frame.*;
 import ij.io.FileInfo;
 import java.awt.*;
 import java.awt.image.*;
@@ -110,23 +110,23 @@ public class CompositeImage extends ImagePlus {
     		return "";
 		Calibration cal = getCalibration();
     	int type = getType();
-		String res="";
+		String res=", value=";
 		for(int ch=0; ch<cip.length; ch++) {
 	    	int[] v = getPixel(x, y, cip[ch]);
 			switch (type) {
 				case GRAY8: case GRAY16:
 					double cValue = ((cal==null)?v[0]:cal.getCValue(v[0]));
 					if (cValue==v[0]) {
-	    				res=res+((ch==0)?", value=":", ") + v[0];
+	    				res=res+((ch==0)?"":", ") + v[0];
 	    				break;
 					}else {
-	    				res+=(ch==0?", value=":", ") + IJ.d2s(cValue) + " ("+v[0]+")";
+	    				res+=(ch==0?"":", ") + IJ.d2s(cValue) + " ("+v[0]+")";
 	    				break;
 					}
 	    		case GRAY32:
 	    			double value = Float.intBitsToFloat(v[0]);
 	    			String s = (int)value==value?IJ.d2s(value,0)+".0":IJ.d2s(value,4,7);
-	    			res+=(ch==0?", value=":", ")  + s;
+	    			res+=(ch==0?"":", ")  + s;
 	    			break;
 	    		default: if(ch==(getC()-1))res=super.getValueAsString(x, y);
 			}
@@ -241,7 +241,6 @@ public class CompositeImage extends ImagePlus {
 	public synchronized void updateImage() {
 		int imageSize = width*height;
 		int nChannels = getNChannels();
-		//int redValue, greenValue, blueValue;
 		int ch = getChannel();
 		
 		//IJ.log("updateImage: "+ch+"/"+nChannels+" "+currentSlice+" "+currentFrame);
