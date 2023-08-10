@@ -40,7 +40,7 @@ public class Functions implements MacroConstants, Measurements {
 	GenericDialog gd;
 	PrintWriter writer;
 	boolean altKeyDown, shiftKeyDown;
-	boolean antialiasedText;
+	boolean antialiasedText = IJ.isMacOSX()?true:false; //non-antialiased text is broken on macOS
 	boolean nonScalableText;
 	StringBuffer buffer;
 	RoiManager roiManager;
@@ -2281,6 +2281,8 @@ public class Functions implements MacroConstants, Measurements {
 			return replacePlot(currentPlot);
 		} else if (name.equals("addText") || name.equals("drawLabel")) {
 			return addPlotText(currentPlot);
+		} else if (name.equals("enableLive")) {
+			return enableLivePlot(currentPlot);
 		}
 		// the following commands need a plot under construction
 		if (plot==null)
@@ -2706,6 +2708,15 @@ public class Functions implements MacroConstants, Measurements {
 		double[] x = getNextArray();
 		double[] y = getLastArray();
 		plot.replace(index, shape, x, y);
+		return Double.NaN;
+	}
+
+	double enableLivePlot(Plot plot) {
+		boolean b = getBooleanArg();
+		ImagePlus imp = plot.getImagePlus();
+		PlotWindow pw = imp == null ? null : (PlotWindow)imp.getWindow();
+		if (pw != null)
+			pw.enableLivePlot(b);
 		return Double.NaN;
 	}
 
@@ -3166,13 +3177,14 @@ public class Functions implements MacroConstants, Measurements {
 			interp.getRightParen();
 		} else {
 			size = (int)getNextArg();
-			antialiasedText = false;
+			antialiasedText = IJ.isMacOSX()?true:false || size>=14;
 			if (interp.nextToken()==',') {
 				String styles = getLastString().toLowerCase();
 				if (styles.contains("bold")) style += Font.BOLD;
 				if (styles.contains("italic")) style += Font.ITALIC;
-				if (styles.contains("anti")) antialiasedText = true;
-				if (styles.contains("nonscal")) nonScalableText = true;
+				if (styles.contains("non-")||styles.contains("no-")) antialiasedText=false;
+				if (styles.contains("nonscal")) nonScalableText=true;
+				if (styles.contains("anti")) antialiasedText=true;
 			} else
 				interp.getRightParen();
 		}
@@ -3350,6 +3362,8 @@ public class Functions implements MacroConstants, Measurements {
 							rm.close();
 						}
 					}
+					if (unUpdatedTable!=null && pattern.equals(unUpdatedTable.getTitle()))
+						unUpdatedTable = null;
 				}
 			}
 
@@ -4697,8 +4711,6 @@ public class Functions implements MacroConstants, Measurements {
 			Analyzer.setMeasurement(STACK_POSITION, state);
 		else if (arg1.startsWith("std"))
 			Analyzer.setMeasurement(STD_DEV, state);
-		else if (arg1.equals("showrownumbers"))
-			ResultsTable.getResultsTable().showRowNumbers(state);
 		else if (arg1.equals("showrowindexes"))
 			ResultsTable.getResultsTable().showRowIndexes(state);
 		else if (arg1.startsWith("show"))
@@ -4725,9 +4737,10 @@ public class Functions implements MacroConstants, Measurements {
 			Prefs.supportMacroUndo = state;
 		else if (arg1.equals("inverty"))
 			getImage().getCalibration().setInvertY(state);
-		else if (arg1.equals("scaleconversions"))
+		else if (arg1.equals("scaleconversions")) {
 			ImageConverter.setDoScaling(state);
-		else if (arg1.startsWith("copyhead"))
+			Prefs.calibrateConversions = false;
+		} else if (arg1.startsWith("copyhead"))
 			Prefs.copyColumnHeaders = state;
 		else if (arg1.equals("waitforcompletion"))
 			waitForCompletion = state;
@@ -4739,10 +4752,10 @@ public class Functions implements MacroConstants, Measurements {
 			TextWindow.setMonospaced(state);
 		else if (arg1.startsWith("fullrange"))
 			Prefs.fullRange16bitInversions = state;
-		//else if (arg1.startsWith("saveimageloc")) {
-		//	Prefs.saveImageLocation = state;
-		//	if (!state) Prefs.set(ImageWindow.LOC_KEY,null);
-		else
+		else if (arg1.startsWith("calibrate")) {
+			Prefs.calibrateConversions = state;
+			ImageConverter.setDoScaling(true);
+		} else
 			interp.error("Invalid option");
 	}
 
@@ -8233,7 +8246,7 @@ public class Functions implements MacroConstants, Measurements {
 				break;
 			case COLOR:
 				if (name.equals("foreground") || name.equals("background")
-				|| name.equals("toString"))
+				|| name.equals("toString") || name.equals("wavelengthToColor"))
 					isString = true;
 				break;
 		}
@@ -8330,6 +8343,9 @@ public class Functions implements MacroConstants, Measurements {
 		} else if (name.equals("getLut")) {
 			getLut();
 			return null;
+		} else if (name.equals("wavelengthToColor")) {
+			Color c = Colors.wavelengthToColor(getArg());
+			return new Variable(Colors.colorToString(c));
 		} else
 			interp.error("Unrecognized Color function");
 		return null;

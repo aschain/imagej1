@@ -840,7 +840,9 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 			r.setImage(null);
 			if (!usingDefaultStroke)
 				r.setStroke(getStroke());
+			Color strokeColor2 = getStrokeColor();
 			r.setFillColor(getFillColor());
+			r.setStrokeColor(strokeColor2);
 			r.imageID = getImageID();
 			r.listenersNotified = false;
 			if (bounds!=null)
@@ -1320,9 +1322,13 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 		setRenderingHint(g2d);
 		if (cornerDiameter>0) {
 			int sArcSize = (int)Math.round(cornerDiameter*mag);
-			if (fillColor!=null)
+			if (fillColor!=null) {
 				g.fillRoundRect(sx1, sy1, sw, sh, sArcSize, sArcSize);
-			else
+				if (strokeColor!=null) {
+					g.setColor(strokeColor);
+					g.drawRoundRect(sx1, sy1, sw, sh, sArcSize, sArcSize);
+				}
+			} else
 				g.drawRoundRect(sx1, sy1, sw, sh, sArcSize, sArcSize);
 		} else {
 			if (fillColor!=null) {
@@ -1330,9 +1336,13 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 					g.setColor(Color.cyan);
 					g.drawRect(sx1, sy1, sw, sh);
 				} else {
-					if (!(this instanceof TextRoi))
+					if (!(this instanceof TextRoi)) {
 						g.fillRect(sx1, sy1, sw, sh);
-					else
+						if (strokeColor!=null) {
+							g.setColor(strokeColor);
+							g.drawRect(sx1, sy1, sw, sh);
+						}
+					} else
 						g.drawRect(sx1, sy1, sw, sh);
 				}
 			} else
@@ -1929,14 +1939,19 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 		return ROIColor;
 	}
 
-	/** Sets the color used by this ROI to draw its outline. This color, if not null,
-	 * overrides the global color set by the static setColor() method.
+	/** Sets the color used by this ROI to draw its outline.
+	 * This color, if not null, overrides the global color set
+	 * by the static setColor() method. Set the stroke color
+	 * after setting the fill color to both fill and outline
+	 * the ROI.
 	 * @see #getStrokeColor
 	 * @see #setStrokeWidth
 	 * @see ij.ImagePlus#setOverlay(ij.gui.Overlay)
 	 */
 	public void setStrokeColor(Color c) {
-		 strokeColor = c;
+		strokeColor = c;
+		//if (getType()==TRACED_ROI && c!=null && fillColor!=null)
+		//	throw new IllegalArgumentException();
 	}
 	
 	/** Returns the the color used to draw the ROI outline or null if the default color is being used.
@@ -1957,6 +1972,8 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 	 */
 	public void setFillColor(Color color) {
 		fillColor = color;
+		if (fillColor!=null && isArea())
+			strokeColor=null;
 	}
 
 	/** Returns the fill color used to display this ROI, or null if it is displayed transparently.
@@ -2055,8 +2072,8 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 			this.stroke = new BasicStroke(strokeWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL);
 		else
 			this.stroke = new BasicStroke(strokeWidth);
-		if (strokeWidth>1f)
-			fillColor = null;
+		//if (strokeWidth>1f)
+		//	fillColor = null;
 		if (notify)
 			notifyListeners(RoiListener.MODIFIED);
 	}
@@ -2435,17 +2452,17 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 	/**Converts an image pixel x (offscreen)coordinate to a screen x coordinate,
 	 * taking the the line or area convention for coordinates into account */
 	protected int screenXD(double ox) {
-		if (ic == null) return (int)ox;
+		if (ic==null) return (int)ox;
 		if (useLineSubpixelConvention()) ox += 0.5;
-		return ic.screenXD(ox);
+		return ic!=null?ic.screenXD(ox):(int)ox;
 	}
 
 	/**Converts an image pixel y (offscreen)coordinate to a screen y coordinate,
 	 * taking the the line or area convention for coordinates into account */
 	protected int screenYD(double oy) {
-		if (ic == null) return (int)oy;
+		if (ic==null) return (int)oy;
 		if (useLineSubpixelConvention()) oy += 0.5;
-		return ic.screenYD(oy);
+		return ic!=null?ic.screenYD(oy):(int)oy;
 	}
 
 	protected int screenX(int ox) {return screenXD(ox);}

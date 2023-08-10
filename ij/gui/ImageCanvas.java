@@ -308,6 +308,8 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 			currentImage = -1;
 		int channel=0, slice=0, frame=0;
 		boolean hyperstack = imp.isHyperStack();
+		if (imp.getNChannels()>1)
+			hyperstack = true;
 		if (hyperstack) {
 			channel = imp.getChannel();
 			slice = imp.getSlice();
@@ -336,7 +338,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 			int t = roi.getTPosition();
 			if (hyperstack) {
 				int position = roi.getPosition();
-				//IJ.log(c+" "+z+" "+t+"  "+position+" "+roiManagerShowAllMode);
+				//IJ.log(c+" "+z+" "+t+"  "+channel+" "+position+" "+roiManagerShowAllMode);
 				if (position>0) {
 					if (z==0 && imp.getNSlices()>1)
 						z = position;
@@ -404,7 +406,7 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 		ImagePlus imp2 = roi.getImage();
 		roi.setImage(imp);
 		Color saveColor = roi.getStrokeColor();
-		if (saveColor==null)
+		if (saveColor==null && roi.getFillColor()==null)
 			roi.setStrokeColor(defaultColor);
 		if (roi.getStroke()==null)
 			((Graphics2D)g).setStroke(Roi.onePixelWide);
@@ -767,14 +769,15 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 		ImageWindow win = imp.getWindow();
 		if (win==null) return;
 		Rectangle bounds = win.getBounds();
-		Insets insets = win.getInsets();
+		Insets insets = win.getInsets(false); // do not include small window padding
 		int sliderHeight = win.getSliderHeight();
 		double xmag = (double)(bounds.width-(insets.left+insets.right+ImageWindow.HGAP*2))/srcRect.width;
 		double ymag = (double)(bounds.height-(ImageWindow.VGAP*2+insets.top+insets.bottom+sliderHeight))/srcRect.height;
 		setMagnification(Math.min(xmag, ymag));
 		int width=(int)(imageWidth*magnification);
 		int height=(int)(imageHeight*magnification);
-		if (width==dstWidth&&height==dstHeight) return;
+		if (width==dstWidth && height==dstHeight)
+			return;
 		srcRect=new Rectangle(0,0,imageWidth, imageHeight);
 		setSize(width, height);
 		getParent().doLayout();

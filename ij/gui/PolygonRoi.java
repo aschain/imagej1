@@ -239,6 +239,10 @@ public class PolygonRoi extends Roi {
 						g.drawPolygon(xp2, yp2, nPoints);
 					} else
 						g.fillPolygon(xp2, yp2, nPoints);
+					if (strokeColor!=null) {
+						g.setColor(strokeColor);
+						g.drawPolygon(xp2, yp2, nPoints);
+					}
 				} else
 					g.drawPolygon(xp2, yp2, nPoints);
 			 }
@@ -266,12 +270,12 @@ public class PolygonRoi extends Roi {
 	private void drawSpline(Graphics g, float[] xpoints, float[] ypoints, int npoints, boolean closed, boolean fill, boolean isActiveOverlayRoi) {
 		if (xpoints==null || xpoints.length==0)
 			return;
-		boolean doScaling = (ic != null);	//quicker drawing if we don't need to convert to screen coordinates
-		if (ic!=null) {
+		boolean doScaling = ic!=null; //quicker drawing if we don't need to convert to screen coordinates
+		if (ic!=null) try {
 			Rectangle srcRect = ic.getSrcRect();
-			if (srcRect.x == 0 && srcRect.y == 0 && ic.getMagnification()==1.0)
+			if (srcRect!=null && srcRect.x==0 && srcRect.y==0 && ic.getMagnification()==1.0)
 				doScaling = false;
-		}
+		} catch(Exception e) {}
 		double xd = getXBase();
 		double yd = getYBase();
 		Graphics2D g2d = (Graphics2D)g;
@@ -294,6 +298,10 @@ public class PolygonRoi extends Roi {
 				g2d.draw(path);
 			} else
 				g2d.fill(path);
+			if (strokeColor!=null) {
+				g.setColor(strokeColor);
+				g2d.draw(path);
+			}
 		} else
 			g2d.draw(path);
 	}

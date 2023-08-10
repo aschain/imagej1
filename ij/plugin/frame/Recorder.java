@@ -168,7 +168,7 @@ public class Recorder extends PlugInFrame implements PlugIn, ActionListener, Ima
 	
 	public static void record(String method, String arg) {
 		if (IJ.debugMode) IJ.log("record: "+method+"  "+arg);
-		boolean sw = method.equals("selectWindow");
+		boolean sw = method.equals("selectWindow")||method.equals("selectImage");
 		if (textArea!=null && !(scriptMode&&sw||commandName!=null&&sw)) {
 			if (scriptMode && method.equals("roiManager"))
 				textArea.append("rm.runCommand(imp,\""+arg+"\");\n");
@@ -560,6 +560,16 @@ public class Recorder extends PlugInFrame implements PlugIn, ActionListener, Ima
 							if (index>0)
 								commandOptions = commandOptions.substring(0,index);
 						}
+					}
+					if (name.equals("Scale Bar...")) {
+						commandOptions = commandOptions.replace("thickness=4 ","");
+						commandOptions = commandOptions.replace("location=[Lower Right] ","");
+						commandOptions = commandOptions.replace("font=14 ","");
+						commandOptions = commandOptions.replace("color=White ","");
+						commandOptions = commandOptions.replace("background=None ","");
+						if (commandOptions.contains("height=50")||commandOptions.contains("thickness="))
+							commandOptions = commandOptions.replace("horizontal ","");
+							
 					}
 					String prefix = "run(";
 					if (scriptMode) {

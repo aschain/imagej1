@@ -49,8 +49,8 @@ import javax.swing.filechooser.*;
 					if (defaultDir!=null) {
 						File f = new File(defaultDir);
 						if (IJ.debugMode)
-							IJ.log("DirectoryChooser,setSelectedFileW: "+f);
-						chooser.setSelectedFile(f);
+							IJ.log("DirectoryChooser-setCurrentDir: "+f);
+						chooser.setCurrentDirectory(f);
 					}
 					chooser.setApproveButtonText("Select");
 					chooser.setAccessory(new PrevFolderSelector(chooser));
@@ -83,8 +83,8 @@ import javax.swing.filechooser.*;
 			if (defaultDir!=null) {
 				File f = new File(defaultDir);
 				if (IJ.debugMode)
-					IJ.log("DirectoryChooser,setSelectedFile: "+f);
-				chooser.setSelectedFile(f);
+					IJ.log("DirectoryChooser-setCurrentDir: "+f);
+				chooser.setCurrentDirectory(f);
 			}
 			chooser.setAccessory(new PrevFolderSelector(chooser));
 			chooser.setApproveButtonText("Select");
