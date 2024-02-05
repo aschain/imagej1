@@ -222,10 +222,12 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 				setStrokeColor(scolor);
 		}
 		double defaultWidth = defaultStrokeWidth();
+		//if (defaultWidth>0) setStrokeWidth(defaultWidth);
 		if (defaultWidth>0) {
 			stroke = new BasicStroke((float)defaultWidth);
 			usingDefaultStroke = true;
 		}
+
 		fillColor = defaultFillColor;
 		this.group = defaultGroup;
 		if (defaultGroup>0)
@@ -1411,7 +1413,12 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 	public static int getDefaultHandleSize() {
 		if (defaultHandleSize>0)
 			return defaultHandleSize;
-		double defaultWidth = defaultStrokeWidth();
+		double defaultWidth = 1.0;
+		double guiScale = Prefs.getGuiScale();
+		if (guiScale>1.0) {
+			defaultWidth = guiScale;
+			if (defaultWidth<1.5) defaultWidth = 1.5;
+		}
 		int size = 7;
 		if (defaultWidth>1.5) size=9;
 		if (defaultWidth>=3) size=11;
@@ -1785,6 +1792,8 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 	/** Sets the default stroke width. */
 	public static void setDefaultStrokeWidth(double width) {
 		defaultStrokeWidth = width<0.0?0.0:width;
+		if (defaultStrokeWidth>1)
+			Line.setWidth(1);
 		resetDefaultHandleSize();
 	}
 
@@ -1976,7 +1985,7 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 	 */
 	public void setFillColor(Color color) {
 		fillColor = color;
-		if (fillColor!=null && isArea())
+		if (fillColor!=null && (isArea()&&!(this instanceof TextRoi)))
 			strokeColor=null;
 	}
 
@@ -2076,8 +2085,6 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 			this.stroke = new BasicStroke(strokeWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL);
 		else
 			this.stroke = new BasicStroke(strokeWidth);
-		//if (strokeWidth>1f)
-		//	fillColor = null;
 		if (notify)
 			notifyListeners(RoiListener.MODIFIED);
 	}

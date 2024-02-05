@@ -327,7 +327,7 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 	 */
 	public void addDirectoryField(String label, String defaultPath) {
 		int columns = defaultPath!=null?Math.max(defaultPath.length(),25):25;
-		if (columns>50) columns=50;
+		if (columns>60) columns=60;
 		addDirectoryField(label, defaultPath, columns);
 	}
 
@@ -360,6 +360,7 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 	 */
 	 public void addFileField(String label, String defaultPath) {
 		int columns = defaultPath!=null?Math.max(defaultPath.length(),25):25;
+		if (columns>60) columns=60;
 		addFileField(label, defaultPath, columns);
 	 }
 
@@ -1239,6 +1240,8 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 	}
 
 	private void recordOption(Object component, String value) {
+		if (labels==null)
+			return;
 		String label = (String)labels.get(component);
 		if (value.equals("")) value = "[]";
 		Recorder.recordOption(label, value);
@@ -1491,6 +1494,7 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 	/** Displays this dialog box. */
 	public void showDialog() {
 		showDialogCalled = true;
+		addToSameRow = false;
 		if (macro) {
 			dispose();
 			recorderOn = Recorder.record && Recorder.recordInMacros;
@@ -2009,9 +2013,16 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 	
 		public void actionPerformed(ActionEvent e) {
 			String path = null;
-			if (mode.equals("dir"))
+			if (mode.equals("dir")) {
+				String saveDefaultDir = OpenDialog.getDefaultDirectory();
+				String dir = this.textField.getText();
+				boolean setDefaultDir = dir!=null && !dir.equals("");
+     			if (setDefaultDir)
+					OpenDialog.setDefaultDirectory(dir);
 				path = IJ.getDir("Select a Folder");
-			else {
+				if (setDefaultDir)
+					OpenDialog.setDefaultDirectory(saveDefaultDir);
+			} else {
 				OpenDialog od = new OpenDialog("Select a File", null);
 				String directory = od.getDirectory();
 				String name = od.getFileName();

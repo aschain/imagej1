@@ -5,17 +5,105 @@
 </head>
 <body>
 
-<li> <u>1.54g15  02 September 2023</u>
+<li> <u>1.54i6  12 January 2024</u>
 <ul>
+<li> Thanks to Stein Rorvik, added the Dialog.addFile(label,path,columns)
+and Dialog.addDirectory(label,path,columns) macro functions and limited
+the field width to 60 columns if the number of columns is not
+specified. DOCUMENT
+<li> Thanks to Stein Rorvik, the contents of a cell in the
+Command Finder is displayed in the status bar when you click
+on that cell.
+<li> Thanks to Stein Rorvik, added the Stack.startOrthoViews
+macro function. DOCUMENT
+<li> Thanks to Norbert Vischer, fixed exception caused by Overlay.toArray(indexes)
+(used by Overlay.xor(indexes)).
+<li> Thanks to Philippe Carl, fixed bug with the Threshold window method not being
+updated when using the setAutoThreshold() macro function.
+</ul>
+
+<li> <u>1.54h  15 December 2023</u>
+<ul>
+<li> Thanks to Michael Schmid, improved the fidelity of
+the RGB to indexed color conversion done by the
+<i>Image&gt;Type&gt;8-bit Color</i> command.
+<li> Thanks to Michael Ellis, added the ImageListenerAdapter
+class, which supports notification when an ImagePlus
+is saved.
+<li> Thanks to 'mandamanta', a warning is displayed in the "Log" 
+window if no particles are detected by the particle analyzer 
+when its running in batch mode.
+<li> Thanks to Philippe Carl, added the Dialog.enableYesNoCancel
+and Dialog.getYesNoCancel macro functions
+(<a href="http://wsr.imagej.net/macros/YesNoCancelDialog.ijm">example</a>).
+<li> Thanks to Michael Schmid, the Plot.update() macro function
+now works for plots that are not under construction.
+<li> Thanks to Stein Rorvik, fixed bug where use of a modifier key
+in the text editor caused isKeyDown() calls to be stuck
+returning 'true' for that modifier.
+<li> Thanks to 'IztokD', fixed bugs with the Plot.getValues() macro
+function not working in batch mode.
+<li> Thanks to 'Fijipuff', fixed bug with making montages of multi-channel 
+"Composite" mode images.
+<li> Thanks to Michael Schmid, fixed exceptions that occurred 
+with Plot.addLabel() and with the <i>Image&gt;Color&gt;Show LUT</i>
+command.
+<li> Thanks to Michael Schmid, fixed an exception that occurred 
+with Plot.addLabel().
+<li> Thanks to Michael Schmid, fixed several
+<i>Image&gt;Color&gt;Show LUT</i>
+bugs.
+<li> Thanks to Michael Schmid, fixed bug with virtual stacks
+that cache pixel data
+(<a href="http://wsr.imagej.net/plugins/Test_Virtual_Stack.java">example</a>).
+<li> Thanks to Rodrigo Goncalves, fixed bug that caused the
+Color Thresholder's "Original" button to not work as
+expected.
+<li> Thanks to Etienne Monier, fixed bug with opening image URLs that 
+include access credentials.
+<li> Thanks to Nick Condon, fixed a 1.53 regression that made the
+Plot.getValues() macro function slower.
+<li> Thanks to Stein Rorvik, fixed a 1.54e regression with the
+Overlay.addSelection(fcolor,0,bcolor) macro function when used
+with a text selection.
+<li> Thanks to Michael Cammer, fixed a 1.53b regression that caused
+selection outlines to scale when zooming if the GUI scale was greater
+than 1.0.
+</ul>
+
+<li> <u>1.54g  18 October 2023</u>
+<ul>
+<li> Thanks to Yuekan Jiao, added a "16-bit histogram" 
+option to the <i>Image&gt;Adjust&gt;Threshold</i> dialog
+and a '16-bit' option to the setAutoThreshold()
+macro function and the ImagePlus.setAutoThreshold(String) method.
+When this option is enabled, the full 16-bit histogram is used to 
+calculate the threshold of 16-bit images
+(<a href="http://wsr.imagej.net/macros/js/AutoThreshold16.js">example</a>).
+<li> Thanks to Eyal Rozenberg, the <i>File&gt;Import&gt;Raw</i> command
+uses the directory name as the image title when the
+"Open all files in folder" option is enabled.
+<li> Thanks to Zoltan Kis, the <i>Process&gt;Noise&gt;Remove Outliers</i>
+tools uses sliders for setting the radius and
+threshold.
 <li> Thanks to Nicolas De Francesco and Curtis Rueden,
 the macro language documentation (functions.html) is now included
-in ij.jar and this file is used by the Editor's Macros>Function Finder
+in ij.jar and is used by the Editor's Macros>Function Finder
 command.
-<li> Thanks to Robert Baer, the “Associate ’Show All’ ROIs with slices”
-option in the ROI Manager’s More&gt;&gt;Options dialog is now always
+<li> Thanks to Robert Baer, the "Associate 'Show All' ROIs with slices"
+option in the ROI Manager's More&gt;&gt;Options dialog is now always
 enabled when ImageJ starts up.
+<li> Thanks to Christian Tischer, files with an "ome.tif" or "ome.tiff" extension
+are opened using Bio-Formats.
 <li> Thanks to Fred Damen and Michael Schmid, the ImageProcessor.getSliceNumber()
-method no long requires a PlugInFilter to return the stack position.
+method returns the stack position when not called from a
+PlugInFilter.
+<li> Thanks to Fred Damen, added the Dialog.getLocation(x,y) macro function.
+<li> Thanks to Philippe Carl, added the RoiManager.setPosition(c,z,t)
+macro function.
+<li> Thanks to Fred Damen, the second argument of the
+Dialog.addDirectory(label,defaultdir) function is no longer ignored when
+the user clicks on the "Browse" button.
 <li> Thanks to 'Phiir42', fixed bug with closed tables reopening after
 a macro finishes.
 <li> Thanks to 'Ender', fixed headless mode "Scale Bar" and "Show Info" bugs.
@@ -23,15 +111,14 @@ a macro finishes.
 very small images or user resized windows
 (<a href="http://wsr.imagej.net/macros/js/FitToWindowBug.js">example</a>).
 <li> Thanks to Michael Ellis and Michael Schmid, fixed a
-RotatedRectRoi rounding bug and a bug where the resulting polygon consisted
-of 5 points instead of 4.
+RotatedRectRoi rounding bug and a bug where newly created RotatedRectRois
+consisted of 5 points instead of 4.
 <li> Thanks to Volker Backer, fixed a Roi group bug with Fiji on Linux.
 <li> Thanks to Yuekan Jiao and Michael Schmid, fixed a rounding error with
 PointRoi.getContainedPoints().
 <li> Thanks to Guenter Pudmich, fixed a 1.54d regression that caused 16-bit
 grayscale PNGs to be opened incorrectly.
-<li> Thanks to Saleh Altahini, fixed bug with opening ImspectorPro MSR files
-using Bio-Formats.
+<li> Thanks to Saleh Altahini, fixed bug with opening ImspectorPro MSR files.
 </ul>
 
 <li> <u>1.54f  29 June 2023</u>

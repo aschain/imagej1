@@ -757,9 +757,12 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 		if (getStackSize()>1) {
 			if (ip.getWidth()!=width || ip.getHeight()!=height)
 				throw new IllegalArgumentException("Wrong dimensions for this stack");
+			int ipBitDepth = ip.getBitDepth();
 			int stackBitDepth = stack!=null?stack.getBitDepth():0;
-			if (stackBitDepth>0 && getBitDepth()!=stackBitDepth)
-				throw new IllegalArgumentException("Wrong type for this stack");
+			if (ipBitDepth>0 && stackBitDepth>0 && ipBitDepth!=stackBitDepth) {
+				String info = " \nsize="+getStackSize()+", ipBitDepth="+ipBitDepth+", stackBitDepth="+stackBitDepth;
+				throw new IllegalArgumentException("Wrong type for this stack"+info);
+			}
 		} else {
 			setStackNull();
 			setCurrentSlice(1);
@@ -841,6 +844,8 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
     	boolean resetCurrentSlice = currentSlice>newStackSize;
     	if (resetCurrentSlice) setCurrentSlice(newStackSize);
     	ImageProcessor ip = newStack.getProcessor(currentSlice);
+    	if (newStack.isVirtual()) // work around bug with cached virtual stacks
+    		ip = ip.duplicate();
     	boolean dimensionsChanged = width>0 && height>0 && (width!=ip.getWidth()||height!=ip.getHeight());
     	if (this.stack==null)
     	    newStack.viewers(+1);
@@ -1102,13 +1107,15 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 	}
 
 	/* Returns uncalibrated statistics for this image or ROI, including
-		256 bin histogram, pixelCount, mean, mode, min and max. */
+		256 bin histogram, pixelCount, mean, mode, standard deviation,
+		min and max.
+	*/
 	public ImageStatistics getRawStatistics() {
 		if (roi!=null && roi.isArea())
 			ip.setRoi(roi);
 		else
 			ip.resetRoi();
-		return ImageStatistics.getStatistics(ip, AREA+MEAN+MODE+MIN_MAX, null);
+		return ImageStatistics.getStatistics(ip, AREA+MEAN+MODE+STD_DEV+MIN_MAX, null);
 	}
 
 	/** Returns an ImageStatistics object generated using the
@@ -3059,6 +3066,8 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 							break;
 						case SAVED:
 							//listener.imageSaved(imp);
+							if (listener instanceof ImageListenerAdapter)
+                               ((ImageListenerAdapter)listener).imageSaved(imp);
 							break;
 					}
 				}
@@ -3163,6 +3172,19 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 	public void setDefaultDisplayRange(double min, double max) {
 		this.defaultMin = min;
 		this.defaultMax = max;
+	}
+	
+	/** Uses the specified method to set the threshold levels
+	 * of this image. Use AutoThresholder.getMethods()
+	 * to get a list of the available methods. Add " dark"
+	 * to the method name if the image has a dark background.
+	 * Add " 16-bit" to use the full 16-bit histogram
+	 * when calculating the threshold of 16-bit images.
+	 * Add " stack" to use the histogram of the entire
+	 * stack when calculating the threshold.
+	*/
+	public void setAutoThreshold(String method) {
+		IJ.setAutoThreshold(this, method);
 	}
 
 	/** Returns 'true' if this image is thresholded.
