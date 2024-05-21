@@ -540,12 +540,14 @@ public class Slicer implements PlugIn, TextListener, ItemListener {
 		 double distance = 0.0;
 		 int index;
 		 double oldx=xbase, oldy=ybase;
+		 float strokeWidth=roi.getStrokeWidth();
 		 for (int i=0; i<n; i++) {
 				double len = segmentLengths[i];
 				if (len==0.0)
 					continue;
 				double xinc = dx[i]/len;
 				double yinc = dy[i]/len;
+				double angle=Math.atan2(dy[i], dx[i]);
 				double start = 1.0-leftOver;
 				double rx = xbase+x[i]+start*xinc;
 				double ry = ybase+y[i]+start*yinc;
@@ -554,13 +556,16 @@ public class Slicer implements PlugIn, TextListener, ItemListener {
 				for (int j=0; j<=n2; j++) {
 					index = (int)distance+j;
 					if (index<values.length) {
-						 if (notFloat)
-								values[index] = (float)ip.getInterpolatedPixel(rx, ry);
-						 else if (rgb) {
-								int rgbPixel = ((ColorProcessor)ip).getInterpolatedRGBPixel(rx, ry);
-								values[index] = Float.intBitsToFloat(rgbPixel&0xffffff);
-						 } else
-								values[index] = (float)ip.getInterpolatedValue(rx, ry);
+						if (notFloat) {
+							if(strokeWidth>1.0)values[index]=getLineAveValue(ip,rx,ry,angle,strokeWidth);
+							else values[index] = (float)ip.getInterpolatedPixel(rx, ry);
+						 }else if (rgb) {
+							int rgbPixel = ((ColorProcessor)ip).getInterpolatedRGBPixel(rx, ry);
+							values[index] = Float.intBitsToFloat(rgbPixel&0xffffff);
+						 } else {
+							 if(strokeWidth>1.0)values[index]=getLineAveValue(ip,rx,ry,angle,strokeWidth);
+							values[index] = (float)ip.getInterpolatedValue(rx, ry);
+						 }
 					}
 					rx += xinc;
 					ry += yinc;
@@ -572,6 +577,18 @@ public class Slicer implements PlugIn, TextListener, ItemListener {
 		 return values;
 
 	}
+	
+	public static float getLineAveValue(ImageProcessor ip, double x, double y, double angle, float strokeWidth) {
+		double angleup=angle+Math.PI/2, angledown=angle-Math.PI/2;
+		double[] line=ip.getLine(x+Math.cos(angleup)*strokeWidth, y+Math.sin(angleup)*strokeWidth,
+					x+Math.cos(angledown)*strokeWidth, y+Math.sin(angledown)*strokeWidth);
+		double result=0;
+		for(int i=0; i<line.length;i++)result+=line[i];
+		result/=line.length;
+		return (float)result;
+	}
+	
+	
 
 	void doIrregularSetup(Roi roi) {
 		 n = ((PolygonRoi)roi).getNCoordinates();
