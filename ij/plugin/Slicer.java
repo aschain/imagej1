@@ -30,7 +30,7 @@ public class Slicer implements PlugIn, TextListener, ItemListener {
 	private double inputZSpacing = 1.0;
 	private double outputZSpacing = 1.0;
 	private int outputSlices = 1;
-	private boolean noRoi;
+	private boolean noRoi, polyline;
 	private boolean rgb, notFloat;
 	private Vector fields, checkboxes;
 	private Label message;
@@ -269,6 +269,7 @@ public class Slicer implements PlugIn, TextListener, ItemListener {
 		double outputSpacing = cal.pixelDepth;
 		Roi roi = imp.getRoi();
 		boolean line = roi!=null && roi.getType()==Roi.LINE;
+		polyline= roi!=null && (roi.getType()==Roi.POLYLINE || roi.getType()==Roi.FREELINE);
 		if (line) saveLineInfo(roi);
 		String macroOptions = Macro.getOptions();
 		boolean macroRunning = macroOptions!=null;
@@ -288,8 +289,13 @@ public class Slicer implements PlugIn, TextListener, ItemListener {
 		gd.addNumericField("Output spacing ("+units+"):", outputSpacing, 3);
 		if (line) {
 			if (!IJ.isMacro()) outputSlices=sliceCount;
-			gd.addNumericField("Slice_count:", outputSlices, 0);
-		} else
+			float strokeWidth=(float) (roi.getStrokeWidth()/outputSpacing*cal.pixelWidth);
+			if(strokeWidth<1f)strokeWidth=1f;
+			gd.addNumericField("Slice_count:", (int)(strokeWidth), 0);
+		} else if(polyline) {
+			float strokeWidth=roi.getStrokeWidth();
+			gd.addNumericField("Average over line width (pixels):", strokeWidth<1?1:strokeWidth, 0);
+		}else
 			gd.addChoice("Start at:", starts, startAt);
 		gd.addCheckbox("Flip vertically", flip);
 		gd.addCheckbox("Rotate 90 degrees", rotate);
@@ -319,7 +325,9 @@ public class Slicer implements PlugIn, TextListener, ItemListener {
 			outputSlices = (int)gd.getNextNumber();
 			if (!IJ.isMacro()) sliceCount=outputSlices;
 			imp.setRoi(roi);
-		} else
+		} else if(polyline) {
+			roi.setStrokeWidth(gd.getNextNumber());
+		}else
 			startAt = gd.getNextChoice();
 		flip = gd.getNextBoolean();
 		rotate = gd.getNextBoolean();
@@ -406,15 +414,22 @@ public class Slicer implements PlugIn, TextListener, ItemListener {
 				}
 		 } else if (roi.getType()==Roi.LINE) {
 				Line line = (Line)roi;
-				x1 = line.x1;
-				y1 = line.y1;
-				x2 = line.x2;
-				y2 = line.y2;
-				double dx = x2 - x1;
-				double dy = y2 - y1;
+				double dx = line.x2 - line.x1;
+				double dy = line.y2 - line.y1;
 				double nrm = Math.sqrt(dx*dx + dy*dy)/outputZSpacing;
 				xInc = -(dy/nrm);
 				yInc = (dx/nrm);
+				if(outputSlices>1) {
+					x1 = (double)line.x1 - xInc*(double)outputSlices/2.0;
+					y1 = (double)line.y1 - yInc*(double)outputSlices/2.0;
+					x2 = (double)line.x2 - xInc*(double)outputSlices/2.0;
+					y2 = (double)line.y2 - yInc*(double)outputSlices/2.0;
+				}else {
+					x1 = line.x1;
+					y1 = line.y1;
+					x2 = line.x2;
+					y2 = line.y2;
+				}
 		 } else
 				return null;
 
@@ -539,7 +554,6 @@ public class Slicer implements PlugIn, TextListener, ItemListener {
 		 double leftOver = 1.0;
 		 double distance = 0.0;
 		 int index;
-		 double oldx=xbase, oldy=ybase;
 		 float strokeWidth=roi.getStrokeWidth();
 		 for (int i=0; i<n; i++) {
 				double len = segmentLengths[i];
@@ -556,15 +570,16 @@ public class Slicer implements PlugIn, TextListener, ItemListener {
 				for (int j=0; j<=n2; j++) {
 					index = (int)distance+j;
 					if (index<values.length) {
-						if (notFloat) {
-							if(strokeWidth>1.0)values[index]=getLineAveValue(ip,rx,ry,angle,strokeWidth);
-							else values[index] = (float)ip.getInterpolatedPixel(rx, ry);
-						 }else if (rgb) {
-							int rgbPixel = ((ColorProcessor)ip).getInterpolatedRGBPixel(rx, ry);
-							values[index] = Float.intBitsToFloat(rgbPixel&0xffffff);
-						 } else {
-							 if(strokeWidth>1.0)values[index]=getLineAveValue(ip,rx,ry,angle,strokeWidth);
-							values[index] = (float)ip.getInterpolatedValue(rx, ry);
+						 if(strokeWidth>1.0)values[index]=getNormalLineAveValue(ip,rx,ry,angle,strokeWidth);
+						 else {
+							 if (notFloat) {
+									values[index] = (float)ip.getInterpolatedPixel(rx, ry);
+							 } else if (rgb) {
+									int rgbPixel = ((ColorProcessor)ip).getInterpolatedRGBPixel(rx, ry);
+									values[index] = Float.intBitsToFloat(rgbPixel&0xffffff);
+							 } else {
+									values[index] = (float)ip.getInterpolatedValue(rx, ry);
+							 }
 						 }
 					}
 					rx += xinc;
@@ -577,18 +592,6 @@ public class Slicer implements PlugIn, TextListener, ItemListener {
 		 return values;
 
 	}
-	
-	public static float getLineAveValue(ImageProcessor ip, double x, double y, double angle, float strokeWidth) {
-		double angleup=angle+Math.PI/2, angledown=angle-Math.PI/2;
-		double[] line=ip.getLine(x+Math.cos(angleup)*strokeWidth, y+Math.sin(angleup)*strokeWidth,
-					x+Math.cos(angledown)*strokeWidth, y+Math.sin(angledown)*strokeWidth);
-		double result=0;
-		for(int i=0; i<line.length;i++)result+=line[i];
-		result/=line.length;
-		return (float)result;
-	}
-	
-	
 
 	void doIrregularSetup(Roi roi) {
 		 n = ((PolygonRoi)roi).getNCoordinates();
@@ -625,6 +628,52 @@ public class Slicer implements PlugIn, TextListener, ItemListener {
 				dx[i] = xdelta;
 				dy[i] = ydelta;
 		 }
+	}
+
+	float getNormalLineAveValue(ImageProcessor ip, double x, double y, double angle, float strokeWidth) {
+		double angleup=angle+Math.PI/2, angledown=angle-Math.PI/2;
+		double x1=x+Math.cos(angleup)*strokeWidth, y1=y+Math.sin(angleup)*strokeWidth, x2=x+Math.cos(angledown)*strokeWidth, y2=y+Math.sin(angledown)*strokeWidth;
+		if(ip instanceof ColorProcessor) {
+			int rgbPixel=getRGBLineAveValue((ColorProcessor)ip, x1,y1,x2,y2);
+			return Float.intBitsToFloat(rgbPixel&0xffffff);
+		}
+		else {
+			return getLineAveValue(ip,x1,y1,x2,y2);
+		}
+	}
+	
+	float getLineAveValue(ImageProcessor ip, double x1, double y1, double x2, double y2) {
+		double result=0;
+		double inc=1.0;
+		double[] line=ip.getLine(x1, y1, x2, y2);
+		if(!nointerpolate) {
+			Calibration cal=imp.getCalibration();
+			//double angle=Math.atan2(y2-y1, x2-x1);
+			inc=cal.pixelDepth/cal.pixelWidth;
+		}
+		int i=0, ind=0;
+		for(i=1;ind<line.length;i++) {
+			result+=line[ind];
+			ind=(int)((double)i*inc);
+		}
+		result/=(double)i;
+		return (float)result;
+	}
+	
+	int getRGBLineAveValue(ColorProcessor cip, double x1, double y1, double x2, double y2) {
+		double dx = x2-x1;
+		double dy = y2-y1;
+		int n = (int)Math.round(Math.sqrt(dx*dx + dy*dy));
+		double xinc = n>0?dx/n:0;
+		double yinc = n>0?dy/n:0;
+		int red=0,green=0,blue=0;
+		for(double i=0; i<n;i++) {
+			int pixel=cip.getInterpolatedRGBPixel((x1+(i*xinc)), (y1+(i*yinc)));
+			red+=(pixel&0xff0000)>>16; green+=(pixel&0xff00)>>8; blue+=pixel&0xff;
+		}
+		red/=n; green/=n; blue/=n;
+		int result=0xff000000 + ((red&0xff)<<16) + ((green&0xff)<<8) + (blue&0xff);
+		return result;
 	}
 
 	private float[] getLine(ImageProcessor ip, double x1, double y1, double x2, double y2, float[] data) {
@@ -705,8 +754,14 @@ public class Slicer implements PlugIn, TextListener, ItemListener {
 		 int count = 0;
 		 boolean lineSelection = fields.size()==2;
 		 if (lineSelection) {
-				count = (int)Tools.parseDouble(((TextField)fields.elementAt(1)).getText(), 0.0);
-				if (count>0) makePolygon(count, outSpacing);
+		 	count = (int)Tools.parseDouble(((TextField)fields.elementAt(1)).getText(), 0.0);
+		 	if(polyline) {
+		 		if(count<1) {count=1; ((TextField)fields.elementAt(1)).setText(""+count);}
+		 		imp.getRoi().setStrokeWidth(count);
+		 		imp.updateAndDraw();
+		 	}else {
+		 		if (count>0) makePolygon(count, outSpacing);
+		 	}
 		 }
 		 String size = getSize(inputZSpacing, outSpacing, count);
 		 message.setText("Output Size: "+size);
@@ -730,15 +785,15 @@ public class Slicer implements PlugIn, TextListener, ItemListener {
 		Calibration cal = imp.getCalibration();
 		double cx = cal.pixelWidth;	//corrects preview for x calibration
 		double cy = cal.pixelHeight;	//corrects preview for y calibration
-		x[0] = (int)gx1;
-		y[0] = (int)gy1;
-		x[1] = (int)gx2;
-		y[1] = (int)gy2;
 		double dx = gx2 - gx1;
 		double dy = gy2 - gy1;
 		double nrm = Math.sqrt(dx*dx + dy*dy)/outSpacing;
 		double xInc = -(dy/(cx*nrm));	//cx scales the x increment
 		double yInc = (dx/(cy*nrm));	//cy scales the y increment
+		x[0] = (int)gx1 - (int)(xInc*count/2);
+		y[0] = (int)gy1 - (int)(yInc*count/2);
+		x[1] = (int)gx2 - (int)(xInc*count/2);
+		y[1] = (int)gy2 - (int)(yInc*count/2);
 		x[2] = x[1] + (int)(xInc*count);
 		y[2] = y[1] + (int)(yInc*count);
 		x[3] = x[0] + (int)(xInc*count);
