@@ -3194,9 +3194,9 @@ public class Functions implements MacroConstants, Measurements {
 				String styles = getLastString().toLowerCase();
 				if (styles.contains("bold")) style += Font.BOLD;
 				if (styles.contains("italic")) style += Font.ITALIC;
-				if (styles.contains("non-")||styles.contains("no-")) antialiasedText=false;
 				if (styles.contains("nonscal")) nonScalableText=true;
 				if (styles.contains("anti")) antialiasedText=true;
+				if (styles.contains("non-")||styles.contains("no-")) antialiasedText=false;
 			} else
 				interp.getRightParen();
 		}
@@ -4796,7 +4796,9 @@ public class Functions implements MacroConstants, Measurements {
 		else if (arg1.startsWith("calibrate")) {
 			Prefs.calibrateConversions = state;
 			ImageConverter.setDoScaling(true);
-		} else
+		} else if (arg1.startsWith("mousewheel"))
+			Prefs.mouseWheelStackScrolling = state;
+		else
 			interp.error("Invalid option");
 	}
 
@@ -7149,7 +7151,7 @@ public class Functions implements MacroConstants, Measurements {
 
 	void addRoi(ImagePlus imp, Roi roi){
 		Overlay overlay = imp.getOverlay();
-		if (overlay==null || overlay.size()==0) {
+		if (overlay==null) {
 			if (offscreenOverlay==null)
 				offscreenOverlay = new Overlay();
 			overlay = offscreenOverlay;
@@ -7272,11 +7274,28 @@ public class Functions implements MacroConstants, Measurements {
 			return setSelection();
 		else if (name.equals("setLocAndSize") || name.equals("setLocationAndSize"))
 			return setTableLocAndSize();
+		else if (name.equals("showHistogramTable") || name.equals("list"))
+			return tableList();
 		else
 			interp.error("Unrecognized function name");
 		return null;
 	}
-
+	
+	private Variable tableList() {
+		ImagePlus img = WindowManager.getCurrentImage();
+		boolean isHistogram = false;
+		if (img!=null) {
+			ImageWindow win = img.getWindow();
+			if (win!=null && win instanceof HistogramWindow) {
+				((HistogramWindow)win).showList();
+				isHistogram = true;
+			}
+		}
+		if (!isHistogram)
+			interp.error("No histogram window");
+		return null;
+	}
+	
 	private Variable setTableLocAndSize() {
 		double x = getFirstArg();
 		double y = getNextArg();

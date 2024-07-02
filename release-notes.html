@@ -5,16 +5,52 @@
 </head>
 <body>
 
-<li> <u>1.54j15  15 April 2024</u>
+<li> <u>1.54k10  2 July 2024</u>
+<ul>
+<li> Thanks to Bram van den Broek, the <i>Image&gt;Duplicate</i>
+command enables the "Ignore Selection" option when the ROI is 
+outside the image.
+<li> Thanks to Herbie Gluender, the <i>Image&gt;Duplicate</i>
+command retains the selection when "Ignore Selection" is
+checked in the dialog.
+<li> Thanks to Michael Schmid, file dialogs show the
+prompt in the status bar, a work around on Macs where
+file dialogs do not have titles.
+<li> Thanks to 'odinsbane', fixed bug with FolderOpener
+(<i>File&gt;Import&gt;Image Sequence</i>) only using the
+first FileInfo from tiff stacks.
+<li> Thanks to Michael Nonet and Guenter Pudmich, fixed bug
+with the roiManager("rename",name) macro function causing the
+stack position to be lost.
+<li> Thanks to Philippe Carl and Michael Schmid, fixed bug
+where the roiManager("select",index) macro function did
+not remove previous selections.
+<li> Thanks to Oleg Dobrokhotov, fixed bug with the
+"non-antialiased" option of the setFont() macro
+function to not work as expected.
+<li> Thanks to Felix Rudolphi and Curtis Rueden, fixed a
+1.54i regression that caused FileOpener to throw
+HeadlessExceptions in headless environments.
+
+</ul>
+
+<li> <u>1.54j  12 June 2024</u>
 <ul>
 <li> Thanks to 'ramnoob', added a number of official tags 
 to the DICOM reader.
 <li> Thanks to Abdul Hannan, changed the default extension
 used by the <i>File&gt;Save As&gt;Text Image</i> command from
-“.txt” to “.csv”.
+".txt" to ".csv".
 <li> Thanks to Gabriel Landini, ImageJ adds an "*" next to
 the Mode value in the Histogram window if the histogram is
 multi-modal.
+<li> Thanks to Norbert Vischer, added the
+setOption("MouseWheelStackScrolling",boolean) macro
+function.
+<li> Thanks to Gilles Carpentier, added the
+Table.showHistogramTable macro function, which is
+equivalent to clicking on "List" in a Histogram
+window.
 <li> Thanks to Albert Cardona and Curtis Rueden, added
 public setEqualize() and setSaturated() methods to the
 ContrastEnhancer class.
@@ -24,9 +60,22 @@ work as expected.
 <li> Thanks to Norbert Vischer, fixed bug where empty string
 fields in tables are converted to NaNs after the table is
 saved and reopened.
-<li> Thanks to Stein Rorvik, fixed a bug where the
+<li> Thanks to Stein Rorvik, fixed bug where the
 Table.getColumn() macro function did not work with
 columns containing empty strings.
+<li> Thanks to Norbert Vischer, fixed bug where
+text fields in GenericDialogs opened after a showMessage()
+were non-editable.
+<li> Thanks to Jan Brocher, fixed bug where drag-and-drop of
+directories onto GenericDialog directory fields did not
+work as expected.
+<li> Thanks to Norbert Vischer, fixed an Overlay.clear macro
+function bug.
+<Li> Thanks to Alexander Bender, fixed bug with the ROI Manager
+ignoring selections when saving.
+<li> Thanks to Michael Schmid, fixed 1.53t regression
+where Image&gt;Stacks&gt;Z Project</i> failed when doing
+"Average" projection of 32-bit float stacks
 </ul>
 
 <li> <u>1.54i  03 March 2024</u>
@@ -3081,6 +3130,6 @@ small 16-bit images or selections to be much slower.
 analyzer to hang when processong 32-bit images.
 </ul> 
 
-<a href="http://imagej.nih.gov/ij">Home</a>
+<a href="http://imagej.net/ij">Home</a>
 </body>
 </html>
