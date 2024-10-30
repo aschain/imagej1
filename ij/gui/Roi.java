@@ -1606,7 +1606,7 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 		state = NORMAL;
 		if (imp==null) return;
 		imp.draw(clipX-5, clipY-5, clipWidth+10, clipHeight+10);
-		if (Recorder.record) {
+		if (IJ.recording()) {
 			String method;
 			if (type==OVAL)
 				Recorder.record("makeOval", x, y, width, height);
@@ -2958,6 +2958,10 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 			if (isLine()) {
 				Roi roi2 = Roi.convertLineToArea(Roi.this);
 				mask = roi2.getMask();
+				if (mask==null && roi2.getType()==RECTANGLE) {
+					mask = new ByteProcessor(roi2.width, roi2.height);
+					mask.invert();
+				}
 				xbase = roi2.x;
 				ybase = roi2.y;
 			} else {

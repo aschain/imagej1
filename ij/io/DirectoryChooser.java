@@ -133,7 +133,7 @@ import javax.swing.filechooser.*;
  	public String getDirectory() {
 		if (IJ.debugMode)
 			IJ.log("DirectoryChooser.getDirectory: "+directory);
-		if (Recorder.record && !IJ.isMacOSX())
+		if (IJ.recording() && !IJ.isMacOSX())
 			Recorder.recordPath(title, directory);
  		return directory;
  	}

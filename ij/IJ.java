@@ -1283,11 +1283,11 @@ public class IJ {
 		    		error(msg);
 					return PlugInFilter.DONE;
 		    	}
-				if (Recorder.record)
+				if (IJ.recording())
 					Recorder.recordOption("stack");
 				return flags | PlugInFilter.DOES_STACKS;
 			}
-			if (Recorder.record)
+			if (IJ.recording())
 				Recorder.recordOption("slice");
 		}
 		return flags;
@@ -2572,6 +2572,11 @@ public class IJ {
 		protectStatusBar = protect;
 		if (!protectStatusBar)
 			statusBarThread = null;
+	}
+
+	/** Returns 'true' if the Recorder is running and ImageJ is not in headless mode. */
+	public static boolean recording() {
+		return (!GraphicsEnvironment.isHeadless()&&Recorder.record);
 	}
 
 }

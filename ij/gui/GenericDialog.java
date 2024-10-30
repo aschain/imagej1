@@ -216,7 +216,7 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 			panel.add(new Label(" "+units));
 			add(panel, c);
 		}
-		if (Recorder.record || macro)
+		if (IJ.recording() || macro)
 			saveLabel(tf, label);
 	}
 
@@ -307,7 +307,7 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 		defaultStrings.addElement(defaultText);
 		tf.setDropTarget(null);
 		new DropTarget(tf, new TextDropTarget(tf));
-		if (Recorder.record || macro)
+		if (IJ.recording() || macro)
 			saveLabel(tf, label);
 	}
 
@@ -348,7 +348,7 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 		panel.add(button);
 		layout.setConstraints(panel, constraints);
 		add(panel);
-		if (Recorder.record || macro)
+		if (IJ.recording() || macro)
 			saveLabel(panel, label);
 	}
 
@@ -380,7 +380,7 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 		panel.add(button);
 		layout.setConstraints(panel, constraints);
 		add(panel);
-		if (Recorder.record || macro)
+		if (IJ.recording() || macro)
 			saveLabel(panel, label);
 	}
 
@@ -668,7 +668,7 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 				checkbox.addElement(cb);
 				cb.setState(defaultValues[i1]);
 				cb.addItemListener(this);
-				if (Recorder.record || macro)
+				if (IJ.recording() || macro)
 					saveLabel(cb, labels[i1]);
 				if (IJ.isLinux()) {
 					Panel panel2 = new Panel();
@@ -724,7 +724,7 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 		c.anchor = GridBagConstraints.WEST;
 		c.insets = new Insets(insets.top, insets.left, 0, 0);
 		add(panel, c);
-		if (Recorder.record || macro)
+		if (IJ.recording() || macro)
 			saveLabel(cg, label);
 	}
 
@@ -771,7 +771,7 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 		choice.addElement(thisChoice);
 		int index = thisChoice.getSelectedIndex();
 		defaultChoiceIndexes.addElement(Integer.valueOf(index));
-		if (Recorder.record || macro)
+		if (IJ.recording() || macro)
 			saveLabel(thisChoice, label);
 	}
 
@@ -951,6 +951,7 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 			sliderDigits = new Vector(5);
 		}
 		Scrollbar s = new Scrollbar(Scrollbar.HORIZONTAL, (int)defaultValue, 1, (int)minValue, (int)maxValue+1);
+		if (IJ.debugMode) IJ.log("Scrollbar: "+scale+" "+defaultValue+" "+minValue+" "+maxValue);
 		GUI.fixScrollbar(s);
 		slider.addElement(s);
 		s.addAdjustmentListener(this);
@@ -1020,7 +1021,7 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 		c.insets.left = 0;
 		c.insets.bottom -= 3;
 		add(panel, c);
-		if (Recorder.record || macro)
+		if (IJ.recording() || macro)
 			saveLabel(tf, label);
 	}
 	
@@ -1731,7 +1732,7 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 				if (!Double.isNaN(value)) {
 					Scrollbar sb = (Scrollbar)slider.elementAt(i);
 					double scale = ((Double)sliderScales.get(i)).doubleValue();
-					sb.setValue((int)(value*scale));
+					sb.setValue((int)Math.round(value*scale));
 				}
 			}
 		}
@@ -1821,7 +1822,8 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 		return new Insets(i.top+10, i.left+10, i.bottom+10, i.right+10);
 	}
 
-	public synchronized void adjustmentValueChanged(AdjustmentEvent e) {
+	/** Callback for sliders */
+	public void adjustmentValueChanged(AdjustmentEvent e) {
 		Object source = e.getSource();
 		for (int i=0; i<slider.size(); i++) {
 			if (source==slider.elementAt(i)) {
@@ -2050,8 +2052,8 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 					path = directory+name;
 			}
 			if (path!=null) {
-				if (IJ.isWindows())
-					path = path.replaceAll("\\\\", "/"); // replace "\" with "/"
+				//if (IJ.isWindows())
+				//	path = path.replaceAll("\\\\", "/"); // replace "\" with "/"
 				this.textField.setText(path);
 			}
 		}

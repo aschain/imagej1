@@ -5,10 +5,52 @@
 </head>
 <body>
 
-<li> <u>1.54k16  4 September 2024</u>
+
+<li> <u>1.54m16  28 October 2024</u>
 <ul>
+<li> Thanks to 'Patricia' and Herbie Gluender, the
+<i>Image&gt;Transform&gt;Image to Results</i> command
+now shows NaNs when values are outside non-rectangular
+selections.
+<li> Thanks to Kevin Terretaz, CommandFinder
+(<i>Plugins&gt;Utilities&gt;Find Commands</i>) filtering is more
+precise and flexible. It now splits the input into individual words 
+and returns commands where all words are found in either the command 
+name or the menu path.
+<li> Thanks to Bram van den Broek, fixed bug with duplicating hyperstacks when
+the selection was outside the image border.
+<li> Thanks to Giovanni Cardone and Michael Schmid, fixed bug with
+right arrow in dialox box sliders not working as expected on
+Linux and Windows.
+<li> Thanks to Giovanni Cardone and Michael Schmid, fixed bug where
+the ImageProcessor.getLine() method returned a smaller than 
+expected array with horizontal lines with a width equal
+to the image width or vertical lines with a length equal to
+the image height.
+<li> Thanks to Peter Dodok, fixed bug with recording in
+Fiji headless mode.
+<li> Thanks to Jerome Mutterer, fixed bug where the -ijpath
+command line option is not respected when using the
+-batch option.
+<li> Thanks to Guenter Pudmich, fixed bug with the calculation
+of 16 and 32 bit histogram bin widths.
+</ul>
+
+<li> <u>1.54k  15 September 2024</u>
+<ul>
+<li> Thanks to 'Carlos', added the RoiManager.delete(index) macro function
+and the RoiManager.delete(index) method.
+<li> Thanks to Michael Schmid, the dialog shown for <i>Image&gt;Overlay&gt;Add Selection</i>
+with the ALT key down has an additional "Show on all slices" checkbox.
+Using "Apply" in the <i>Image&gt;Overlay&gt;Overlay Options</i> dialog
+can be also used to remove the stack positions for the current overlay
+("Set stack positions" off is equivalent to "Show on all slices"). With
+"Set stack positions" on, the stack position of the overlay elements is set
+to the current slice if it was previously unspecified. Modifying an overlay
+with "Apply" in <i>Image&gt;Overlay&gt;Overlay Options</i> and removing an
+overlay are undoable operations (ctrl+z).
 <li> Thanks to Michael Schmid, the stack positions of multi-point ROIs can be set in
-in the <i>Edit&gt;Selection&gt;Properties</i> dialog or in the ROI Manager's
+the <i>Edit&gt;Selection&gt;Properties</i> dialog or in the ROI Manager's
 Properties dialog. The ROI Manager's More&gt;&gt;Remove Positions command also works
 for multi-point ROIs.
 <li> Thanks to 'nicole3432', restored the particle analyzers's "Record starts" option.
@@ -32,13 +74,29 @@ where the roiManager("select",index) macro function did
 not remove previous selections.
 <li> Thanks to Oleg Dobrokhotov, fixed bug with the
 "non-antialiased" option of the setFont() macro
-function to not work as expected.
+function not working as expected.
 <li> Thanks to Jonathan Cottet, fixed bug with
 IJ.openImage(path,n) opening .ome.tif files.
+<li> Thanks to Fred Demen and Michael Schmid, fixed bug
+with the run("Size...",option) macro function when
+the "width=" option was missing and the "constrain"
+option was presendt.
+<li> Thanks to Fred Demen, fixed bug with the
+<i>Image&gt;Adjust&gt;Window/Level</i> "Set" dialog
+using inadequate precision when displaying float values.
+<li> Thanks to Michael Schmid, fixed <i>Undo</i> exception
+after using <i>Image&gt;Adjust&gt;Size</i> on
+a stack.
+<li> Thanks to 'Carlos', fixed bug with freehand and
+segmented line selection iterators when the line was
+completely straight vertically or
+horizontally.
+<li> Thanks to Christophe Leterrier, fixed bug with the
+Array.concat() macro function not accepting getList()
+as an argument.
 <li> Thanks to Felix Rudolphi and Curtis Rueden, fixed a
 1.54i regression that caused FileOpener to throw
 HeadlessExceptions in headless environments.
-
 </ul>
 
 <li> <u>1.54j  12 June 2024</u>

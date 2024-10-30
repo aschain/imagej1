@@ -38,7 +38,7 @@ public class Macro_Runner implements PlugIn {
 				path = directory+name;
 				Prefs.set("ij.macrodir",directory);
 				runMacroFile(path, null);
-				if (Recorder.record) {
+				if (IJ.recording()) {
 					path = Recorder.fixPath(path);
 					if (Recorder.scriptMode())
 						Recorder.recordCall("IJ.runMacroFile(\""+path+"\");");

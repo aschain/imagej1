@@ -61,6 +61,8 @@ public class Duplicator implements PlugIn, TextListener, ItemListener {
 		ignoreSelection = (staticIgnoreSelection||ignoreNextSelection) && Macro.getOptions()==null;
 		if (!IJ.altKeyDown()||stackSize>1) {
 			if (imp.isHyperStack() || imp.isComposite()) {
+				if (roiOutside)
+					imp.deleteRoi();
 				duplicateHyperstack(imp, newTitle);			
 				if (isRotatedRect)
 					straightenRotatedRect(impA, roiA, IJ.getImage());								
@@ -277,7 +279,7 @@ public class Duplicator implements PlugIn, TextListener, ItemListener {
 		Overlay overlay = imp.getOverlay();
 		if (overlay!=null && !imp.getHideOverlay())
 			imp2.setOverlay(overlay.crop(rect));
-   		if (Recorder.record) {
+   		if (IJ.recording()) {
    			if (imp.getRoi()==null || ignoreSelection)
    				Recorder.recordCall("imp = imp.duplicate();");
    			else
@@ -390,7 +392,7 @@ public class Duplicator implements PlugIn, TextListener, ItemListener {
 			overlay2.crop(firstSlice, lastSlice);
 			imp2.setOverlay(overlay2);
 		}
-   		if (Recorder.record)
+   		if (IJ.recording())
    			Recorder.recordCall("imp = imp.crop(\""+firstSlice+"-"+lastSlice+"\");");
 		return imp2;
 	}
@@ -463,7 +465,7 @@ public class Duplicator implements PlugIn, TextListener, ItemListener {
 				overlay2.crop(firstC, lastC, firstZ, lastZ, firstT, lastT);
 			imp2.setOverlay(overlay2);
 		}
-   		if (Recorder.record)
+   		if (IJ.recording())
    			Recorder.recordCall("imp = new Duplicator().run(imp, "+firstC+", "+lastC+", "+firstZ+", "+lastZ+", "+firstT+", "+lastT+");");
 		return imp2;
 	}
@@ -527,7 +529,7 @@ public class Duplicator implements PlugIn, TextListener, ItemListener {
 			if (!ignoreNextSelection) staticIgnoreSelection=ignoreSelection;
 		}
 		ignoreNextSelection = false;
-		if (Recorder.record && titleField!=null && titleField.getText().equals(sliceLabel))
+		if (IJ.recording() && titleField!=null && titleField.getText().equals(sliceLabel))
 			Recorder.recordOption("use");
 		return title;
 	}
