@@ -3326,12 +3326,17 @@ Returns the image property (a string) associated with <i>key</i>,
 or an empty string if <i>key</i> is not found.
 <br>
 
-<a name="Property.getNumber"></a>
-<b>Property.getNumber(key)</b><br>
+<a name="Property.getValue"></a>
+<b>Property.getValue(key)</b><br>
 Returns the image property associated with <i>key</i>,
 as a number, or returns NaN if <i>key</i> is not found
 or the property cannot be converted into a number.
-Requires 1.53b.
+Requires 1.53n.
+<br>
+
+<a name="Property.getNumber"></a>
+<b>Property.getNumber(key)</b><br>
+Alias for Property.getValue(key).
 <br>
 
 <a name="Property.set"></a>
@@ -3640,6 +3645,13 @@ Sets the selection name.
 <a name="Roi.setStrokeWidth"></a>
 <b>Roi.setStrokeWidth(width)</b><br>
 Sets the selection stroke width.
+<br>
+
+<a name="Roi.setMinStrokeWidth"></a>
+<b>Roi.setMinStrokeWidth(minWidth)</b><br>
+Sets the minimum scaled stroke width
+(<a href="http://wsr.imagej.net/macros/Polygons.ijm">example</a>).
+Requires 1.54m.
 <br>
 
 <a name="Roi.setUnscalableStrokeWidth"></a>
@@ -4595,6 +4607,11 @@ Enables/disables the "Calibrate conversions" option in the
 to 8-bit and 16-bit are density calibrated when this
 option is enabled, so results from measurements stay the same.
 <br>
+<a name="setOption_SetIJMenuBar"></a>
+<b>setOption("SetIJMenuBar", boolean)</b><br>
+On Macs, show the ImageJ menu bar on image window activation.
+Requires 1.54m.
+<br>
 <a name="setOption_Show_All"></a>
 <b>setOption("Show All", boolean)</b><br>
 Enables/disables the the "Show All" mode in the ROI Manager.
@@ -5471,7 +5488,7 @@ in the dialog box.
 
 <p class=navbar> <a href="#Top">top</a> | <a href="https://imagej.net/ij/index.html">home</a></p>
 
-<small>Last updated 2024-06-17</small>
+<small>Last updated 2025-02-15</small>
 
 </body>
 </html>

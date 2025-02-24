@@ -440,7 +440,7 @@ public class HistogramWindow extends ImageWindow implements Measurements, Action
 			}
 			ip.setJustification(ImageProcessor.LEFT_JUSTIFY);
 		}        
-		double binWidth = (hmax-hmin+1)/stats.nBins;
+		double binWidth = stats.binSize;
 		binWidth = Math.abs(binWidth);
 		showBins = binWidth!=1.0 || !fixedRange;
 		col1 = XMARGIN + 5;

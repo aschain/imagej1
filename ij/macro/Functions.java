@@ -715,7 +715,6 @@ public class Functions implements MacroConstants, Measurements {
 		}
 		IJ.selectWindow(title);
 		resetImage();
-		interp.selectCount++;
 	}
 
 	void setForegroundColor() {
@@ -3234,7 +3233,6 @@ public class Functions implements MacroConstants, Measurements {
 			interp.getRightParen();
 		}
 		resetImage();
-		interp.selectCount++;
 	}
 
 	void selectImage(String title) {
@@ -4799,6 +4797,8 @@ public class Functions implements MacroConstants, Measurements {
 			ImageConverter.setDoScaling(true);
 		} else if (arg1.startsWith("mousewheel"))
 			Prefs.mouseWheelStackScrolling = state;
+		else if (arg1.startsWith("setijmenubar"))
+			Prefs.setIJMenuBar = state;
 		else
 			interp.error("Invalid option");
 	}
@@ -5157,6 +5157,25 @@ public class Functions implements MacroConstants, Measurements {
 		return desc.dispatch(this);
 	}
 
+	void handleProcessBuffers(InputStream... streams){
+		for (int i = 0; i < streams.length; i++) {
+			final InputStream is = streams[i];
+			new Thread(new Runnable(){
+                @Override
+                public void run(){
+                    try {
+                        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+                        while (br.readLine() != null)
+                        {}
+                    } catch (IOException ioe)
+                        {
+                        ioe.printStackTrace();  
+                    }
+                }
+            }).start();
+		}
+	}
+
 	String exec() {
 		String[] cmd;
 		StringBuffer sb = new StringBuffer(256);
@@ -5191,14 +5210,20 @@ public class Functions implements MacroConstants, Measurements {
 			Process p = Runtime.getRuntime().exec(cmd);
 			boolean returnImmediately = openingDoc || !waitForCompletion;
 			waitForCompletion = true;
-			if (returnImmediately)
+			if (returnImmediately){
+				handleProcessBuffers(p.getInputStream(), p.getErrorStream()); // empty both buffers
 				return null;
-			reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			} else {
+				handleProcessBuffers(p.getErrorStream()); // empty only unused ErrorStream buffer
+			}
+			reader = new BufferedReader(new InputStreamReader(p.getInputStream())); // notice that this function will discard all process error output
 			String line; int count=1;
 			while ((line=reader.readLine())!=null)  {
         		sb.append(line+"\n");
-        		if (count++==1&&line.startsWith("Microsoft Windows"))
-        			break; // user probably ran 'cmd' without /c option
+        		if (count++==1&&line.startsWith("Microsoft Windows")){
+					handleProcessBuffers(p.getInputStream()); // must empty the InputStream buffer anyway
+					break; // user probably ran 'cmd' without /c option
+				}
         	}
 		} catch (Exception e) {
     		sb.append(e.getMessage()+"\n");
@@ -6765,16 +6790,6 @@ public class Functions implements MacroConstants, Measurements {
 			getImage().setOverlay(overlayClipboard);
 			return Double.NaN;
 		} else if (name.equals("pasteAndMerge")) {
-			/*
-			interp.getParens();
-			if (overlayClipboard==null)
-				interp.error("Overlay clipboard empty");
-			Overlay overlay = getImage().getOverlay(); 
-			if (overlay!=null)
-				getImage().setOverlay(overlay.add(overlayClipboard));
-			else
-				getImage().setOverlay(overlayClipboard);
-			*/
 			return Double.NaN;
 		} else if (name.equals("drawLabels")) {
 			overlayDrawLabels = getBooleanArg();
@@ -6798,11 +6813,11 @@ public class Functions implements MacroConstants, Measurements {
 		if (overlay==null && name.equals("size")) {
 			interp.getParens();
 			return 0.0;
-		} else if (name.equals("hidden"))
+		} else if (name.equals("hidden")) {
 			return overlay!=null && imp.getHideOverlay()?1.0:0.0;
-		else if (name.equals("addSelection") || name.equals("addRoi"))
+		} else if (name.equals("addSelection") || name.equals("addRoi")) {
 			return overlayAddSelection(imp, overlay);
-		else if (name.equals("setPosition")) {
+		} else if (name.equals("setPosition")) {
 			addDrawingToOverlay(imp);
 			return overlaySetPosition(overlay);
 		} else if (name.equals("setFillColor"))
@@ -6954,7 +6969,7 @@ public class Functions implements MacroConstants, Measurements {
 			ResultsTable.selectRow(roi);
 		return Double.NaN;
 	}
-
+	
 	private double getOverlayElementBounds(Overlay overlay) {
 		int index = (int)getFirstArg();
 		Variable x = getNextVariable();
@@ -6971,7 +6986,7 @@ public class Functions implements MacroConstants, Measurements {
 		height.setValue(r.height);
 		return Double.NaN;
 	}
-
+	
 	double overlayAddSelection(ImagePlus imp, Overlay overlay) {
 		String strokeColor = null;
 		double strokeWidth = Double.NaN;
@@ -7904,6 +7919,9 @@ public class Functions implements MacroConstants, Measurements {
 			roi.setStrokeWidth(getArg());
 			imp.draw();
 			return null;
+		} else if (name.equals("setMinStrokeWidth")) {
+			roi.setMinStrokeWidth(getArg());
+			return null;
 		} else if (name.equals("getStrokeWidth")) {
 			interp.getParens();
 			return new Variable(roi.getStrokeWidth());
@@ -8217,7 +8235,7 @@ public class Functions implements MacroConstants, Measurements {
 		} else if (name.equals("get")) {
 			String value = imp.getProp(getStringArg());
 			return new Variable(value!=null?value:"");
-		} else if (name.equals("getNumber")) {
+		} else if (name.equals("getNumber") || name.equals("getValue")) {
 			String svalue = imp.getProp(getStringArg());
 			double nvalue = svalue!=null?Tools.parseDouble(svalue):Double.NaN;
 			return new Variable(nvalue);
