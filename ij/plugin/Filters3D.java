@@ -4,8 +4,6 @@ import ij.*;
 import ij.process.*;
 import ij.gui.GenericDialog;
 import ij.util.ThreadUtil;
-import ij.plugin.RGBStackMerge;
-import ij.gui.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /*
@@ -118,50 +116,6 @@ public class Filters3D implements PlugIn {
 			ThreadUtil.startAndJoin(threads);
 		}
 		return res;
-	}
-	
-	private static void filterHyperstack2(final ImagePlus imp, int filter, float vx, float vy, float vz) {
-		
-		// get stack info
-		final ImageStack stack = imp.getStack();
-		if (stack.getBitDepth()==24) filterRGB(stack, filter, vx, vy, vz);
-		final float voisx = vx;
-		final float voisy = vy;
-		final float voisz = vz;
-		final int width= stack.getWidth();
-		final int height= stack.getHeight();
-		
-		if ((filter==MEAN) || (filter==MEDIAN) || (filter==MIN) || (filter==MAX) || (filter==VAR)) {
-			IJ.showStatus("3D filtering...");
-			// PARALLEL 
-			int bitdepth=stack.getBitDepth();
-			if(filter==VAR) bitdepth=32;
-			final ImageStack out = ImageStack.create(width, height, stack.getSize(), bitdepth);
-			final int frms=imp.getNFrames(), chs=imp.getNChannels();
-			final int n_cpus = Prefs.getThreads();
-			final int f = filter;
-			final int dec = (int) Math.ceil((double) imp.getNSlices() / (double) n_cpus);
-			Thread[] threads = ThreadUtil.createThreadArray(n_cpus);
-			for(int fr=1; fr<=frms; fr++) {
-				for(int ch=1; ch<chs; ch++) {
-					final int chf=ch, frf=fr;
-					final AtomicInteger ai = new AtomicInteger(0);
-					for (int ithread = 0; ithread < threads.length; ithread++) {
-						threads[ithread] = new Thread() {
-							public void run() {
-								StackProcessor processor = new StackProcessor(stack);
-								for (int k = ai.getAndIncrement(); k < n_cpus; k = ai.getAndIncrement()) {
-									processor.filter3D(out, imp, chf, frf, voisx, voisy, voisz, dec * k, dec * (k + 1), f);
-								}
-							}
-						};
-					}
-					ThreadUtil.startAndJoin(threads);
-				}
-			}
-			imp.setStack(out, imp.getNChannels(), imp.getNSlices(), imp.getNFrames());
-		}
-		
 	}
 	
 	private static void filterHyperstack(ImagePlus imp, int filter, float vx, float vy, float vz) {
