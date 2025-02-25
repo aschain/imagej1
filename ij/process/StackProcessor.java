@@ -276,14 +276,28 @@ public class StackProcessor {
      * @param filter
      */
     public void filter3D(ImageStack out, float radx, float rady, float radz, int zmin, int zmax, int filter) {
-    	filter3D(out, null, 0, 0, radx, rady, radz, zmin, zmax, filter);
+    	filter3D(out, 1, 1, 1, stack.getSize(), radx, rady, radz, zmin, zmax, filter);
     }
     
-    public void filter3D(ImageStack out, ImagePlus imp, int ch, int fr,  float radx, float rady, float radz, int zmin, int zmax, int filter) {
+    /**
+     * 
+     * @param out
+     * @param imp ImagePlus to get the Stack Index
+     * @param channel Channel to do the filter on
+     * @param frame Frame to do the filter on
+     * @param chs Number of channels in the hyperstack
+     * @param slices Number of slices in the hyperstack
+     * @param radx Radius of filter in x
+     * @param rady Radius of filter in y
+     * @param radz Radis of filter in z
+     * @param zmin
+     * @param zmax
+     * @param filter
+     */
+    public void filter3D(ImageStack out, int channel, int frame, int chs, int slices, float radx, float rady, float radz, int zmin, int zmax, int filter) {
         int[] ker = this.createKernelEllipsoid(radx, rady, radz);
         int nb = 0;
-        int slices=stack.getSize();
-        if(imp!=null)slices=imp.getNSlices();
+        if(slices==0)slices=stack.getSize();
         for (int i=0; i<ker.length; i++)
             nb += ker[i];
         if (zmin<0)
@@ -295,10 +309,10 @@ public class StackProcessor {
         double value;
         for (int z=zmin; z<zmax; z++) {
             if (zmin==0) IJ.showProgress(z+1, zmax);
-        	int z2 = ((imp==null)? z : imp.getStackIndex(ch, z+1, fr));
+        	int z2 = channel-1+(chs*(z))+(chs*slices*(frame-1));
             for (int y=0; y<sizey; y++) {
                 for (int x=0; x<sizex; x++) {
-                    ArrayUtil tab = getNeighborhood(imp, ch, fr, ker, nb, x, y, z, radx, rady, radz);
+                    ArrayUtil tab = getNeighborhood(channel, frame, chs, slices, ker, nb, x, y, z, radx, rady, radz);
                     switch (filter) {
 						case FILTER_MEAN:
 							out.setVoxel(x, y, z2, tab.getMean()); break;
@@ -323,20 +337,6 @@ public class StackProcessor {
         } //z
     }
 
-    /*
-    private ArrayUtil getNeighborhood(int[] ker, int nbval, int x, int y, int z, float radx, float rady, float radz) {
-        int vx = (int)Math.ceil(radx);
-        int vy = (int)Math.ceil(rady);
-        int vz = (int)Math.ceil(radz);
-        int x0=x-vx, y0=y-vy, z0=z-vz;
-        int w=vx*2, h=vy*2, d=vz*2;
-		if (x0<0 || x0+w>stack.getWidth() || y0<0 || y0+h>stack.getHeight() || z0<0 || z0+d>stack.size())
-			return getEdgeNeighborhood(ker, nbval, x, y, z, radx, rady, radz);
-        voxels = stack.getVoxels(x0, y0, z0, w, h, d, voxels);
-		return new ArrayUtil(voxels);
-    }
-    */
-
     /**
      * Gets the neighboring attribute of the Image3D with a kernel as a array
      * adapted for hyperstack.  For a hyperstack, include imp, ch and fr.
@@ -345,6 +345,8 @@ public class StackProcessor {
      * @param imp include the ImagePlus
      * @param ch channel of the hyperstack (1-based)
      * @param fr frame of the hyperstack (1-based)
+     * @param chs Number of channels in the hyperstack
+     * @param slices number of slices of the hyperstack
      * @param ker The kernel array (>0 ok)
      * @param nbval The number of non-zero values
      * @param x Coordinate x of the pixel
@@ -355,7 +357,7 @@ public class StackProcessor {
      * @param rady Radius z of the neighboring
      * @return The values of the nieghbor pixels inside an array
      */
-    private ArrayUtil getNeighborhood(ImagePlus imp, int ch, int fr, int[] ker, int nbval, int x, int y, int z, float radx, float rady, float radz) {
+    private ArrayUtil getNeighborhood(int channel, int frame, int chs, int slices, int[] ker, int nbval, int x, int y, int z, float radx, float rady, float radz) {
         ArrayUtil pix = new ArrayUtil(nbval);
         int vx = (int) Math.ceil(radx);
         int vy = (int) Math.ceil(rady);
@@ -365,9 +367,9 @@ public class StackProcessor {
         int sizex = stack.getWidth();
         int sizey = stack.getHeight();
         int sizez = stack.size();
-        if(imp!=null) sizez=imp.getNSlices();
+        if(slices>1) sizez=slices;
         for (int k = z - vz; k <= z + vz; k++) {
-			int khs=imp==null?k:imp.getStackIndex(ch, k+1, fr);
+			int khs= channel-1 + (chs * k) + (chs * slices * (frame-1));
             for (int j = y - vy; j <= y + vy; j++) {
                 for (int i = x - vx; i <= x + vx; i++) {
 					if (ker[c]>0 && i>=0 && j>=0 && k>=0 && i<sizex && j<sizey && k<sizez) {

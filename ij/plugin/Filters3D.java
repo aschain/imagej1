@@ -14,6 +14,7 @@ public class Filters3D implements PlugIn {
     public final static int MEAN=10, MEDIAN=11, MIN=12, MAX=13, VAR=14, MAXLOCAL=15;
 	private static float xradius = 2, yradius = 2, zradius = 2;
 	private static boolean doAllFrms=true;
+	private static boolean doAllChs=true;
 
 	public void run(String arg) {
 		String name = null;
@@ -53,6 +54,7 @@ public class Filters3D implements PlugIn {
 		gd.addNumericField("X radius:", xradius, 1);
 		gd.addNumericField("Y radius:", yradius, 1);
 		gd.addNumericField("Z radius:", zradius, 1);
+		if(imp.getNChannels()>1)gd.addCheckbox("Run on all channels?", doAllChs);
 		if(imp.getNFrames()>1)gd.addCheckbox("Run on all frames?", doAllFrms);
 		gd.showDialog();
 		if (gd.wasCanceled()) {
@@ -61,26 +63,38 @@ public class Filters3D implements PlugIn {
 		xradius = (float) gd.getNextNumber();
 		yradius = (float) gd.getNextNumber();
 		zradius = (float) gd.getNextNumber();
+		if(imp.getNChannels()>1)doAllChs=gd.getNextBoolean();
 		if(imp.getNFrames()>1)doAllFrms=gd.getNextBoolean();
 		return true;
 	}
 
 	private void run(ImagePlus imp, int filter, float radX, float radY, float radZ) {
-		if (imp.isHyperStack()) {
-			filterHyperstack(imp, filter, radX, radY, radZ);
-			return;
-		}
-		ImageStack res = filter(imp.getStack(), filter, radX, radY, radZ);
+		ImageStack res = filter(imp.getStack(), imp.getC(), imp.getT(), imp.getNChannels(), imp.getNSlices(), filter, radX, radY, radZ);
 		imp.setStack(res);
 	}
-	
+
 	public static ImageStack filter(ImageStack stackorig, int filter, float vx, float vy, float vz) {
+		return filter(stackorig, 1, 1, 1, stackorig.size(), filter, vx, vy, vz);
+	}
 	
-		if (stackorig.getBitDepth()==24)
-			return filterRGB(stackorig, filter, vx, vy, vz);
+	/**
+	 * Original functionality was for a single stack, so if imp is not provided, then
+	 * assume a non-hyperstack.
+	 * 
+	 * @param imp Required if a hyperstack, otherwise null is ok
+	 * @param stack ImageStack
+	 * @param filter
+	 * @param vx
+	 * @param vy
+	 * @param vz
+	 * @return
+	 */
+	public static ImageStack filter(final ImageStack stack, final int channel, final int frame, final int chs, final int slices, final int filter, float vx, float vy, float vz) {
+	
+		if (stack.getBitDepth()==24)
+			return filterRGB(frame, slices, stack, filter, vx, vy, vz);
 
 		// get stack info
-		final ImageStack stack = stackorig;
 		final float voisx = vx;
 		final float voisy = vy;
 		final float voisz = vz;
@@ -93,71 +107,51 @@ public class Filters3D implements PlugIn {
 			if (filter==VAR)
 				res = ImageStack.create(width, height, depth, 32);
 			else
-				res = ImageStack.create(width, height, depth, stackorig.getBitDepth());
+				res = ImageStack.create(width, height, depth, stack.getBitDepth());
 			IJ.showStatus("3D filtering...");
 			// PARALLEL 
 			final ImageStack out = res;
 			final AtomicInteger ai = new AtomicInteger(0);
 			final int n_cpus = Prefs.getThreads();
 
-			final int f = filter;
 			final int dec = (int) Math.ceil((double) stack.size() / (double) n_cpus);
-			Thread[] threads = ThreadUtil.createThreadArray(n_cpus);
-			for (int ithread = 0; ithread < threads.length; ithread++) {
-				threads[ithread] = new Thread() {
-					public void run() {
-						StackProcessor processor = new StackProcessor(stack);
-						for (int k = ai.getAndIncrement(); k < n_cpus; k = ai.getAndIncrement()) {
-							processor.filter3D(out, voisx, voisy, voisz, dec * k, dec * (k + 1), f);
+			for(int fr=0; fr< (depth/slices/chs); fr++) {
+				for(int ch=0; ch<chs; ch++) {
+					IJ.log("doaf:"+doAllFrms+" doac:"+doAllChs+" ch"+ch+" fr"+fr);
+					if( (doAllFrms || fr==(frame-1)) && (doAllChs || ch==(channel-1))) {
+						final int chf=ch;
+						final int frf=fr;
+						Thread[] threads = ThreadUtil.createThreadArray(n_cpus);
+						for (int ithread = 0; ithread < threads.length; ithread++) {
+							threads[ithread] = new Thread() {
+								public void run() {
+									StackProcessor processor = new StackProcessor(stack);
+									for (int k = ai.getAndIncrement(); k < n_cpus; k = ai.getAndIncrement()) {
+										processor.filter3D(out, chf+1, frf+1, chs, slices, voisx, voisy, voisz, dec * k, dec * (k + 1), filter);
+									}
+								}
+							};
+						}
+						ThreadUtil.startAndJoin(threads);
+					}else {
+						for(int sl=0;sl<slices;sl++) {
+							int index=1+ch+(chs*sl)+(chs*slices*fr);
+							out.setProcessor(stack.getProcessor(index),index);
+							out.setSliceLabel(stack.getSliceLabel(index), index);
 						}
 					}
-				};
+				}
 			}
-			ThreadUtil.startAndJoin(threads);
+			
 		}
 		return res;
 	}
-	
-	private static void filterHyperstack(ImagePlus imp, int filter, float vx, float vy, float vz) {
-		//if (imp.getNDimensions()>4) {
-		//	IJ.error("5D hyperstacks are currently not supported");
-		//	return;
-		//}
-		int frms=imp.getNFrames(), chs=imp.getNChannels(), sls=imp.getNSlices(), firstfr=0, lastfr=frms;
-		if(!doAllFrms) {firstfr=imp.getT()-1; lastfr=imp.getT();}
-		for(int fr=firstfr;fr<lastfr;fr++) {
-			ImagePlus curimp=imp;
-			imp.setT(fr+1);
-			if(frms>1) {
-				Duplicator dup=new Duplicator();
-				curimp=dup.run(imp, 1, chs, 1, sls, fr+1, fr+1);
-			}
-			if (imp.getNChannels()==1) {
-				ImageStack stack = filter(curimp.getStack(), filter, vx, vy, vz);
-				curimp.setStack(stack);
-				return;
-			}
-	        ImagePlus[] channels = ChannelSplitter.split(curimp);
-	        int n = channels.length;
-	        for (int i=0; i<n; i++) {
-				ImageStack stack = filter(channels[i].getStack(), filter, vx, vy, vz);
-				channels[i].setStack(stack);
-			}
-			curimp.setImage(RGBStackMerge.mergeChannels(channels, false));
-			if(frms>1) {
-				for(int sl=0;sl<sls;sl++)
-					for(int c=1;c<=chs;c++)
-						imp.getStack().setProcessor(curimp.getStack().getProcessor(sl*chs+c), sl*chs+c+fr*sls*chs);
-			}
-		}
-		
-	}
 
-	private static ImageStack filterRGB(ImageStack rgb_in, int filter, float vx, float vy, float vz) {
+	private static ImageStack filterRGB(int frame, int slices, ImageStack rgb_in, int filter, float vx, float vy, float vz) {
         ImageStack[] channels = ChannelSplitter.splitRGB(rgb_in, false);
-		ImageStack red = filter(channels[0], filter, vx, vy, vz);
-		ImageStack green = filter(channels[1], filter, vx, vy, vz);
-		ImageStack blue = filter(channels[2], filter, vx, vy, vz);
+		ImageStack red = filter(channels[0], 1, frame, 1, slices, filter, vx, vy, vz);
+		ImageStack green = filter(channels[1], 1, frame, 1, slices, filter, vx, vy, vz);
+		ImageStack blue = filter(channels[2], 1, frame, 1, slices, filter, vx, vy, vz);
         return RGBStackMerge.mergeStacks(red, green, blue, false);
 	}
 
