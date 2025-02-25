@@ -276,65 +276,74 @@ public class StackProcessor {
      * @param filter
      */
     public void filter3D(ImageStack out, float radx, float rady, float radz, int zmin, int zmax, int filter) {
-    	filter3D(out, 1, 1, 1, stack.getSize(), radx, rady, radz, zmin, zmax, filter);
+    	filter3D(out, 1, stack.getSize(), radx, rady, radz, 0, 1, zmin, zmax, 0, 1, filter);
     }
     
     /**
      * filter3d with added channel, frame, chs, and slices info for hyperstack 
      * 
-     * @param out
-     * @param imp ImagePlus to get the Stack Index
-     * @param channel Channel to do the filter on
-     * @param frame Frame to do the filter on
-     * @param chs Number of channels in the hyperstack
-     * @param slices Number of slices in the hyperstack
+     * @param out ImageStack output
+     * @param nChs Number of channels in the hyperstack
+     * @param nSlices Number of slices in the hyperstack
      * @param radx Radius of filter in x
      * @param rady Radius of filter in y
      * @param radz Radis of filter in z
-     * @param zmin
-     * @param zmax
+     * @param cmin start channel (0-based)
+     * @param cmax end channel (0-based)
+     * @param zmin start slice (0-based)
+     * @param zmax end slice (0-based)
+     * @param tmin start frame (0-based)
+     * @param tmax end frame (0-based)
      * @param filter
      */
-    public void filter3D(ImageStack out, int channel, int frame, int chs, int slices, float radx, float rady, float radz, int zmin, int zmax, int filter) {
+    public void filter3D(ImageStack out, int nChs, int nSlices, float radx, float rady, float radz, int cmin, int cmax, int zmin, int zmax, int tmin, int tmax, int filter) {
         int[] ker = this.createKernelEllipsoid(radx, rady, radz);
         int nb = 0;
         for (int i=0; i<ker.length; i++)
             nb += ker[i];
-        if (zmin<0)
-            zmin = 0;
-        if (zmax>slices)
-            zmax = slices;
+        if(nSlices>stack.getSize())nSlices=stack.getSize();
+        if (zmin<0) zmin = 0;
+        if (zmax>nSlices) zmax = nSlices;
+        if (cmin<0) cmin=0;
+        if (cmax>nChs) cmax=nChs;
+        if (tmin<0) tmin=0;
+        if(tmax>(stack.getSize()/nChs/nSlices))tmax=stack.getSize()/nChs/nSlices;
         int sizex = stack.getWidth();
         int sizey = stack.getHeight();
         double value;
-        for (int z=zmin; z<zmax; z++) {
-            if (zmin==0) IJ.showProgress(z+1, zmax);
-        	int z2 = channel-1+(chs*(z))+(chs*slices*(frame-1));
-            for (int y=0; y<sizey; y++) {
-                for (int x=0; x<sizex; x++) {
-                    ArrayUtil tab = getNeighborhood(channel, frame, chs, slices, ker, nb, x, y, z, radx, rady, radz);
-                    switch (filter) {
-						case FILTER_MEAN:
-							out.setVoxel(x, y, z2, tab.getMean()); break;
-						case FILTER_MEDIAN:
-							out.setVoxel(x, y, z2, tab.medianSort()); break;
-						case FILTER_MIN:
-							out.setVoxel(x, y, z2, tab.getMinimum()); break;
-						case FILTER_MAX:
-							out.setVoxel(x, y, z2, tab.getMaximum()); break;
-						case FILTER_VAR:
-							out.setVoxel(x, y, z2, tab.getVariance()); break;
-						case FILTER_MAXLOCAL:
-							value = stack.getVoxel(x, y, z2);
-							if (tab.isMaximum(value))
-								out.setVoxel(x, y, z2, value);
-							else
-								out.setVoxel(x, y, z2, 0);
-							break;
-                    } //switch
-                }  //x
-            } //y
-        } //z
+        
+        for (int t=tmin; t<tmax; t++) {
+        	for (int c=cmin; c<cmax; c++) {
+		        for (int z=zmin; z<zmax; z++) {
+		            if (zmin==0) IJ.showProgress(z+1, zmax);
+		        	int sliceIndex = c+(nChs*z)+(nChs*nSlices*t);
+		            for (int y=0; y<sizey; y++) {
+		                for (int x=0; x<sizex; x++) {
+		                    ArrayUtil tab = getNeighborhood(c, t, nChs, nSlices, ker, nb, x, y, z, radx, rady, radz);
+		                    switch (filter) {
+								case FILTER_MEAN:
+									out.setVoxel(x, y, sliceIndex, tab.getMean()); break;
+								case FILTER_MEDIAN:
+									out.setVoxel(x, y, sliceIndex, tab.medianSort()); break;
+								case FILTER_MIN:
+									out.setVoxel(x, y, sliceIndex, tab.getMinimum()); break;
+								case FILTER_MAX:
+									out.setVoxel(x, y, sliceIndex, tab.getMaximum()); break;
+								case FILTER_VAR:
+									out.setVoxel(x, y, sliceIndex, tab.getVariance()); break;
+								case FILTER_MAXLOCAL:
+									value = stack.getVoxel(x, y, sliceIndex);
+									if (tab.isMaximum(value))
+										out.setVoxel(x, y, sliceIndex, value);
+									else
+										out.setVoxel(x, y, sliceIndex, 0);
+									break;
+		                    } //switch
+		                }  //x
+		            } //y
+		        } //z
+        	}
+        }
     }
 
     /**
@@ -343,10 +352,10 @@ public class StackProcessor {
      * ch and fr are 1-based
      *
      * @param imp include the ImagePlus
-     * @param ch channel of the hyperstack (1-based)
-     * @param fr frame of the hyperstack (1-based)
-     * @param chs Number of channels in the hyperstack
-     * @param slices number of slices of the hyperstack
+     * @param ch channel of the hyperstack (0-based)
+     * @param fr frame of the hyperstack (0-based)
+     * @param nChs Number of channels in the hyperstack
+     * @param nSlices number of slices of the hyperstack
      * @param ker The kernel array (>0 ok)
      * @param nbval The number of non-zero values
      * @param x Coordinate x of the pixel
@@ -357,7 +366,7 @@ public class StackProcessor {
      * @param rady Radius z of the neighboring
      * @return The values of the nieghbor pixels inside an array
      */
-    private ArrayUtil getNeighborhood(int channel, int frame, int chs, int slices, int[] ker, int nbval, int x, int y, int z, float radx, float rady, float radz) {
+    private ArrayUtil getNeighborhood(int ch, int fr, int nChs, int nSlices, int[] ker, int nbval, int x, int y, int z, float radx, float rady, float radz) {
         ArrayUtil pix = new ArrayUtil(nbval);
         int vx = (int) Math.ceil(radx);
         int vy = (int) Math.ceil(rady);
@@ -366,9 +375,9 @@ public class StackProcessor {
         int c = 0;
         int sizex = stack.getWidth();
         int sizey = stack.getHeight();
-        int sizez = slices;
+        int sizez = nSlices;
         for (int k = z - vz; k <= z + vz; k++) {
-			int khs= channel-1 + (chs * k) + (chs * slices * (frame-1));
+			int khs= ch + (nChs * k) + (nChs * nSlices * fr);
             for (int j = y - vy; j <= y + vy; j++) {
                 for (int i = x - vx; i <= x + vx; i++) {
 					if (ker[c]>0 && i>=0 && j>=0 && k>=0 && i<sizex && j<sizey && k<sizez) {
