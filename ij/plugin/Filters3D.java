@@ -89,15 +89,13 @@ public class Filters3D implements PlugIn {
 	 * @param vz
 	 * @return
 	 */
-	public static ImageStack filter(final ImageStack stack, final int channel, final int frame, final int chs, final int slices, final int filter, float vx, float vy, float vz) {
+	public static ImageStack filter(final ImageStack stack, final int channel, final int frame, final int chs, final int slices, 
+									final int filter, final float vx, final float vy, final float vz) {
 	
 		if (stack.getBitDepth()==24)
 			return filterRGB(frame, slices, stack, filter, vx, vy, vz);
 
 		// get stack info
-		final float voisx = vx;
-		final float voisy = vy;
-		final float voisz = vz;
 		final int width= stack.getWidth();
 		final int height= stack.getHeight();
 		final int depth= stack.size();
@@ -117,17 +115,17 @@ public class Filters3D implements PlugIn {
 			final int dec = (int) Math.ceil((double) stack.size() / (double) n_cpus);
 			for(int fr=0; fr< (depth/slices/chs); fr++) {
 				for(int ch=0; ch<chs; ch++) {
-					IJ.log("doaf:"+doAllFrms+" doac:"+doAllChs+" ch"+ch+" fr"+fr);
 					if( (doAllFrms || fr==(frame-1)) && (doAllChs || ch==(channel-1))) {
 						final int chf=ch;
 						final int frf=fr;
+						ai.set(0);
 						Thread[] threads = ThreadUtil.createThreadArray(n_cpus);
 						for (int ithread = 0; ithread < threads.length; ithread++) {
 							threads[ithread] = new Thread() {
 								public void run() {
 									StackProcessor processor = new StackProcessor(stack);
 									for (int k = ai.getAndIncrement(); k < n_cpus; k = ai.getAndIncrement()) {
-										processor.filter3D(out, chf+1, frf+1, chs, slices, voisx, voisy, voisz, dec * k, dec * (k + 1), filter);
+										processor.filter3D(out, chf+1, frf+1, chs, slices, vx, vy, vz, dec * k, dec * (k + 1), filter);
 									}
 								}
 							};

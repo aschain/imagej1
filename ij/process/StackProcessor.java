@@ -297,7 +297,6 @@ public class StackProcessor {
     public void filter3D(ImageStack out, int channel, int frame, int chs, int slices, float radx, float rady, float radz, int zmin, int zmax, int filter) {
         int[] ker = this.createKernelEllipsoid(radx, rady, radz);
         int nb = 0;
-        if(slices==0)slices=stack.getSize();
         for (int i=0; i<ker.length; i++)
             nb += ker[i];
         if (zmin<0)
@@ -366,8 +365,7 @@ public class StackProcessor {
         int c = 0;
         int sizex = stack.getWidth();
         int sizey = stack.getHeight();
-        int sizez = stack.size();
-        if(slices>1) sizez=slices;
+        int sizez = slices;
         for (int k = z - vz; k <= z + vz; k++) {
 			int khs= channel-1 + (chs * k) + (chs * slices * (frame-1));
             for (int j = y - vy; j <= y + vy; j++) {
