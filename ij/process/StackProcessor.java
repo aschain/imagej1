@@ -280,6 +280,7 @@ public class StackProcessor {
     }
     
     /**
+     * filter3d with added channel, frame, chs, and slices info for hyperstack 
      * 
      * @param out
      * @param imp ImagePlus to get the Stack Index

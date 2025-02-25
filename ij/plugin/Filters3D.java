@@ -45,7 +45,10 @@ public class Filters3D implements PlugIn {
 			return;
 		imp.startTiming();
 		run(imp, filter, xradius, yradius, zradius);
-		IJ.showTime(imp, imp.getStartTime(), "", imp.getStackSize());
+		int nProcessedSlices=imp.getStackSize();
+		if(!doAllChs)nProcessedSlices/=imp.getNChannels();
+		if(!doAllFrms)nProcessedSlices/=imp.getNFrames();
+		IJ.showTime(imp, imp.getStartTime(), "", nProcessedSlices);
 	}
 
 	private boolean showDialog(String name) {
@@ -54,8 +57,8 @@ public class Filters3D implements PlugIn {
 		gd.addNumericField("X radius:", xradius, 1);
 		gd.addNumericField("Y radius:", yradius, 1);
 		gd.addNumericField("Z radius:", zradius, 1);
-		if(imp.getNChannels()>1)gd.addCheckbox("Run on all channels?", doAllChs);
-		if(imp.getNFrames()>1)gd.addCheckbox("Run on all frames?", doAllFrms);
+		if(imp.getNChannels()>1)gd.addCheckbox("SingleChannel: run current channel only?", !doAllChs);
+		if(imp.getNFrames()>1)gd.addCheckbox("SingleFrame: run on current frame only?", !doAllFrms);
 		gd.showDialog();
 		if (gd.wasCanceled()) {
 			return false;
@@ -63,8 +66,8 @@ public class Filters3D implements PlugIn {
 		xradius = (float) gd.getNextNumber();
 		yradius = (float) gd.getNextNumber();
 		zradius = (float) gd.getNextNumber();
-		if(imp.getNChannels()>1)doAllChs=gd.getNextBoolean();
-		if(imp.getNFrames()>1)doAllFrms=gd.getNextBoolean();
+		if(imp.getNChannels()>1)doAllChs=!gd.getNextBoolean();
+		if(imp.getNFrames()>1)doAllFrms=!gd.getNextBoolean();
 		return true;
 	}
 
