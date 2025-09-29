@@ -5,19 +5,38 @@
 </head>
 <body>
 
-
-<li> <u>1.54q14  12 April 2025</u>
+<li> <u>1.54r 25 September 2025</u>
 <ul>
+<li> The <i>File&gt;New&gt;Text Window</i> command now
+records as
+<i>showText("Untitled.txt", "")</i>.
+<li>Fixed several bugs with displaying and positioning
+point selections in the ROI Manager and in overlays.
+<li> Thanks to Matthieu Vermeren, fixed bug where Fit Spline
+fails with ROIs in ROI Manager or overlays
+(<a href="http://wsr.imagej.net/macros/bugs/FitSpline.ijm">example</a>).
+<li> Thanks to Norbert Vischer, fixed bug where the particle analyzer
+failed after "Select All".
+</ul>
+
+<li> <u>1.54q 2 September 2025</u>
+<ul>
+<li> Thanks to 'AFMiJ', updated <i>Image&gt;Adjust&gt;Brightness/Contrast</i>
+to show the image histogram with the LUT colors of the image
+(<a href="https://github.com/imagej/ImageJ/issues/281#issuecomment-3219377578">Github</a>).
 <li> Thanks to 'aschain', the 3D filters in the <i>Process&gt;Filters</i>
 menu now work with hyperstacks.
 <li> Thanks to Michael Schmid, added 'auto' checkboxes to the
 <i>Image&gt;Hyperstacks&gt;Stack to Hyperstack</i> dialog for
 calculating one of the fields.
 <li> Thanks to Jerome Mutterer, added the Array.applyMacro() macro
-function. DOC
+function
+(<a href="http://wsr.imagej.net/macros/examples/ArrayApplyMacroDemo.ijm">example</a>).
 <li> Removed the particle analyzers's "Record starts" option because
 it caused a NullPointerException when running in Fiji headless
 mode.
+<li> Thanks to Michael Schmid, histogram plots now show pixel values
+occurring once (count=1) in log mode.
 <li> Thanks to Michael Schmid, fixed bug where <i>Image&gt;Stacks&gt;Label</i>
 produces a NullPointerException in "overlay" mode when previewing
 and the current stack slice is not the first one.
@@ -30,16 +49,30 @@ a rotated rectangle on a hyperstack.
 command did not correctly set the dimensions.
 <li> Thanks to Christian Tischer, fixed bug where the ChanneSplitter.split()
 method failed in Fiji headless mode.
-<li> Thanks to Michael Schmid, fixed bug with opening a 16-bit AVI with
-"Convert to grayscale" causing an ArrayIndexOutOfBoundsException.
-<li> Thanks to Michael Schmid, fixed 1.54m9 <i>Analyze&gt;Plot Profile</i>
-regression where ImageProcessor.getLine() did not sample the
-correct points.
+<li> Thanks to Michael Schmid, fixed bug with opening an uncompressed
+16-bit AVI with "Convert to grayscale" causing an
+ArrayIndexOutOfBoundsException.
+<li> Thanks to 'scouser27', fixed bug with macro recorder not recording points
+for the multi-point tool beyond the first point.
 <li> Thanks to 'AndreC' and 'scouser27' fixed regression that caused point
 selections on hyperstacks to not be correctly added to overlays and the
 ROI Manager.
 <li> Thanks to Michael Schmid, fixed 1.54k regression with saving and
 opening point ROIs.
+<li> Fixed 1.54q2 regression where multi-point selections
+lost their point positions when added to the ROI Manager.
+<li> Fixed 1.53 regression where the AVI Reader did not open all
+frames when the "Use virtual stack" option was not enabled.
+<li> Thanks to Michael Daube, fixed 1.54 regression where the
+Roi.getZPosition() method did not work as expected with
+PointRois.
+</ul>
+
+<li> <u>1.54p  17 February 2025</u>
+<ul>
+<li> Thanks to Michael Schmid, fixed 1.54m9 <i>Analyze&gt;Plot Profile</i>
+regression where ImageProcessor.getLine() did not sample the
+correct points
 </ul>
 
 <li> <u>1.54n  17 February 2025</u>

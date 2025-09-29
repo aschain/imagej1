@@ -57,7 +57,6 @@ public class PointRoi extends PolygonRoi {
 	private int nMarkers;
 	private boolean addToOverlay;
 	public static PointRoi savedPoints;
-	private boolean positionSet;
 
 	static {
 		setDefaultType((int)Prefs.get(TYPE_KEY, HYBRID));
@@ -143,15 +142,21 @@ public class PointRoi extends PolygonRoi {
 		setCounter(Toolbar.getMultiPointMode()?defaultCounter:0);
 		incrementCounter(imp);
 		enlargeArrays(50);
-		if (IJ.recording()) {
-			String add = Prefs.pointAddToOverlay?" add":"";
-			String options = sizes[convertSizeToIndex(size)]+" "+Colors.colorToString(getColor())+" "+types[type]+add;
-			options = options.toLowerCase();
-			if (Recorder.scriptMode())
-				Recorder.recordCall("imp.setRoi(new PointRoi("+x+","+y+",\""+options+"\"));");
-			else
-				Recorder.record("makePoint", x, y, options);
-		}
+		record(x, y, false);
+	}
+	
+	private void record(int xx, int yy, boolean addingPoint) {
+		if (!IJ.recording())
+			return;
+		String add = Prefs.pointAddToOverlay?" add":"";
+		String options = sizes[convertSizeToIndex(size)]+" "+Colors.colorToString(getColor())+" "+types[type]+add;
+		options = options.toLowerCase();
+		if (addingPoint)
+			options = "add";
+		if (Recorder.scriptMode())
+			Recorder.recordCall("imp.setRoi(new PointRoi("+xx+","+yy+",\""+options+"\"));");
+		else
+			Recorder.record("makePoint", xx, yy, options);
 	}
 
 	public void setOptions(String options) {
@@ -213,7 +218,6 @@ public class PointRoi extends PolygonRoi {
 			double scale = size>=XXL?2:1.5;
 			fontSize += scale*convertSizeToIndex(size);
 			fontSize = (int)Math.round(fontSize);
-			//IJ.log("fontSize: "+fontSize+" "+scale);
 			font = new Font("SansSerif", Font.PLAIN, fontSize);
 			g.setFont(font);
 			if (fontSize>9)
@@ -226,9 +230,7 @@ public class PointRoi extends PolygonRoi {
 			slice = 0;  // In RoiManager's "show all" mode and not "associate with slice", draw point irrespective of currently selected slice
 		if (Prefs.showAllPoints)
 			slice = 0;  // "Show on all slices" in Point tool options 
-		//IJ.log("draw: "+positions+" "+imp.getCurrentSlice());
 		for (int i=0; i<nPoints; i++) {
-			//IJ.log(i+" "+slice+" "+(positions!=null?positions[i]:-1)+"  "+getPosition());
 			if (slice==0 || (positions!=null&&(slice==positions[i]||positions[i]==0)))
 				drawPoint(g, xp2[i], yp2[i], i+1);
 		}
@@ -351,6 +353,7 @@ public class PointRoi extends PolygonRoi {
 	public void addUserPoint(ImagePlus imp, double ox, double oy) {
 		addPoint(imp, ox, oy);
 		nMarkers++;
+		record((int)Math.round(ox),(int)Math.round(oy), true);
 	}
 
 	private void addPoint2(ImagePlus imp, double ox, double oy) {
@@ -399,7 +402,6 @@ public class PointRoi extends PolygonRoi {
 	}
 
 	private synchronized void incrementCounter(ImagePlus imp) {
-		//IJ.log("incrementCounter: "+nPoints+" "+counter+" "+(counters!=null?""+counters.length:"null"));
 		counts[counter]++;
 		boolean isStack = imp!=null && imp.getStackSize()>1;
 		if (counter!=0 || isStack || counters!=null) {
@@ -419,9 +421,7 @@ public class PointRoi extends PolygonRoi {
 			}
 			counters[nPoints-1] = (short)counter;
 			if (imp!=null)
-					positions[nPoints-1] = imp.getStackSize()>1 ? imp.getCurrentSlice() : 0;
-			//if (positions[nPoints-1]==0 || positions[nPoints-1]==1 || counters[nPoints-1]==0)
-			//IJ.log("incrementCounter: "+nPoints+" "+counters.length+" "+counters[nPoints-1]+"   "+positions[nPoints-1]+" "+imp);
+				positions[nPoints-1] = imp.getStackSize()>1 ? imp.getCurrentSlice() : 0;
 		}
 		if (rt!=null && WindowManager.getFrame(getCountsTitle())!=null)
 			displayCounts();
@@ -679,7 +679,6 @@ public class PointRoi extends PolygonRoi {
 			for (int i=0; i<n; i++) {
 				int counter = counters[i]&0xff;
 				int position = counters[i]>>8;
-				//IJ.log(i+" cnt="+counter+" slice="+position);
 				this.counters[i] = (short)counter;
 				this.positions[i] = position;
 				if (counter<counts.length && counter>nCounters-1)
@@ -726,25 +725,28 @@ public class PointRoi extends PolygonRoi {
 			if (n != POINTWISE_POSITION)
 				Arrays.fill(positions, n);
 		}
-		hyperstackPosition = false;
-		positionSet = true;
+		super.setPosition(nPoints>1?0:n);
 	}
-
+	
 	/** Returns the stack position (image number) of the points in this Roi, if
 	 *  all points have the same position. Returns 0 if none of the points is
 	 *  associated with a particular stack image, and PointRoi.POINTWISE_POSITION = -2
 	 *  if there are different stack positions for different points.
 	 */
 	public int getPosition() {
-		if (positions==null || nPoints<1 || !positionSet)
-			return 0;
+		int position = 0;
+		if (positions==null || nPoints<1)
+			position = 0;
+		else if (nPoints==1)
+			return super.getPosition();
 		else {
-			int position = positions[0];
-			for (int i=1; i<nPoints; i++)
+			position = positions[0];
+			for (int i=1; i<nPoints; i++) {
 				if (positions[i] != position)
-					return POINTWISE_POSITION;
-			return position;
+					position = POINTWISE_POSITION;
+			}
 		}
+		return position;
 	}
 
 	/** Returns the stack slice of the point with the given index, or 0 if no slice defined for this point */
@@ -1031,9 +1033,9 @@ public class PointRoi extends PolygonRoi {
 
 	public String toString() {
 		if (nPoints>1)
-			return ("Roi[Points, count="+nPoints+", pos="+getPositionAsString()+"]");
+			return ("Roi[Points, count="+nPoints+", pos="+getPositionAsString()+", psize="+size+"]");
 		else
-			return ("Roi[Point, x="+x+", y="+y+", pos="+getPositionAsString()+"]");
+			return ("Roi[Point, x="+x+", y="+y+", pos="+getPositionAsString()+", psize="+size+"]");
 	}
 
 	/** @deprecated */
