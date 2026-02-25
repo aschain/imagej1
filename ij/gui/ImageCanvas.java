@@ -1,7 +1,6 @@
 package ij.gui;
 
 import java.awt.*;
-import java.util.Properties;
 import java.awt.image.*;
 import ij.process.*;
 import ij.measure.*;
@@ -1121,6 +1120,12 @@ public class ImageCanvas extends Canvas implements MouseListener, MouseMotionLis
 		flags = e.getModifiers();		
 		if (toolID!=Toolbar.MAGNIFIER && (e.isPopupTrigger()||(!IJ.isMacintosh()&&(flags&Event.META_MASK)!=0))) {
 			handlePopupMenu(e);
+			return;
+		}
+
+		if(e.getButton()>3) {
+			if(e.getButton()==5) IJ.run(imp, "Next Slice [>]", "");
+			else if(e.getButton()==4) IJ.run(imp, "Previous Slice [<]", "");
 			return;
 		}
 
