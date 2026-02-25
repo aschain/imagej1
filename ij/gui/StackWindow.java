@@ -171,7 +171,7 @@ public class StackWindow extends ImageWindow implements Runnable, AdjustmentList
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		synchronized(this) {
 			int rotation = e.getWheelRotation();
-			boolean ctrl = (e.getModifiers()&Event.CTRL_MASK)!=0;
+			boolean ctrl = (e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK)!=0;
 			if (hyperStack) // ctrl+scroll wheel adjusts hyperstack slice positions
 				ctrl = false;
 			if ((ctrl||IJ.shiftKeyDown()) && ic!=null) {
@@ -187,10 +187,17 @@ public class StackWindow extends ImageWindow implements Runnable, AdjustmentList
 			if (!Prefs.mouseWheelStackScrolling)
 				return;
 			if (hyperStack) {
+				boolean doshiftdown=false;
+				if((e.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK)!=0)doshiftdown=true;
+				if(doshiftdown) {
+					IJ.setKeyDown(KeyEvent.VK_CONTROL);
+					IJ.setKeyUp(KeyEvent.VK_SHIFT);
+				}
 				if (rotation>0)
 					IJ.run(imp, "Next Slice [>]", "");
 				else if (rotation<0)
 					IJ.run(imp, "Previous Slice [<]", "");
+				if(doshiftdown) IJ.setKeyUp(KeyEvent.VK_CONTROL);
 			} else {
 				int csl = imp.getCurrentSlice();
 				int slice = csl + rotation;
