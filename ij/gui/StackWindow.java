@@ -187,17 +187,14 @@ public class StackWindow extends ImageWindow implements Runnable, AdjustmentList
 			if (!Prefs.mouseWheelStackScrolling)
 				return;
 			if (hyperStack) {
-				boolean doshiftdown=false;
-				if((e.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK)!=0)doshiftdown=true;
-				if(doshiftdown) {
-					IJ.setKeyDown(KeyEvent.VK_CONTROL);
-					IJ.setKeyUp(KeyEvent.VK_SHIFT);
-				}
+				// horizontal scroll wheel on mice will deliver a scrollwheel event with the shift mask
+				boolean isHorizontalScroll=((e.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK)!=0);
+				if(isHorizontalScroll) IJ.setKeyDown(KeyEvent.VK_CONTROL);
 				if (rotation>0)
 					IJ.run(imp, "Next Slice [>]", "");
 				else if (rotation<0)
 					IJ.run(imp, "Previous Slice [<]", "");
-				if(doshiftdown) IJ.setKeyUp(KeyEvent.VK_CONTROL);
+				if(isHorizontalScroll) IJ.setKeyUp(KeyEvent.VK_CONTROL);
 			} else {
 				int csl = imp.getCurrentSlice();
 				int slice = csl + rotation;

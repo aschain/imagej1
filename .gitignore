@@ -18,3 +18,4 @@
 #github workflow
 /.github/
 /.vscode/
+/.mavenrc
