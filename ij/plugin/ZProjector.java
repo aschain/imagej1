@@ -2,12 +2,7 @@ package ij.plugin;
 import ij.*; 
 import ij.gui.*; 
 import ij.process.*;
-import ij.plugin.filter.*; 
 import ij.plugin.frame.Recorder;
-import ij.measure.Measurements;
-import java.lang.*; 
-import java.awt.*; 
-import java.awt.event.*; 
 import java.util.Arrays;
 
 /** This plugin performs a z-projection of the input stack. Type of
@@ -656,7 +651,6 @@ public class ZProjector implements PlugIn {
 		ImageStack stack = imp.getStack();
 		int w = stack.getWidth();
 		int h = stack.getHeight();
-		int d = stack.getSize();
 		ImagePlus projection = IJ.createImage(makeTitle(), "32-bit Black", w, h, 1);
 		ImageProcessor ip = projection.getProcessor();
 		double[] sum = new double[w*h];
@@ -700,6 +694,7 @@ public class ZProjector implements PlugIn {
     /** Compute average intensity projection. */
     class AverageIntensity extends RayFunction {
      	private float[] fpixels;
+		private double[] dpixels;
  		private int num, len; 
 
 		/** Constructor requires number of slices to be
@@ -708,28 +703,31 @@ public class ZProjector implements PlugIn {
 		public AverageIntensity(FloatProcessor fp, int num) {
 			fpixels = (float[])fp.getPixels();
 			len = fpixels.length;
+			dpixels = new double[len];
 	    	this.num = num;
 		}
 
 		public void projectSlice(byte[] pixels) {
 	    	for(int i=0; i<len; i++)
-				fpixels[i] += (pixels[i]&0xff); 
+				dpixels[i] += (pixels[i]&0xff); 
 		}
 
 		public void projectSlice(short[] pixels) {
 	    	for(int i=0; i<len; i++)
-				fpixels[i] += pixels[i]&0xffff;
+				dpixels[i] += pixels[i]&0xffff;
 		}
 
 		public void projectSlice(float[] pixels) {
 	    	for(int i=0; i<len; i++)
-				fpixels[i] += pixels[i]; 
+				dpixels[i] += pixels[i]; 
 		}
 
 		public void postProcess() {
-			float fnum = num;
-	    	for(int i=0; i<len; i++)
-				fpixels[i] /= fnum;
+			double dnum = num;
+	    	for(int i=0; i<len; i++){
+				dpixels[i] /= dnum;
+				fpixels[i] = (float)dpixels[i];
+			}
 		}
 
     } // end AverageIntensity
