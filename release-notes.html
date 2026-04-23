@@ -5,6 +5,18 @@
 </head>
 <body>
 
+<li> <u>1.54t4 16 April 2026</u>
+<ul>
+<li> The arrow keys, when used to move selections or to zoom in
+and out, now require the control (or command) key when the
+<i>Edit&gt;Options&gt;Misc&gt;Require control key for shortcuts</i>
+option is enabled
+(<a href="http://wsr.imagej.net/macros/js/Asteroids.js">example</a>).
+<li> Thanks to Michael Schmid, fixed bug with the "Sliding paraboloid"
+option of the BackgroundSubtracter that caused an endless loop with
+some images containing NaNs. 
+</ul>
+
 <li> <u>1.54s 26 March 2026</u>
 <ul>
 <li> Thanks to Joris Van Meenen, the <i>Images to Stack</i> command
@@ -22,18 +34,9 @@ not open, and it is now recordable.
 <li> Thanks to Jerome Mutterer, fixed regression that caused
 "Show All" in the ROI Manager to not work as expected with
 composite images.
-<li> Thanks to Michael Schmid, fixed an incorrect slice label order bug 
-and a recording bug with the
-<i>Image&gt;Hyperstack&gt;Stack to Hyperstack</i>
-command.
-<li> Thanks to Michael Schmid, fixed bug with
-ImageStack.setSliceLabel(string,int) not working with
-FileInfoVirtualStacks.
-<li> Thanks to Michael Schmid, fixed bug where TIFF Virtual Stacks
-lost their slice labels when a slice was deleted.
-<li> Thanks to Michael Schmid,fixed several bugs related
-to slice labels of virtual stacks.
-
+<li> Thanks to Michael Schmid, fixed several bugs related to slice labels
+of virtual stacks and a recording bug with the
+<i>Image&gt;Hyperstack&gt;Stack to Hyperstack</i> command.
 </ul>
 
 <li> <u>1.54r 25 September 2025</u>

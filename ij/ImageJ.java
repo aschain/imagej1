@@ -78,8 +78,8 @@ public class ImageJ extends Frame implements ActionListener,
 	MouseListener, KeyListener, WindowListener, ItemListener, Runnable {
 
 	/** Plugins should call IJ.getVersion() or IJ.getFullVersion() to get the version string. */
-	public static final String VERSION = "1.54s";
-	public static final String BUILD = ""; //14
+	public static final String VERSION = "1.54t";
+	public static final String BUILD = "4";
 	public static Color backgroundColor = new Color(237,237,237);
 	/** SansSerif, 12-point, plain font. */
 	public static final Font SansSerif12 = new Font("SansSerif", Font.PLAIN, 12);
@@ -544,9 +544,9 @@ public class ImageJ extends Frame implements ActionListener,
 							cmd="Next Slice [>]";
 					else if (stackKey && keyCode==KeyEvent.VK_LEFT)
 							cmd="Previous Slice [<]";
-					else if (zoomKey && keyCode==KeyEvent.VK_DOWN && !ignoreArrowKeys(imp) && Toolbar.getToolId()<Toolbar.SPARE6)
+					else if (zoomKey && keyCode==KeyEvent.VK_DOWN && !ignoreArrowKeys(imp,control) && Toolbar.getToolId()<Toolbar.SPARE6)
 							cmd="Out [-]";
-					else if (zoomKey && keyCode==KeyEvent.VK_UP && !ignoreArrowKeys(imp) && Toolbar.getToolId()<Toolbar.SPARE6)
+					else if (zoomKey && keyCode==KeyEvent.VK_UP && !ignoreArrowKeys(imp,control) && Toolbar.getToolId()<Toolbar.SPARE6)
 							cmd="In [+]";
 					else if (roi!=null) {
 						if ((flags & KeyEvent.ALT_MASK)!=0 || (flags & KeyEvent.CTRL_MASK)!=0)
@@ -604,7 +604,7 @@ public class ImageJ extends Frame implements ActionListener,
 		return false;
 	}
 	
-	private boolean ignoreArrowKeys(ImagePlus imp) {
+	private boolean ignoreArrowKeys(ImagePlus imp, boolean control) {
 		Frame frame = WindowManager.getFrontWindow();
 		String title = frame!=null?frame.getTitle():null;
 		if (title!=null && title.equals("ROI Manager"))
@@ -620,6 +620,8 @@ public class ImageJ extends Frame implements ActionListener,
 		ImageWindow win = imp.getWindow();
 		// LOCI Data Browser window?
 		if (imp.getStackSize()>1 && win!=null && win.getClass().getName().startsWith("loci"))
+			return true;
+		if (Prefs.requireControlKey && !control) 
 			return true;
 		return false;
 	}
