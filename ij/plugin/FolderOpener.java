@@ -21,7 +21,7 @@ public class FolderOpener implements PlugIn, TextListener {
 	private static String[] excludedTypes = {".txt",".lut",".roi",".pty",".hdr",".java",".ijm",".py",".js",".bsh",".xml",".rar",".h5",".doc",".xls"};
 	private static boolean staticSortFileNames = true;
 	private static boolean staticOpenAsVirtualStack;
-	private boolean convertToGrayscale;  //unused
+	private static boolean convertToGrayscale;
 	private boolean sortFileNames = true;
 	private boolean sortByMetaData = true;
 	private boolean openAsVirtualStack;
@@ -201,6 +201,12 @@ public class FolderOpener implements PlugIn, TextListener {
 				opener.setSilentMode(true);
 				IJ.redirectErrorMessages(true);
 				ImagePlus imp = opener.openTempImage(directory, list[i]);
+				if (imp!=null && convertToGrayscale) {
+					String saved = Macro.getOptions();
+					IJ.run(imp, "8-bit", "");
+					if (saved!=null && !saved.equals(""))
+						Macro.setOptions(saved);
+				}
 				IJ.redirectErrorMessages(false);
 				if (imp!=null) {
 					width = imp.getWidth();
@@ -250,6 +256,12 @@ public class FolderOpener implements PlugIn, TextListener {
 					imp = null;
 				} else if (!openAsVirtualStack||stack==null) {
 					imp = opener.openTempImage(directory, list[i]);
+					if (imp!=null && convertToGrayscale) {
+						String saved = Macro.getOptions();
+						IJ.run(imp, "8-bit", "");
+						if (saved!=null && !saved.equals(""))
+							Macro.setOptions(saved);
+					}
 					stackSize = imp!=null?imp.getStackSize():1;
 				}
 				IJ.redirectErrorMessages(false);
@@ -599,6 +611,7 @@ public class FolderOpener implements PlugIn, TextListener {
 			stepField.addTextListener(this);
 		}
 		gd.addNumericField("Scale:", this.scale, 0, 6, "%");
+		gd.addCheckbox("Convert to 8-bit Grayscale", convertToGrayscale);
 		gd.addCheckbox("Sort names numerically", sortFileNames);
 		gd.addCheckbox("Use virtual stack", openAsVirtualStack);
 		gd.addCheckbox("Open as separate images", false);		
@@ -625,10 +638,15 @@ public class FolderOpener implements PlugIn, TextListener {
 		this.scale = gd.getNextNumber();
 		if (this.scale<5.0) this.scale = 5.0;
 		if (this.scale>100.0) this.scale = 100.0;
+		convertToGrayscale = gd.getNextBoolean();
 		sortFileNames = gd.getNextBoolean();
 		if (!sortFileNames)
 			sortByMetaData = false;
 		openAsVirtualStack = gd.getNextBoolean();
+		if (convertToGrayscale && bitDepth==24) {
+			IJ.error("Cannot convert to grayscale and RGB at the same time.");
+			return false;
+		}
 		if (openAsVirtualStack)
 			scale = 100.0;
 		openAsSeparateImages = gd.getNextBoolean();

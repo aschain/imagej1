@@ -46,8 +46,13 @@ public class Opener {
 	private boolean doNotUseBioFormats;
 
 	static {
-		Hashtable commands = Menus.getCommands();
-		bioformats = commands!=null && commands.get("Bio-Formats Importer")!=null;
+		try {
+			IJ.getClassLoader().loadClass("loci.plugins.LociImporter");
+			bioformats = true;
+		} catch (ClassNotFoundException e) {
+			Hashtable commands = Menus.getCommands();
+			bioformats = commands!=null && commands.get("Bio-Formats Importer")!=null;
+		}
 	}
 
 	public Opener() {

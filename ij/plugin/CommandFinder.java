@@ -247,6 +247,8 @@ public class CommandFinder implements PlugIn, ActionListener, WindowListener, Ke
 			return false;
 		String code = BatchProcessor.openMacroFromJar(name);
 		if (code != null) {
+			if (name.endsWith(".txt"))
+				name = name.substring(0, name.length()-4) + ".ijm";
 			Editor ed = new Editor();
 			ed.setSize(700, 600);
 			ed.create(name, code);

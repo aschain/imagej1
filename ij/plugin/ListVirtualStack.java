@@ -34,7 +34,7 @@ public class ListVirtualStack extends VirtualStack implements PlugIn {
 			IJ.error("Stack From List", "The file path list is empty");
 			return;
 		}
-		if (!list[0].startsWith("http://")) {
+		if (!(list[0].startsWith("http://") || list[0].startsWith("https://"))) {
 			File f = new File(list[0]);
 			if (!f.exists()) {
 				IJ.error("Stack From List", "The first file on the list does not exist:\n \n"+list[0]);
@@ -92,7 +92,7 @@ public class ListVirtualStack extends VirtualStack implements PlugIn {
 	}
 	
 	String[] open(String path) {
-		if (path.startsWith("http://"))
+		if (path.startsWith("http://") || path.startsWith("https://"))
 			return openUrl(path);
 		Vector v = new Vector();
 		File file = new File(path);

@@ -16,7 +16,13 @@ public class RecentOpener implements Runnable {
 	/** Open the file and move the path to top of the submenu. */
 	public void run() {
 		Opener o = new Opener();
-		o.open(path);
+		Object result = IJ._hooks.interceptOpenRecent(path);
+		if (result==null)
+			o.open(path);
+		else if (result instanceof String)
+			o.open((String)result);
+		else if (!(result instanceof ImagePlus))
+			return;
 		Menu menu = Menus.getOpenRecentMenu();
 		int n = menu.getItemCount();
 		int index = 0;

@@ -60,6 +60,19 @@ public class PluginClassLoader extends URLClassLoader {
 				addJar(f2);
 		}
 		addDirectory(f, "jars"); // add ImageJ/jars; requested by Wilhelm Burger
+		for (java.util.Iterator iter = ij.IJ._hooks.handleExtraPluginJars().iterator(); iter.hasNext();) {
+			Object next = iter.next();
+			if (!(next instanceof File))
+				continue;
+			File extra = (File)next;
+			if (!extra.exists())
+				continue;
+			if (extra.isDirectory())
+				addDirectory(extra);
+			else
+				addJar(extra);
+		}
+		ij.IJ._hooks.newPluginClassLoader(this);
 	}
 
 	private void addDirectory(File f) {
@@ -70,7 +83,7 @@ public class PluginClassLoader extends URLClassLoader {
 		} catch (MalformedURLException e) {
 			ij.IJ.log("PluginClassLoader: "+e);
 		}
-		String[] innerlist = f.list();
+		String[] innerlist = ij.IJ._hooks.addPluginDirectory(f, f.list());
 		if (innerlist==null)
 			return;
 		for (int j=0; j<innerlist.length; j++) {

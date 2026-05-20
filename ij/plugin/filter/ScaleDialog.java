@@ -121,6 +121,8 @@ public class ScaleDialog implements PlugInFilter {
 	
 	/** Creates a panel containing an "Unscale" button. */
 	Panel makeButtonPanel(SetScaleDialog gd) {
+		if (GraphicsEnvironment.isHeadless())
+			return null;
 		Panel panel = new Panel();
     	panel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 		gd.unscaleButton = new Button("Click to Remove Scale");

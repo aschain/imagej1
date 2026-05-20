@@ -172,8 +172,11 @@ public class DragAndDrop implements PlugIn, DropTargetListener, Runnable {
 	public void openFile(File f) {
 		if (IJ.debugMode) IJ.log("DragAndDrop.openFile: "+f);
 		try {
+			Object result = IJ._hooks.interceptDragAndDropFile(f);
+			if (result!=null && !(result instanceof String))
+				return;
 			if (null == f) return;
-			String path = f.getCanonicalPath();
+			String path = f.getAbsolutePath();
 			if (f.exists()) {
 				if (f.isDirectory()) {
 					if (openAsVirtualStack)

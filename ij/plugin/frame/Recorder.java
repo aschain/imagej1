@@ -838,6 +838,8 @@ public class Recorder extends PlugInFrame implements PlugIn, ActionListener, Ima
 				name += ".ijm";
 			}
 		}
+		if (name.endsWith(".txt"))
+			name = name.substring(0, name.length()-4)+".ijm";
 		ed.createMacro(name, text);
 		fgColorSet = bgColorSet = false;
 		bbSet = false;

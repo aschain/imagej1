@@ -46,7 +46,7 @@ public class NonBlockingGenericDialog extends GenericDialog {
 			}
 		}
 		try {
-			wait();
+			if (isShowing()) wait();
 		} catch (InterruptedException e) { }
 	}
 

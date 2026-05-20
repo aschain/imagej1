@@ -48,6 +48,8 @@ public class IJ {
 	public static final String URL2 = "http://imagej.net/ij";
 
 	public static final int ALL_KEYS = -1;
+
+	public static LegacyHooks _hooks = new LegacyHooks();
 	
 	/** Use setDebugMode(boolean) to enable/disable debug mode. */
 	public static boolean debugMode;
@@ -122,12 +124,23 @@ public class IJ {
 		df[8] = new DecimalFormat("0.00000000", dfs);
 		df[9] = new DecimalFormat("0.000000000", dfs);
 		df[0].setRoundingMode(RoundingMode.HALF_UP);
+		_hooks.installed();
+	}
+
+	public static LegacyHooks _hooks(LegacyHooks hooks) {
+		LegacyHooks previous = _hooks;
+		if (previous!=null)
+			previous.dispose();
+		_hooks = hooks!=null?hooks:new LegacyHooks();
+		_hooks.installed();
+		return previous;
 	}
 			
 	static void init(ImageJ imagej, Applet theApplet) {
 		ij = imagej;
 		applet = theApplet;
 		progressBar = ij.getProgressBar();
+		_hooks.initialized();
 	}
 
 	static void cleanup() {
@@ -161,6 +174,8 @@ public class IJ {
 		if the macro does not return a value, or "[aborted]" if the
 		macro was aborted due to an error.  */
 	public static String runMacro(String macro, String arg) {
+		if (ij==null && Menus.getCommands()==null)
+			init();
 		Macro_Runner mr = new Macro_Runner();
 		return mr.runMacro(macro, arg);
 	}
@@ -202,6 +217,15 @@ public class IJ {
 	/** Runs the specified plugin and returns a reference to it. */
 	public static Object runPlugIn(String commandName, String className, String arg) {
 		if (arg==null) arg = "";
+		if (classLoader!=null)
+			Thread.currentThread().setContextClassLoader(classLoader);
+		Object intercepted = _hooks.interceptRunPlugIn(className, arg);
+		if (intercepted!=null)
+			return intercepted;
+		if ("ij.IJ.init".equals(className)) {
+			init();
+			return null;
+		}
 		if (IJ.debugMode)
 			IJ.log("runPlugIn: "+className+argument(arg));
 		// Load using custom classloader if this is a user 
@@ -236,6 +260,8 @@ public class IJ {
 		if (applet!=null) return null;
 		if (createNewLoader)
 			classLoader = null;
+		if (classLoader!=null)
+			Thread.currentThread().setContextClassLoader(classLoader);
 		ClassLoader loader = getClassLoader();
 		Object thePlugIn = null;
 		try { 
@@ -423,6 +449,7 @@ public class IJ {
 		Menus m = new Menus(null, null);
 		Prefs.load(m, null);
 		m.addMenuBar();
+		_hooks.initialized();
 	}
 
 	private static void testAbort() {
@@ -467,6 +494,7 @@ public class IJ {
 			if (ic!=null)
 				ic.setShowCursorStatus(s.length()==0?true:false);
 		}
+		_hooks.showStatus(s);
 	}
 	
 	/**Displays a message in the status bar and flashes
@@ -553,6 +581,7 @@ public class IJ {
 
 	public static synchronized void log(String s) {
 		if (s==null) return;
+		_hooks.log(s);
 		if (logPanel==null && ij!=null) {
 			TextWindow logWindow = new TextWindow("Log", "", 400, 250);
 			logPanel = logWindow.getTextPanel();
@@ -773,6 +802,7 @@ public class IJ {
 	if the ImageJ window is not present. */
 	public static void showProgress(double progress) {
 		if (progressBar!=null) progressBar.show(progress, false);
+		_hooks.showProgress(progress);
 	}
 
 	/**	Updates the progress bar, where the length of the bar is set to
@@ -788,6 +818,7 @@ public class IJ {
 			if (currentIndex==finalIndex)
 				progressBar.setBatchMode(false);
 		}
+		_hooks.showProgress(currentIndex, finalIndex);
 	}
 
 	/** Displays a message in a dialog box titled "Message".
@@ -1833,6 +1864,9 @@ public class IJ {
 
 	/** Returns the ImageJ version number as a string. */
 	public static String getVersion() {
+		String version = _hooks.getAppVersion();
+		if (version!=null)
+			return version;
 		return ImageJ.VERSION;
 	}
 	
@@ -1949,6 +1983,13 @@ public class IJ {
 	public static void open(String path) {
 		if (ij==null && Menus.getCommands()==null)
 			init();
+		Object result = _hooks.interceptFileOpen(path);
+		if (result!=null) {
+			if (result instanceof String)
+				path = (String)result;
+			else
+				return;
+		}
 		Opener o = new Opener();
 		macroRunning = true;
 		if (path==null || path.equals(""))		
@@ -1976,6 +2017,15 @@ public class IJ {
 	 * @see ij.io.Opener#openUsingBioFormats(String)
 	*/
 	public static ImagePlus openImage(String path) {
+		Object result = _hooks.interceptOpenImage(path, -1);
+		if (result!=null) {
+			if (result instanceof ImagePlus)
+				return (ImagePlus)result;
+			else if (result instanceof String)
+				path = (String)result;
+			else
+				return null;
+		}
 		macroRunning = true;
 		ImagePlus imp = (new Opener()).openImage(path);
 		macroRunning = false;
@@ -1984,6 +2034,15 @@ public class IJ {
 
 	/** Opens the nth image of the specified tiff stack. */
 	public static ImagePlus openImage(String path, int n) {
+		Object result = _hooks.interceptOpenImage(path, n);
+		if (result!=null) {
+			if (result instanceof ImagePlus)
+				return (ImagePlus)result;
+			else if (result instanceof String)
+				path = (String)result;
+			else
+				return null;
+		}
 		Opener opener = new Opener();
 		opener.doNotUseBioFormats();
 		return opener.openImage(path, n);

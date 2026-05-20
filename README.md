@@ -58,7 +58,14 @@ You can compile and run ImageJ using the [Maven] build tool:
 |-----------------------|-----------------------------------------------------------------------|
 | `mvn`                 | Compile and package ImageJ into a JAR file in the `target` directory. |
 | `mvn -Pexec`          | Compile and then run ImageJ.                                          |
+| `mvn -Ppatched-ij1`   | Compile and package ImageJ, then write a pre-patched JAR using ij1-patcher. |
 | `mvn javadoc:javadoc` | Generate the project Javadoc in the `target/apidocs` directory.       |
+
+When using `-Ppatched-ij1`, the patched artifact is written to:
+
+`target/<finalName>-patched.jar`
+
+This bakes in ij1-patcher modifications at build time, so no runtime patch step is needed when launching ImageJ.
 
 [public domain]: https://imagej.nih.gov/ij/disclaimer.html
 [ImageJ website]: https://imagej.nih.gov/ij/

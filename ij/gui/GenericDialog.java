@@ -101,13 +101,13 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 		this(title, null);
 	}
 
-	//private static Frame getParentFrame() {
-	//	return null;
-	//}
+	private static Frame getParentFrame(Frame parent) {
+		return parent!=null && parent.isVisible() ? parent : null;
+	}
 
 	/** Creates a new GenericDialog using the specified title and parent frame. */
 	public GenericDialog(String title, Frame parent) {
-		super(parent, title, true);
+		super(getParentFrame(parent), title, true);
 		ImageJ ij = IJ.getInstance();
 		if (ij!=null) setFont(ij.getFont());
 		okay = new Button("  OK  ");

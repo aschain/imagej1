@@ -30,6 +30,18 @@ public class RGBStackSplitter implements PlugInFilter {
 		green = channels[1];
 		blue = channels[2];
 	}
+
+	/** Deprecated; replaced by ChannelSplitter.split(ImagePlus). */
+	public static ImagePlus[] splitChannelsToArray(ImagePlus imp, boolean closeAfter) {
+		if (!imp.isComposite()) {
+			IJ.error("splitChannelsToArray was called on a non-composite image");
+			return null;
+		}
+		ImagePlus[] result = ChannelSplitter.split(imp);
+		if (closeAfter)
+			imp.close();
+		return result;
+	}
 	
 }
 

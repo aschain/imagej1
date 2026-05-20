@@ -148,7 +148,8 @@ public class Interpreter implements MacroConstants {
 		callDepth = 0;
 		instance = this;
 		if (!calledMacro) {
-			batchMode = false;
+			if (IJ.getInstance()!=null)
+				batchMode = false;
 			imageTable = imageActivations = null;
 		}
 		pushGlobals();
@@ -1365,7 +1366,8 @@ public class Interpreter implements MacroConstants {
 		tokenString = "";
 		IJ.showStatus("");
 		IJ.showProgress(0, 0);
-		batchMode = false;
+		if (IJ.getInstance()!=null)
+			batchMode = false;
 		imageTable = imageActivations = null;
 		WindowManager.setTempCurrentImage(null);
 		wasError = true;
@@ -1422,6 +1424,10 @@ public class Interpreter implements MacroConstants {
 	}
 		
 	void showError(String title, String msg, String[] variables) {
+		if (IJ.getInstance()==null) {
+			System.err.println(title+": "+msg);
+			return;
+		}
 		boolean noImages = msg.startsWith("There are no images open");
 		if (noImages)
 			title = "No Image";
@@ -2083,7 +2089,8 @@ public class Interpreter implements MacroConstants {
 		if (!calledMacro || batchMacro) {
 			if (batchMode)
 				showingProgress = true;
-			batchMode = false;
+			if (IJ.getInstance()!=null)
+				batchMode = false;
 			imageTable = imageActivations = null;
 			WindowManager.setTempCurrentImage(null);
 		}
@@ -2137,7 +2144,8 @@ public class Interpreter implements MacroConstants {
 	/** Aborts this macro. */
 	public void abortMacro() {
 		if (!calledMacro || batchMacro) {
-			batchMode = false;
+			if (IJ.getInstance()!=null)
+				batchMode = false;
 			imageTable = imageActivations = null;
 		}
 		if (func!=null && !(macroName!=null&&macroName.indexOf(" Tool")!=-1))
@@ -2194,12 +2202,14 @@ public class Interpreter implements MacroConstants {
 	}
 
 	static void setBatchMode(boolean b) {
-		batchMode = b;
+		batchMode = IJ.getInstance()==null ? true : b;
 		if (b==false)
 			imageTable = imageActivations = null;
 	}
 
 	public static boolean isBatchMode() {
+		if (IJ.getInstance()==null)
+			return true;
 		return batchMode && !tempShowMode;
 	}
 	

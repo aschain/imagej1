@@ -81,6 +81,8 @@ public class Executer implements Runnable {
 				IJ.outOfMemory(command);
 			else if (e instanceof RuntimeException && msg!=null && msg.equals(Macro.MACRO_CANCELED))
 				; //do nothing
+			else if (e instanceof NoSuchMethodError && IJ._hooks.handleNoSuchMethodError((NoSuchMethodError)e))
+				; // handled by hook
 			else {
 				CharArrayWriter caw = new CharArrayWriter();
 				PrintWriter pw = new PrintWriter(caw);
@@ -229,10 +231,10 @@ public class Executer implements Runnable {
 			f = new File(path);
 		}
 		if (f.exists()) {
-			String dir = OpenDialog.getLastDirectory();
-			IJ.open(path);
-			OpenDialog.setLastDirectory(dir);
-			return true;
+			ImagePlus imp = (ImagePlus)IJ.runPlugIn("ij.plugin.LutLoader", path);
+			if (imp!=null && imp.getWidth()>0)
+				imp.show();
+			return imp!=null;
 		}
 		return false;
     }

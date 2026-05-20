@@ -1,5 +1,6 @@
 package ij.gui;
 import ij.*;
+import ij.macro.Interpreter;
 import ij.measure.Calibration;
 import ij.plugin.frame.SyncWindows;
 import java.awt.*;
@@ -36,7 +37,8 @@ public class StackWindow extends ImageWindow implements Runnable, AdjustmentList
 			ic.setMaxBounds();
 		if (IJ.isMacro() && !isVisible()) //'super' may have called show()
 			imp.setDeactivated(); //prepare for waitTillActivated (imp may have been activated before)
-		show();
+		if (!Interpreter.batchMode)
+			show();
 		if (IJ.isMacro())
 			imp.waitTillActivated();
 		int previousSlice = imp.getCurrentSlice();

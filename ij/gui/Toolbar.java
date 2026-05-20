@@ -273,7 +273,9 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 	public int getToolId(String name) {
 		int tool =  -1;
 		for (int i=0; i<getNumTools(); i++) {
-			if (names[i]!=null && names[i].startsWith(name)) {
+			if (names[i]!=null && (names[i].equals(name)
+					|| names[i].startsWith(name+"-")
+					|| names[i].startsWith(name+" -"))) {
 				tool = i;
 				break;
 			}			

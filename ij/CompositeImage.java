@@ -96,6 +96,14 @@ public class CompositeImage extends ImagePlus {
 			setOpenAsHyperStack(true);
 	}
 
+	/** Splits this composite image into per-channel images and optionally closes it. */
+	public ImagePlus[] splitChannels(boolean closeAfter) {
+		ImagePlus[] result = ij.plugin.ChannelSplitter.split(this);
+		if (closeAfter)
+			close();
+		return result;
+	}
+
 	@Override
 	public Image getImage() {
 		if (img==null)

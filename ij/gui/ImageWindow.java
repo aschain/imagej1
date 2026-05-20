@@ -1,10 +1,7 @@
 package ij.gui;
 import java.awt.*;
-import java.awt.image.*;
-import java.util.Properties;
 import java.awt.event.*;
 import ij.*;
-import ij.process.*;
 import ij.io.*;
 import ij.measure.*;
 import ij.plugin.frame.*;
@@ -25,7 +22,7 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 	protected ImageJ ij;
 	protected ImageCanvas ic;
 	private double initialMagnification = 1;
-	private int newWidth, newHeight;
+	//private int newWidth, newHeight;
 	protected boolean closed;
 	private boolean newCanvas;
 	private boolean unzoomWhenMinimizing = true;
@@ -448,6 +445,7 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 			xloc = 0;
 			yloc = 0;
 		}
+		IJ._hooks.interceptImageWindowClose(this);
 		WindowManager.removeWindow(this);
 		if (ij!=null && ij.quitting())  // this may help avoid thread deadlocks
 			return true;
@@ -646,7 +644,7 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 	public synchronized void mouseWheelMoved(MouseWheelEvent e) {
 		int rotation = e.getWheelRotation();
 		int amount = e.getScrollAmount();
-		boolean ctrl = (e.getModifiers()&Event.CTRL_MASK)!=0;
+		boolean ctrl = (e.getModifiersEx()&InputEvent.CTRL_DOWN_MASK)!=0;
 		//if (IJ.debugMode) {
 		//	IJ.log("mouseWheelMoved: "+e);
 		//	IJ.log("  type: "+e.getScrollType());
@@ -741,6 +739,19 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 	
 	public int getSliderHeight() {
 		return sliderHeight;
+	}
+
+	public void setVisible(boolean vis) {
+		if (vis)
+			IJ._hooks.registerImage(this.getImagePlus());
+		if (IJ._hooks.isLegacyMode())
+			super.setVisible(vis);
+	}
+
+	public void show() {
+		IJ._hooks.registerImage(this.getImagePlus());
+		if (IJ._hooks.isLegacyMode())
+			super.show();
 	}
 	
 	public static void setImageJMenuBar(ImageWindow win) {

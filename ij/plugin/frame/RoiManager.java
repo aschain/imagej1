@@ -2914,6 +2914,16 @@ public class RoiManager extends PlugInFrame implements ActionListener, ItemListe
 	public static String getErrorMessage() {
 		return errorMessage;
 	}
+
+	public void show() {
+		if (ij.IJ._hooks.isLegacyMode())
+			super.show();
+	}
+
+	public void setVisible(boolean b) {
+		if (ij.IJ._hooks.isLegacyMode())
+			super.setVisible(b);
+	}
 	
 	@Override
 	public String toString() {

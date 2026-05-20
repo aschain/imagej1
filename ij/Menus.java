@@ -102,6 +102,7 @@ public class Menus {
 		error = null;
 		mbar = null;
 		menus = new Properties();
+		IJ._hooks.addMenuItem(null, null);
 		pluginsTable = new Hashtable();
 		shortcuts = new Hashtable();
 		pluginsPrefs = new Vector();
@@ -448,6 +449,7 @@ public class Menus {
 			menu.add(item);
 		item.addActionListener(ij);
 		fixFontSize(item);
+		reportMenuItem(menu, label, pluginsTable!=null?(String)pluginsTable.get(label):null);
 	}
 	
 	void addPlugInItem(Menu menu, String label, String className, int shortcut, boolean shift) {
@@ -463,6 +465,7 @@ public class Menus {
 		menu.add(item);
 		item.addItemListener(ij);
 		item.setState(false);
+		reportMenuItem(menu, label, className);
 		return item;
 	}
 
@@ -488,6 +491,7 @@ public class Menus {
 		if (name.equals("Lookup Tables") && applet==null)
 			addLuts(submenu);
 		fixFontSize(submenu);
+		reportMenuItem(menu, submenu.getLabel(), null);
 		return submenu;
 	}
 	
@@ -519,7 +523,8 @@ public class Menus {
 	static void addPluginItem(Menu submenu, String s) {
 		if (s.startsWith("\"-\"")) {
 			// add menu separator if command="-"
-			addSeparator(submenu);
+			if (submenu!=null)
+				addSeparator(submenu);
 			return;
 		}
 		int lastComma = s.lastIndexOf(',');
@@ -545,7 +550,8 @@ public class Menus {
 			keyCode -= 200;
 			shift = true;
 		}
-		addItem(submenu,command,keyCode,shift);
+		if (submenu!=null)
+			addItem(submenu,command,keyCode,shift);
 		while(s.charAt(lastComma+1)==' ' && lastComma+2<s.length())
 			lastComma++; // remove leading spaces
 		String className = s.substring(lastComma+1,s.length());
@@ -554,6 +560,7 @@ public class Menus {
 			duplicateCommand = pluginsTable.get(command)!=null;
 		pluginsTable.put(command, className);
 		nPlugins++;
+		reportMenuItem(submenu, command, className);
 	}
 
 	void checkForDuplicate(String command) {
@@ -736,6 +743,14 @@ public class Menus {
 	void installJarPlugins() {
 		if (jarFiles==null)
 			return;
+		HashSet seen = new HashSet();
+		for (Iterator iter = jarFiles.iterator(); iter.hasNext();) {
+			Object jar = iter.next();
+			if (seen.contains(jar))
+				iter.remove();
+			else
+				seen.add(jar);
+		}
 		installingJars = true;
 		for (int i=0; i<jarFiles.size(); i++) {
             isJarErrorHeading = false;
@@ -766,6 +781,13 @@ public class Menus {
 	void installJarPlugin(String jar, String s) {
 		addSorted = false;
 		Menu menu;
+		if (s==null)
+			return;
+		if (GraphicsEnvironment.isHeadless()) {
+			int quote = s.indexOf('"');
+			if (quote>=0)
+				addPluginItem(null, s.substring(quote));
+		}
 		s = s.trim();
 		if (s.startsWith("Plugins>")) {
 			int firstComma = s.indexOf(',');
@@ -932,10 +954,50 @@ public class Menus {
 
     static void addSeparator(Menu menu) {
     	menu.addSeparator();
+		reportSeparator(menu);
     }
+
+	private static String getMenuPath(Menu menu) {
+		if (menu==null || menus==null)
+			return null;
+		for (Enumeration en=menus.propertyNames(); en.hasMoreElements();) {
+			String key = (String)en.nextElement();
+			if (menus.get(key)==menu)
+				return key;
+		}
+		return null;
+	}
+
+	private static void reportMenuItem(Menu menu, String label, String command) {
+		String menuPath = getMenuPath(menu);
+		if (menuPath==null || label==null)
+			return;
+		IJ._hooks.addMenuItem(menuPath+">"+label, command);
+	}
+
+	private static void reportSeparator(Menu menu) {
+		String menuPath = getMenuPath(menu);
+		if (menuPath==null)
+			return;
+		IJ._hooks.addMenuItem(menuPath+">-", null);
+	}
 
     /** Opens the configuration file ("plugins.config") from a JAR file and returns it as an InputStream. */
 	InputStream getConfigurationFile(String jar) {
+		File isDir = new File(jar);
+		if (isDir.exists() && isDir.isDirectory()) {
+			File config = new File(isDir, "plugins.config");
+			if (config.exists()) {
+				try {
+					return new FileInputStream(config);
+				}
+				catch (IOException e) {
+					IJ.log(jar+": "+e);
+					return null;
+				}
+			}
+			return IJ._hooks.autoGenerateConfigFile(isDir);
+		}
 		try {
 			ZipFile jarFile = new ZipFile(jar);
 			Enumeration entries = jarFile.entries();
@@ -1091,6 +1153,24 @@ public class Menus {
 			} else {
 				if (!isClassFile)
 					checkSubdirectory(pluginsPath, name, v);
+			}
+		}
+		for (Iterator iter = IJ._hooks.handleExtraPluginJars().iterator(); iter.hasNext();) {
+			Object next = iter.next();
+			if (!(next instanceof File))
+				continue;
+			File extra = (File)next;
+			if (!extra.exists())
+				continue;
+			if (jarFiles==null)
+				jarFiles = new Vector();
+			jarFiles.addElement(extra.getAbsolutePath());
+		}
+		if (jarFiles!=null) {
+			for (int i=jarFiles.size()-1; i>=0; i--) {
+				String entry = (String)jarFiles.elementAt(i);
+				if (entry.endsWith("-sources.jar"))
+					jarFiles.remove(i);
 			}
 		}
 		list = new String[v.size()];
@@ -1714,6 +1794,7 @@ public class Menus {
 		if (err!=null) IJ.error(err);
 		m.installStartupMacroSet();
 		IJ.resetClassLoader();
+		IJ._hooks.runAfterRefreshMenus();
 		//IJ.runPlugIn("ij.plugin.ClassChecker", "");
 		IJ.showStatus("Menus updated: "+m.nPlugins + " commands, " + m.nMacros + " macros");
 	}

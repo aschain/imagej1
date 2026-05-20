@@ -330,6 +330,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 			if (listeners.size()>0) notifyListeners(UPDATED);
 		}
 		draw();
+		IJ._hooks.registerImage(this);
 	}
 
 	/** Use to update the image when the underlying virtual stack changes. */
@@ -426,6 +427,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 		if (win!=null) {
 			draw();
 			win.repaint();
+			IJ._hooks.registerImage(this);
 		}
 	}
 
@@ -457,6 +459,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 		if (win==null) {
 			img = null;
 			Interpreter.removeBatchModeImage(this);
+			IJ._hooks.unregisterImage(this);
 			return;
 		}
 		boolean unlocked = lockSilently();
@@ -466,6 +469,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 		win = null;
 		setOverlay(overlay2);
 		if (unlocked) unlock();
+		IJ._hooks.unregisterImage(this);
 	}
 
 	/** Closes this image and sets the ImageProcessor to null. To avoid the
@@ -480,6 +484,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 			deleteRoi(); //save any ROI so it can be restored later
 			Interpreter.removeBatchModeImage(this);
 		}
+		IJ._hooks.unregisterImage(this);
     }
 
 	/** Opens a window to display this image and clears the status bar. */
@@ -533,6 +538,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 			if (setIJMenuBar)
 				IJ.wait(25);
 			notifyListeners(OPENED);
+			IJ._hooks.registerImage(this);
 		}
 	}
 	
@@ -863,7 +869,9 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 			if (resetCurrentSlice) setSlice(currentSlice);
 			return;
 		}
-		boolean invalidDimensions = (isDisplayedHyperStack()||(this instanceof CompositeImage)) && (win instanceof StackWindow) && !((StackWindow)win).validDimensions();
+		StackWindow stackWindow = win instanceof StackWindow ? (StackWindow)win : null;
+		boolean invalidDimensions = (isDisplayedHyperStack()||(this instanceof CompositeImage))
+			&& stackWindow!=null && !stackWindow.validDimensions();
 		if (newStackSize>1 && !(win instanceof StackWindow)) {
 			if (isDisplayedHyperStack())
 				setOpenAsHyperStack(true);
@@ -3547,5 +3555,26 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
     public boolean windowActivated() {
     	return this.activated;
     }
+
+	public void killProcessor() {
+	}
+
+	/** Obsolete. */
+	public void setDisplayList(Vector list) {
+		ImageCanvas canvas = getCanvas();
+		if (canvas!=null)
+			canvas.setDisplayList(list);
+	}
+
+	/** Obsolete. */
+	public Vector getDisplayList() {
+		ImageCanvas canvas = getCanvas();
+		return canvas!=null ? canvas.getDisplayList() : null;
+	}
+
+	/** Obsolete. */
+	public void setDisplayList(Roi roi, Color strokeColor, int strokeWidth, Color fillColor) {
+		setOverlay(roi, strokeColor, strokeWidth, fillColor);
+	}
         
 }

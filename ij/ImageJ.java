@@ -310,6 +310,8 @@ public class ImageJ extends Frame implements ActionListener,
 	}
 	
 	void showStatus(String s) {
+		if (s==null || "".equals(s))
+			s = version();
         statusLine.setText(s);
 	}
 
@@ -423,6 +425,8 @@ public class ImageJ extends Frame implements ActionListener,
 	public void mouseEntered(MouseEvent e) {}
 
  	public void keyPressed(KeyEvent e) {
+		if (IJ._hooks.interceptKeyPressed(e))
+			return;
 		if (e.isConsumed())
 			return;
 		int keyCode = e.getKeyCode();
@@ -700,6 +704,8 @@ public class ImageJ extends Frame implements ActionListener,
 
 	/** Called by ImageJ when the user selects Quit. */
 	public void quit() {
+		if (!IJ._hooks.quit())
+			return;
 		quitMacro = IJ.macroRunning();
 		Thread thread = new Thread(this, "Quit");
 		thread.setPriority(Thread.NORM_PRIORITY);

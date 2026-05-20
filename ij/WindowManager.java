@@ -488,7 +488,7 @@ public class WindowManager {
 				frame.dispose();
 			}
 		}
-		return true;
+		return IJ._hooks.interceptCloseAllWindows();
     }
     
     private static boolean quittingViaMacro() {
