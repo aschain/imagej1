@@ -1,6 +1,5 @@
 package ij.gui;
 import java.awt.*;
-import java.awt.image.*;
 import java.awt.event.*;
 import ij.*;
 import ij.plugin.frame.Recorder;
@@ -30,7 +29,7 @@ public class EllipseRoi extends PolygonRoi {
 		type = FREEROI;
 		xstart = offScreenXD(sx);
 		ystart = offScreenYD(sy);
-		setDrawOffset(false);
+		//setDrawOffset(false);
 		bounds = null;
 	}
 

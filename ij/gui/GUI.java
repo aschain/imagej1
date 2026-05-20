@@ -9,16 +9,16 @@ import javax.swing.UIManager;
 /** This class consists of static GUI utility methods. */
 public class GUI {
 	private static final Font DEFAULT_FONT = ImageJ.SansSerif12;
-	private static Color lightGray = new Color(240,240,240);
-	private static boolean isWindows8;
+	//private static Color lightGray = new Color(240,240,240);
+	//private static boolean isWindows8;
 	private static Color scrollbarBackground = new Color(245,245,245);
 
-	static {
-		if (IJ.isWindows()) {
-			String osname = System.getProperty("os.name");
-			isWindows8 = osname.contains("unknown") || osname.contains("8");
-		}
-	}
+	//static {
+	//	if (IJ.isWindows()) {
+			//String osname = System.getProperty("os.name");
+			//isWindows8 = osname.contains("unknown") || osname.contains("8");
+	//	}
+	//}
 
 	/** Positions the specified window in the center of the screen that contains target. */
 	public static void center(Window win, Component target) {

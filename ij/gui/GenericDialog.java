@@ -2,7 +2,6 @@ package ij.gui;
 import ij.*;
 import ij.plugin.frame.Recorder;
 import ij.plugin.ScreenGrabber;
-import ij.plugin.filter.PlugInFilter;
 import ij.plugin.filter.PlugInFilterRunner;
 import ij.util.Tools;
 import ij.macro.*;
@@ -44,9 +43,13 @@ import java.awt.dnd.*;
 public class GenericDialog extends Dialog implements ActionListener, TextListener,
 FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 
-	protected Vector numberField, stringField, checkbox, choice, slider, radioButtonGroups;
+	protected Vector<TextField> numberField, stringField;
+	protected Vector<Checkbox> checkbox;
+	protected Vector<Choice> choice;
+	protected Vector<Scrollbar> slider;
+	protected Vector<CheckboxGroup> radioButtonGroups;
 	protected TextArea textArea1, textArea2;
-	protected Vector defaultValues,defaultText,defaultStrings,defaultChoiceIndexes;
+	protected Vector<Object> defaultValues,defaultText,defaultStrings,defaultChoiceIndexes;
 	protected Component theLabel;
 	private Button okay;
 	private Button cancel;
@@ -56,19 +59,20 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 	private int nfIndex, sfIndex, cbIndex, choiceIndex, textAreaIndex, radioButtonIndex;
 	private GridBagConstraints c;
 	private boolean firstNumericField=true;
-	private boolean firstSlider=true;
+	//private boolean firstSlider=true;
 	private boolean invalidNumber;
 	private String errorMessage;
-	private Hashtable labels;
+	private Hashtable<Object, String> labels;
 	private boolean macro;
 	private String macroOptions;
 	private boolean addToSameRow;
 	private boolean addToSameRowCalled;
 	private int topInset, leftInset, bottomInset;
 	private boolean customInsets;
-	private Vector sliderIndexes, sliderScales, sliderDigits;
+	private Vector<Integer> sliderIndexes, sliderDigits;
+	private Vector<Double> sliderScales;
 	private Checkbox previewCheckbox;	 // the "Preview" Checkbox, if any
-	private Vector dialogListeners;		 // the Objects to notify on user input
+	private Vector<DialogListener> dialogListeners;		 // the Objects to notify on user input
 	private PlugInFilterRunner pfr;		 // the PlugInFilterRunner for automatic preview
 	private String previewLabel = " Preview";
 	private final static String previewRunning = "wait...";
@@ -78,11 +82,11 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 	private boolean centerDialog = true;
 	private String helpURL;
 	private boolean smartRecording;
-	private Vector imagePanels;
+	private Vector<ImagePanel> imagePanels;
 	protected static GenericDialog instance;
 	private boolean firstPaint = true;
 	private boolean fontSizeSet;
-	private boolean showDialogCalled;
+	//private boolean showDialogCalled;
 	private boolean optionsRecorded;	 // have dialogListeners been called to record options?
 	private Label lastLabelAdded;
 	private int[] windowIDs;
@@ -97,9 +101,9 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 		this(title, null);
 	}
 
-	private static Frame getParentFrame() {
-		return null;
-	}
+	//private static Frame getParentFrame() {
+	//	return null;
+	//}
 
 	/** Creates a new GenericDialog using the specified title and parent frame. */
 	public GenericDialog(String title, Frame parent) {
@@ -177,9 +181,9 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 			addToSameRow = false;
 		}
 		if (numberField==null) {
-			numberField = new Vector(5);
-			defaultValues = new Vector(5);
-			defaultText = new Vector(5);
+			numberField = new Vector<TextField>(5);
+			defaultValues = new Vector<Object>(5);
+			defaultText = new Vector<Object>(5);
 		}
 		if (IJ.isWindows()) columns -= 2;
 		if (columns<1) columns = 1;
@@ -229,7 +233,7 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 	/** Saves the label for given component, for macro recording and for accessing the component in macros. */
 	private void saveLabel(Object component, String label) {
 		if (labels==null)
-			labels = new Hashtable();
+			labels = new Hashtable<Object, String>();
 		if (label.length()>0)
 			label = Macro.trimKey(label.trim());
 		if (label.length()>0 && hasLabel(label)) {						// not a unique label?
@@ -270,7 +274,7 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 			label2 = label2.replace('_', ' ');
 		Label fieldLabel = makeLabel(label2);
 		this.lastLabelAdded = fieldLabel;
-		boolean custom = customInsets;
+		//boolean custom = customInsets;
 		if (addToSameRow) {
 			c.gridx = GridBagConstraints.RELATIVE;
 			addToSameRow = false;
@@ -285,8 +289,8 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 		c.gridwidth = 1;
 		add(fieldLabel, c);
 		if (stringField==null) {
-			stringField = new Vector(4);
-			defaultStrings = new Vector(4);
+			stringField = new Vector<TextField>(4);
+			defaultStrings = new Vector<Object>(4);
 		}
 
 		TextField tf = newTextField(defaultText, columns);
@@ -557,7 +561,7 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 		c.anchor = GridBagConstraints.WEST;
 		c.gridwidth = 2;
 		if (checkbox==null)
-			checkbox = new Vector(4);
+			checkbox = new Vector<Checkbox>(4);
 		Checkbox cb = new Checkbox(label2);
 		cb.setState(defaultValue);
 		cb.addItemListener(this);
@@ -633,9 +637,9 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 		Panel panel = new Panel();
 		int nRows = headings!=null?rows+1:rows;
 		panel.setLayout(new GridLayout(nRows, columns, 6, 0));
-		int startCBIndex = cbIndex;
+		//int startCBIndex = cbIndex;
 		if (checkbox==null)
-			checkbox = new Vector(12);
+			checkbox = new Vector<Checkbox>(12);
 		if (headings!=null) {
 			Font font = new Font("SansSerif", Font.BOLD, 12);
 			for (int i=0; i<columns; i++) {
@@ -707,7 +711,7 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 			panel.add(cb);
 		}
 		if (radioButtonGroups==null)
-			radioButtonGroups = new Vector();
+			radioButtonGroups = new Vector<CheckboxGroup>();
 		radioButtonGroups.addElement(cg);
 		Insets insets = getInsets(5, 10, 0, 0);
 		if (label==null || label.equals("")) {
@@ -752,8 +756,8 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 		c.anchor = GridBagConstraints.EAST;
 		c.gridwidth = 1;
 		if (choice==null) {
-			choice = new Vector(4);
-			defaultChoiceIndexes = new Vector(4);
+			choice = new Vector<Choice>(4);
+			defaultChoiceIndexes = new Vector<Object>(4);
 		}
 		add(fieldLabel, c);
 		Choice thisChoice = new Choice();
@@ -945,10 +949,10 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 		add(fieldLabel, c);
 
 		if (slider==null) {
-			slider = new Vector(5);
-			sliderIndexes = new Vector(5);
-			sliderScales = new Vector(5);
-			sliderDigits = new Vector(5);
+			slider = new Vector<Scrollbar>(5);
+			sliderIndexes = new Vector<Integer>(5);
+			sliderScales = new Vector<Double>(5);
+			sliderDigits = new Vector<Integer>(5);
 		}
 		Scrollbar s = new Scrollbar(Scrollbar.HORIZONTAL, (int)defaultValue, 1, (int)minValue, (int)maxValue+1);
 		if (IJ.debugMode) IJ.log("Scrollbar: "+scale+" "+defaultValue+" "+minValue+" "+maxValue);
@@ -968,7 +972,7 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 					if (sb==slider.elementAt(i)) {
 						int index = ((Integer)sliderIndexes.get(i)).intValue();
 						TextField tf = (TextField)numberField.elementAt(index);
-						double scale = ((Double)sliderScales.get(i)).doubleValue();
+						double scale = (sliderScales.get(i)).doubleValue();
 						int digits = ((Integer)sliderDigits.get(i)).intValue();
 						tf.setText(""+IJ.d2s(sb.getValue()/scale,digits));
 					}
@@ -977,9 +981,9 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 		});
 
 		if (numberField==null) {
-			numberField = new Vector(5);
-			defaultValues = new Vector(5);
-			defaultText = new Vector(5);
+			numberField = new Vector<TextField>(5);
+			defaultValues = new Vector<Object>(5);
+			defaultText = new Vector<Object>(5);
 		}
 		if (IJ.isWindows()) columns -= 2;
 		if (columns<1) columns = 1;
@@ -997,7 +1001,7 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 		defaultValues.addElement(Double.valueOf(defaultValue/scale));
 		defaultText.addElement(tf.getText());
 		tf.setEditable(true);
-		firstSlider = false;
+		//firstSlider = false;
 
 		Panel panel = new Panel();
 		GridBagLayout pgrid = new GridBagLayout();
@@ -1060,7 +1064,7 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 		ImagePanel imagePanel = new ImagePanel(image);
 		addPanel(imagePanel);
 		if (imagePanels==null)
-			imagePanels = new Vector();
+			imagePanels = new Vector<ImagePanel>();
 		imagePanels.add(imagePanel);
 	}
 
@@ -1168,7 +1172,7 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 	 */
 	public void addDialogListener(DialogListener dl) {
 		if (dialogListeners == null)
-			dialogListeners = new Vector();
+			dialogListeners = new Vector<DialogListener>();
 		dialogListeners.addElement(dl);
 	}
 
@@ -1506,7 +1510,7 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 
 	/** Displays this dialog box. */
 	public void showDialog() {
-		showDialogCalled = true;
+		//showDialogCalled = true;
 		addToSameRow = false;
 		if (macro) {
 			dispose();
@@ -1608,32 +1612,32 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 	}
 	
 	/** Returns the Vector containing the numeric TextFields. */
-	public Vector getNumericFields() {
+	public Vector<TextField> getNumericFields() {
 		return numberField;
 	}
 
 	/** Returns the Vector containing the string TextFields. */
-	public Vector getStringFields() {
+	public Vector<TextField> getStringFields() {
 		return stringField;
 	}
 
 	/** Returns the Vector containing the Checkboxes. */
-	public Vector getCheckboxes() {
+	public Vector<Checkbox> getCheckboxes() {
 		return checkbox;
 	}
 
 	/** Returns the Vector containing the Choices. */
-	public Vector getChoices() {
+	public Vector<Choice> getChoices() {
 		return choice;
 	}
 
 	/** Returns the Vector containing the sliders (Scrollbars). */
-	public Vector getSliders() {
+	public Vector<Scrollbar> getSliders() {
 		return slider;
 	}
 
 	/** Returns the Vector that contains the RadioButtonGroups. */
-	public Vector getRadioButtonGroups() {
+	public Vector<CheckboxGroup> getRadioButtonGroups() {
 		return radioButtonGroups;
 	}
 
@@ -1733,7 +1737,7 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 				double value = Tools.parseDouble(tf.getText());
 				if (!Double.isNaN(value)) {
 					Scrollbar sb = (Scrollbar)slider.elementAt(i);
-					double scale = ((Double)sliderScales.get(i)).doubleValue();
+					double scale = (sliderScales.get(i)).doubleValue();
 					sb.setValue((int)Math.round(value*scale));
 				}
 			}
@@ -1772,7 +1776,7 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 				if (sb==slider.elementAt(i)) {
 					int index = ((Integer)sliderIndexes.get(i)).intValue();
 					TextField tf = (TextField)numberField.elementAt(index);
-					double scale = ((Double)sliderScales.get(i)).doubleValue();
+					double scale = (sliderScales.get(i)).doubleValue();
 					int digits = ((Integer)sliderDigits.get(i)).intValue();
 					tf.setText(""+IJ.d2s(sb.getValue()/scale,digits));
 				}
@@ -1789,7 +1793,7 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 			wasCanceled = true;
 			dispose();
 			IJ.resetEscape();
-		} else if (keyCode==KeyEvent.VK_W && (e.getModifiers()&Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())!=0) {
+		} else if (keyCode==KeyEvent.VK_W && (e.getModifiersEx()&Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())!=0) {
 			wasCanceled = true;
 			dispose();
 		}
@@ -1809,10 +1813,10 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 	public void keyReleased(KeyEvent e) {
 		int keyCode = e.getKeyCode();
 		IJ.setKeyUp(keyCode);
-		int flags = e.getModifiers();
-		boolean control = (flags & KeyEvent.CTRL_MASK) != 0;
-		boolean meta = (flags & KeyEvent.META_MASK) != 0;
-		boolean shift = (flags & e.SHIFT_MASK) != 0;
+		int flags = e.getModifiersEx();
+		boolean control = (flags & InputEvent.CTRL_DOWN_MASK) != 0;
+		boolean meta = (flags & InputEvent.META_DOWN_MASK) != 0;
+		boolean shift = (flags & InputEvent.SHIFT_DOWN_MASK) != 0;
 		if (keyCode==KeyEvent.VK_G && shift && (control||meta))
 			new ScreenGrabber().run("");
 	}
@@ -1832,7 +1836,7 @@ FocusListener, ItemListener, KeyListener, AdjustmentListener, WindowListener {
 				Scrollbar sb = (Scrollbar)source;
 				int index = ((Integer)sliderIndexes.get(i)).intValue();
 				TextField tf = (TextField)numberField.elementAt(index);
-				double scale = ((Double)sliderScales.get(i)).doubleValue();
+				double scale = (sliderScales.get(i)).doubleValue();
 				int digits = ((Integer)sliderDigits.get(i)).intValue();
 				tf.setText(""+IJ.d2s(sb.getValue()/scale,digits));
 			}

@@ -1,6 +1,5 @@
 package ij.gui;
 import ij.*;
-import ij.process.*;
 import ij.util.*;
 import ij.plugin.Colors;
 import java.awt.*;
@@ -10,7 +9,8 @@ import java.awt.event.*;
 
  /** Displays a dialog that allows the user to select a color using three sliders. */
 public class ColorChooser implements TextListener, AdjustmentListener {
-	Vector colors, sliders;
+	Vector<TextField> colors;
+	Vector<Scrollbar> sliders;
 	ColorPanel panel;
 	Color initialColor;
 	int red, green, blue;
@@ -69,13 +69,13 @@ public class ColorChooser implements TextListener, AdjustmentListener {
 	}
 
 	public synchronized void adjustmentValueChanged(AdjustmentEvent e) {
-		Object source = e.getSource();
-		for (int i=0; i<sliders.size(); i++) {
-			if (source==sliders.elementAt(i)) {
-				Scrollbar sb = (Scrollbar)source;
-				TextField tf = (TextField)colors.elementAt(i);
-			}
-		}
+		//Object source = e.getSource();
+		//for (int i=0; i<sliders.size(); i++) {
+		//	if (source==sliders.elementAt(i)) {
+		//		Scrollbar sb = (Scrollbar)source;
+		//		TextField tf = (TextField)colors.elementAt(i);
+		//	}
+		//}
 	}
 
 }

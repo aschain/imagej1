@@ -1,5 +1,5 @@
 module ij {
-	requires java.desktop;
+	requires transitive java.desktop;
 	requires java.rmi;
 	requires java.compiler;
 	requires java.scripting;
