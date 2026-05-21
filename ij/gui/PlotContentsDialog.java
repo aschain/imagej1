@@ -34,7 +34,8 @@ public class PlotContentsDialog implements DialogListener {
 	private String[]      allPlotNames;
 	private static Plot   previousPlot;
 	private static int    previousPlotObjectIndex;
-	private int           defaultPlotIndex, defaultObjectIndex;
+	private int           defaultPlotIndex;
+	//private int           defaultObjectIndex;
 	private int           currentPlotNumObjects;
 	private Choice        tableChoice;               // for "Add from Table"
 	final static int      N_COLUMNS = 4;             // number of data columns that we can have; x, y, xE, yE
@@ -47,7 +48,7 @@ public class PlotContentsDialog implements DialogListener {
 	private static String previousTableName;
 	private static int[]  previousColumns = new int[]{1, 1, 0, 0}; //must be N_COLUMNS elements
 	private static int    defaultTableIndex;
-	private static int[]  defaultColumnIndex = new int[N_COLUMNS];
+	//private static int[]  defaultColumnIndex = new int[N_COLUMNS];
 	private String[]      arrayHeadings;             // for "Add from Arrays"
 	private ArrayList<float[]> arrayData;
 	private Choice        fitDataChoice;             // for "Add Fit"
@@ -142,13 +143,13 @@ public class PlotContentsDialog implements DialogListener {
 		} else if (dialogType == ADD_FROM_PLOT) {
 			gd.addChoice("Select Plot:", allPlotNames, allPlotNames[defaultPlotIndex]);
 			gd.addChoice("Item to Add:", new String[]{""}, "");  // will be set up by makeSourcePlotObjects
-			Vector choices = gd.getChoices();
-			plotChoice = (Choice)(choices.get(0));
-			objectChoice = (Choice)(choices.get(1));
+			Vector<Choice> choices = gd.getChoices();
+			plotChoice = choices.get(0);
+			objectChoice = choices.get(1);
 			makeSourcePlotObjects();
 		} else if (dialogType == ADD_FROM_TABLE) {
 			gd.addChoice("Select Table:", allTableNames, allTableNames[defaultTableIndex]);
-			tableChoice = (Choice)(gd.getChoices().get(0));
+			tableChoice = gd.getChoices().get(0);
 			if (creatingPlot) tableChoice.setEnabled(false);     // we can't select the table, we have only one
 		} else if (dialogType == ADD_FIT) {
 			String[] dataSources = plot.getDataObjectDesignations();
@@ -158,7 +159,7 @@ public class PlotContentsDialog implements DialogListener {
 			}
 			gd.addChoice("Fit Data Set:", dataSources, dataSources[0]);
 			gd.addChoice("Fit Function:", new String[0], "");
-			Vector choices = gd.getChoices();
+			Vector<Choice> choices = gd.getChoices();
 			fitDataChoice = (Choice)(choices.get(0));
 			fitFunctionChoice = (Choice)(choices.get(1));
 			if (dataSources.length == 1)
@@ -170,7 +171,7 @@ public class PlotContentsDialog implements DialogListener {
 		if (dialogType == ADD_FROM_TABLE || dialogType == ADD_FROM_ARRAYS) {
 			for (int i=0; i<nColumnsToUse; i++) {
 				gd.addChoice(COLUMN_NAMES[i], new String[]{""}, "");  // will set up by makeSourceColumns
-				Vector choices = gd.getChoices();
+				Vector<Choice> choices = gd.getChoices();
 				columnChoice[i] = (Choice)(choices.get(choices.size()-1));
 			}
 			makeSourceColumns();
@@ -184,14 +185,14 @@ public class PlotContentsDialog implements DialogListener {
 		gd.addStringField("Label:", "", 20);
 		gd.setInsets(10, 60, 0);
 		gd.addCheckbox("Visible", true);
-		Vector choices = gd.getChoices();
+		Vector<Choice> choices = gd.getChoices();
 		symbolChoice = (Choice)(choices.get(choices.size()-1));
-		Vector stringFields = gd.getStringFields();
-		colorField = (TextField)(stringFields.get(0));
-		color2Field = (TextField)(stringFields.get(1));
-		labelField = (TextField)(stringFields.get(2));
-		widthField = (TextField)(gd.getNumericFields().get(0));
-		visibleCheckbox = (Checkbox)(gd.getCheckboxes().get(0));
+		Vector<TextField> stringFields = gd.getStringFields();
+		colorField = stringFields.get(0);
+		color2Field = stringFields.get(1);
+		labelField = stringFields.get(2);
+		widthField = gd.getNumericFields().get(0);
+		visibleCheckbox = gd.getCheckboxes().get(0);
 		gd.addDialogListener(this);
 		IJ.wait(100);			//sometimes needed to avoid hanging?
 		if (dialogType == STYLE)

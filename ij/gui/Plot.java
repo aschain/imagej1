@@ -270,7 +270,16 @@ public class Plot implements Cloneable {
 	public Plot(ImagePlus imp, InputStream is) throws IOException, ClassNotFoundException {
 		ObjectInputStream in = new ObjectInputStream(is);
 		pp = (PlotProperties)in.readObject();
-		allPlotObjects = (Vector<PlotObject>)in.readObject();
+		Object plotObjectsObject = in.readObject();
+		if (!(plotObjectsObject instanceof Vector))
+			throw new IOException("Invalid plot data: expected Vector of PlotObject");
+		Vector<?> plotObjects = (Vector<?>)plotObjectsObject;
+		allPlotObjects = new Vector<PlotObject>(plotObjects.size());
+		for (Object object : plotObjects) {
+			if (!(object instanceof PlotObject))
+				throw new IOException("Invalid plot data: vector contains non-PlotObject");
+			allPlotObjects.add((PlotObject)object);
+		}
 		in.close();
 		if (pp.xLabel.type==8) {
 			pp.xLabel.updateType();	//convert old (pre-1.52i) type codes for the PlotObjects
@@ -824,7 +833,7 @@ public class Plot implements Cloneable {
 
 	/** Adds a set of points to the plot using double ArrayLists.
 	 * Must be called before the plot is displayed. */
-	public void addPoints(ArrayList x, ArrayList y, int shape) {
+	public void addPoints(ArrayList<Double> x, ArrayList<Double> y, int shape) {
 		addPoints(getDoubleFromArrayList(x), getDoubleFromArrayList(y), shape);
 	}
 
@@ -840,15 +849,15 @@ public class Plot implements Cloneable {
 
 	/** Adds a set of points to the plot using double ArrayLists.
 	 * Must be called before the plot is displayed. */
-	public void addPoints(ArrayList x, ArrayList y, ArrayList errorBars, int shape) {
+	public void addPoints(ArrayList<Double> x, ArrayList<Double> y, ArrayList<Double> errorBars, int shape) {
 		addPoints(getDoubleFromArrayList(x), getDoubleFromArrayList(y), getDoubleFromArrayList(errorBars), shape);
 	}
 
-	public double[] getDoubleFromArrayList(ArrayList list) {
+	public double[] getDoubleFromArrayList(ArrayList<Double> list) {
 		if (list == null) return null;
 		double[] targ = new double[list.size()];
 		for (int i = 0; i < list.size(); i++)
-			targ[i] = ((Double) list.get(i)).doubleValue();
+			targ[i] = list.get(i).doubleValue();
 		return targ;
 	}
 
@@ -869,7 +878,7 @@ public class Plot implements Cloneable {
 	 * @param shapeType e.g. "boxes width=20"
 	 * @param floatCoords eg[6][3] holding 1 Xval + 5 Yvals for 3 boxes
 	 */
-	public void drawShapes(String shapeType, ArrayList floatCoords) {
+	public void drawShapes(String shapeType, ArrayList<float[]> floatCoords) {
 		allPlotObjects.add(new PlotObject(shapeType, floatCoords, currentLineWidth, currentColor, currentColor2));
 	}
 
@@ -880,7 +889,7 @@ public class Plot implements Cloneable {
 	/** Adds a set of vectors to the plot using double ArrayLists.
 	 *	Does not support logarithmic axes.
 	 *	Must be called before the plot is displayed. */
-	public void drawVectors(ArrayList x1, ArrayList y1, ArrayList x2, ArrayList y2) {
+	public void drawVectors(ArrayList<Double> x1, ArrayList<Double> y1, ArrayList<Double> x2, ArrayList<Double> y2) {
 		drawVectors(getDoubleFromArrayList(x1), getDoubleFromArrayList(y1), getDoubleFromArrayList(x2), getDoubleFromArrayList(y2));
 	}
 
@@ -1310,12 +1319,13 @@ public class Plot implements Cloneable {
 		int nObjects = getNumPlotObjects(mask, includeHidden);
 		String[] names = new String[nObjects];
 		if (names.length == 0) return names;
-		int iData = 1, iArrow = 1, iLine = 1, iText = 1,  iBox = 1, iShape = 1; //Human readable counters of each object type
+		//int iBox = 1;
+		int iData = 1, iArrow = 1, iLine = 1, iText = 1, iShape = 1; //Human readable counters of each object type
 		int i = 0;
 		for (PlotObject plotObject : allPlotObjects) {
 			int type = plotObject.type;
 			if ((type & mask) == 0 || (!includeHidden && plotObject.hasFlag(PlotObject.HIDDEN))) continue;
-			String label = plotObject.label;
+			//String label = plotObject.label;
 			switch (type) {
 				case PlotObject.XY_DATA:
 					names[i] = "Data Set "+iData+": "+(plotObject.label != null ?
@@ -1425,7 +1435,7 @@ public class Plot implements Cloneable {
 			plotObject.unsetFlag(PlotObject.HIDDEN);
 		plotObject.color = Colors.decode(items[0].trim(), plotObject.color);
 		plotObject.color2 = Colors.decode(items[1].trim(), null);
-		float lineWidth = plotObject.lineWidth;
+		//float lineWidth = plotObject.lineWidth;
 		if (items.length >= 3) try {
 			plotObject.lineWidth = Float.parseFloat(items[2].trim());
 		} catch (NumberFormatException e) {};
@@ -2526,7 +2536,7 @@ public class Plot implements Cloneable {
 			if (xMin==xMax) {
 				if (hasFlag(X_NUMBERS)) {
 					String s = IJ.d2s(xMin,getDigits(xMin, 0.001*xMin, 5, suggestedDigits));
-					int y = yBasePxl;
+					//int y = yBasePxl;
 					ip.drawString(s, xBasePxl-ip.getStringWidth(s)/2, yOfXAxisNumbers);
 				}
 			} else {
@@ -3465,8 +3475,8 @@ public class Plot implements Cloneable {
 
 	private void drawHorizontalErrorBars(float[] x, float[] y, float[] e) {
 		int nPoints = Math.min(Math.min(x.length, y.length), e.length);
-		float[] xpoints = new float[2];
-		float[] ypoints = new float[2];
+		//float[] xpoints = new float[2];
+		//float[] ypoints = new float[2];
 		for (int i=0; i<nPoints; i++) {
 			if (Float.isNaN(x[i]) || Float.isNaN(y[i]) || (logXAxis && !(y[i] >0))) continue;
 			int y0 = scaleY(y[i]);
@@ -4204,7 +4214,7 @@ class PlotObject implements Cloneable, Serializable {
 	public float[] xValues, yValues, xEValues, yEValues;
 	/** For SHAPES: For boxplots with whiskers ('boxes'), elements of the ArrayList are float[6] with x and all 5 y values
 	 *  (for 'boxesx', y and all 5 x values), for 'rectangles', float[4] with x1, y1, x2, y2. */
-	public ArrayList shapeData;
+	public ArrayList<float[]> shapeData;
 	/** For SHAPES only, shape type & options. Currently implemented: 'boxes', 'boxesx' (box plots with whiskers), 'rectangles', 'redraw_grid' */
 	public String shapeType; //e.g. "boxes width=20"
 	/** Type of the points, such as Plot.LINE, Plot.CROSS etc. (for type = XY_DATA) */
@@ -4267,7 +4277,7 @@ class PlotObject implements Cloneable, Serializable {
 	}
 
 	/** Constructor for a set of shapes */
-	PlotObject(String shapeType, ArrayList shapeData, float lineWidth,  Color color, Color color2) {
+	PlotObject(String shapeType, ArrayList<float[]> shapeData, float lineWidth,  Color color, Color color2) {
 		this.type = SHAPES;
 		this.shapeData = shapeData;
 		this.shapeType = shapeType;
@@ -4413,15 +4423,16 @@ class PlotObject implements Cloneable, Serializable {
 
 	/** A clone of an array list one level deeper than a shallow clone.
 	 *  The clone() method of the objects in the list must be accessible */
-	private ArrayList cloneArrayList(ArrayList src) {
-		ArrayList dest = (ArrayList)(src.clone());     //shallow clone
-		Class[] noClasses = new Class[0];
+	@SuppressWarnings("unchecked")
+	private <T> ArrayList<T> cloneArrayList(ArrayList<T> src) {
+		ArrayList<T> dest = (ArrayList<T>)(src.clone());     //shallow clone
+		Class<?>[] noClasses = new Class[0];
 		Object[] noObjects = new Object[0];
 		for (int i=0; i<dest.size(); i++) {
 			Object o = dest.get(i);
 			if (o != null) try {
 				Method cloneMethod = o.getClass().getMethod("clone", noClasses);
-				dest.set(i, cloneMethod.invoke(o, noObjects));
+				dest.set(i, (T)cloneMethod.invoke(o, noObjects));
 			} catch (Exception e) {}
 		}
 		return dest;

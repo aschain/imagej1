@@ -34,7 +34,7 @@ public class NonBlockingGenericDialog extends GenericDialog {
 		if (imp != null) {
 			ImageWindow win = imp.getWindow();
 			if (win != null) {      //when the associated image closes, also close the dialog
-				final NonBlockingGenericDialog gd = this;
+				//final NonBlockingGenericDialog gd = this;
 				windowListener = new WindowAdapter() {
 					public void windowClosed(WindowEvent e) {
 						cancelDialogAndClose();

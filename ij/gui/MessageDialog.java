@@ -45,7 +45,7 @@ public class MessageDialog extends Dialog implements ActionListener, KeyListener
 		pack();
 		GUI.centerOnImageJScreen(this);
 		addWindowListener(this);
-		show();
+		setVisible(true);
 	}
 	
 	public void actionPerformed(ActionEvent e) {

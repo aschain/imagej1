@@ -33,7 +33,7 @@ public class ImageRoi extends Roi {
 		
 	public void draw(Graphics g) {
 		Graphics2D g2d = (Graphics2D)g;						
-		double mag = getMagnification();
+		//double mag = getMagnification();
 		int sx2 = screenX(x+width);
 		int sy2 = screenY(y+height);
 		Composite saveComposite = null;

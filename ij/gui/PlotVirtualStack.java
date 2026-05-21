@@ -6,7 +6,7 @@ import java.util.*;
 
 /** This is a virtual stack of frozen plots. */
 public class PlotVirtualStack extends VirtualStack {
-	private Vector plots = new Vector(50);
+	private Vector<byte[]> plots = new Vector<byte[]>(50);
 	private int bitDepth = 8;
 	
 	public PlotVirtualStack(int width, int height) {

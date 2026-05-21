@@ -550,8 +550,8 @@ public class Line extends Roi {
 			ip.setLineWidth((int)Math.round(getStrokeWidth()));
 		else
 			ip.setLineWidth(1);
-		double x = getXBase();
-		double y = getYBase();
+		//double x = getXBase();
+		//double y = getYBase();
 		x1d=getXBase()+x1R; y1d=getYBase()+y1R; x2d=getXBase()+x2R; y2d=getYBase()+y2R;
 		if (getStrokeWidth()<=1 || fillLine) {
 			ip.moveTo((int)Math.round(x1d), (int)Math.round(y1d));

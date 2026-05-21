@@ -84,7 +84,7 @@ public class ImageLayout implements LayoutManager {
 		int preferredImageWidth = d.width - (insets.left + insets.right + hgap*2);
 		int preferredImageHeight = d.height - (insets.top + insets.bottom + vgap*2 + extraHeight);
 		ic.resizeCanvas(preferredImageWidth, preferredImageHeight);
-		int maxwidth = d.width - (insets.left + insets.right + hgap*2);
+		//int maxwidth = d.width - (insets.left + insets.right + hgap*2);
 		int maxheight = d.height - (insets.top + insets.bottom + vgap*2);
 		Dimension psize = preferredLayoutSize(target);
 		int x = insets.left + hgap + (d.width - psize.width)/2;

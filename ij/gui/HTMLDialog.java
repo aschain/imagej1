@@ -76,7 +76,7 @@ public class HTMLDialog extends JDialog implements ActionListener, KeyListener, 
 		GUI.centerOnImageJScreen(this);		
 		if (!modal) {
 			WindowManager.addWindow(this);
-			show();
+			setVisible(true);
 		}
 		final JScrollBar verticalScrollBar = scrollPane.getVerticalScrollBar();
 		if (verticalScrollBar!=null) {
@@ -86,7 +86,7 @@ public class HTMLDialog extends JDialog implements ActionListener, KeyListener, 
 				}
 			});
 		}
-		if (modal) show();
+		if (modal) setVisible(true);
 		Java2.setLookAndFeel(saveLookAndFeel);
 	}
 

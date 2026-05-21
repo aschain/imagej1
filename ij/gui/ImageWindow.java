@@ -22,7 +22,7 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 	protected ImageJ ij;
 	protected ImageCanvas ic;
 	private double initialMagnification = 1;
-	private int newWidth, newHeight;
+	//private int newWidth, newHeight;
 	protected boolean closed;
 	private boolean newCanvas;
 	private boolean unzoomWhenMinimizing = true;
@@ -112,7 +112,7 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 				pack();
 				if (IJ.isMacro())
 					imp.setDeactivated(); //prepare for waitTillActivated (imp may have been activated before if it gets a new Window now)
-				show();
+				setVisible(true);
 			}
 			if (ic.getMagnification()!=0.0)
 				imp.setTitle(imp.getTitle());
@@ -146,7 +146,7 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 			} else {
 				if (IJ.isMacro())
 					imp.setDeactivated(); //prepare for waitTillActivated (imp may have been activated previously and gets a new Window now)
-				show();
+				setVisible(true);
 			}
 		}
 	}
@@ -643,7 +643,7 @@ public class ImageWindow extends Frame implements FocusListener, WindowListener,
 	public synchronized void mouseWheelMoved(MouseWheelEvent e) {
 		int rotation = e.getWheelRotation();
 		int amount = e.getScrollAmount();
-		boolean ctrl = (e.getModifiers()&Event.CTRL_MASK)!=0;
+		boolean ctrl = (e.getModifiersEx()&InputEvent.CTRL_DOWN_MASK)!=0;
 		//if (IJ.debugMode) {
 		//	IJ.log("mouseWheelMoved: "+e);
 		//	IJ.log("  type: "+e.getScrollType());
