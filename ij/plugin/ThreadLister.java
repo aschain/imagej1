@@ -1,7 +1,7 @@
 package ij.plugin;
-import java.io.*;
 import ij.*;
 import ij.text.*;
+import java.io.*;
 import javax.swing.SwingUtilities;
 
 /**

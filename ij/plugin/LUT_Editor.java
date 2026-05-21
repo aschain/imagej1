@@ -1,14 +1,12 @@
 package ij.plugin;
 import ij.*;
-import ij.process.*;
 import ij.gui.*;
-import ij.plugin.frame.Recorder;
-import java.awt.*;
-import java.awt.image.*;
-import ij.util.*;
 import ij.measure.*;
-import java.util.Vector;
+import ij.plugin.frame.Recorder;
+import ij.process.*;
+import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.*;
 
 public class LUT_Editor implements PlugIn, ActionListener{
     private ImagePlus imp;

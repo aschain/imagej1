@@ -7,6 +7,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import ij.io.FileInfo;
 import ij.measure.Calibration;
 import ij.process.ByteProcessor;
@@ -14,11 +15,9 @@ import ij.process.ColorProcessor;
 import ij.process.DataConstants;
 import ij.process.ImageProcessor;
 import ij.process.LUT;
-
 import java.awt.Color;
 import java.awt.image.IndexColorModel;
 import java.io.File;
-
 import org.junit.Before;
 import org.junit.Test;
 

@@ -1,15 +1,14 @@
 package ij;
-import ij.plugin.Converter;
-import ij.plugin.frame.Recorder;
-import ij.plugin.frame.Editor; 
-import ij.text.TextWindow;
-import ij.plugin.frame.PlugInFrame;
-import ij.plugin.frame.Commands;
-import ij.util.Tools;
+import ij.gui.*;
 import ij.macro.Interpreter;
+import ij.plugin.frame.Commands;
+import ij.plugin.frame.Editor;
+import ij.plugin.frame.PlugInFrame;
+import ij.plugin.frame.Recorder;
+import ij.text.TextWindow;
+import ij.util.Tools;
 import java.awt.*;
 import java.util.*;
-import ij.gui.*;
 
 /** This class consists of static methods used to manage ImageJ's windows. */
 public class WindowManager {

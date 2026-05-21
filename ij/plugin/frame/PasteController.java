@@ -1,10 +1,10 @@
 package ij.plugin.frame;
+import ij.*;
+import ij.gui.*;
+import ij.plugin.*;
+import ij.process.*;
 import java.awt.*;
 import java.awt.event.*;
-import ij.*;
-import ij.plugin.*;
-import ij.gui.*;
-import ij.process.*;
 
 /** Implements ImageJ's Paste Control window. */
 public class PasteController extends PlugInFrame implements PlugIn, ItemListener {

@@ -1,18 +1,17 @@
 package ij.process;
-import java.util.*;
-import java.awt.*;
-import java.awt.image.*;
-import java.awt.geom.Rectangle2D;
-import java.awt.font.GlyphVector;
-import java.awt.font.FontRenderContext;
+import ij.Prefs;
 import ij.gui.*;
-import ij.util.*;
-import ij.plugin.filter.GaussianBlur;
+import ij.measure.Measurements;
 import ij.plugin.Binner;
 import ij.plugin.Colors;
+import ij.plugin.filter.GaussianBlur;
 import ij.process.AutoThresholder.Method;
-import ij.Prefs;
-import ij.measure.Measurements;
+import ij.util.*;
+import java.awt.*;
+import java.awt.font.GlyphVector;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.*;
+import java.util.*;
 
 /**
 This abstract class is the superclass for classes that process

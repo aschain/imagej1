@@ -6,8 +6,8 @@ package ij.io;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import ij.IJInfo;
 
+import ij.IJInfo;
 import org.junit.Test;
 
 /**

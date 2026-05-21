@@ -1,15 +1,14 @@
 package ij.plugin;
 import ij.*;
-import ij.process.*;
 import ij.gui.*;
-import ij.util.Tools;
+import ij.measure.Calibration;
 import ij.plugin.filter.PlugInFilter;
 import ij.plugin.frame.Recorder;
-import ij.measure.Calibration;
+import ij.process.*;
+import ij.util.Tools;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Vector;
-
 
 /** This plugin implements the Analyze/Histogram command. */
 public class Histogram implements PlugIn, TextListener {

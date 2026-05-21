@@ -1,13 +1,8 @@
 package ij.plugin;
 import ij.*;
 import ij.gui.*;
-import ij.process.*;
-import ij.plugin.filter.Analyzer;
-import ij.measure.Measurements;
 import java.awt.*;
-import java.awt.event.*;
 import java.util.*;
-
 
 /** This plugin implements the Edit/Options/Point Tool command. */
 public class PointToolOptions implements PlugIn, DialogListener {

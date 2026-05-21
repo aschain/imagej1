@@ -1,8 +1,7 @@
 package ij.plugin;
 import ij.*;
-import ij.process.*;
 import ij.gui.*;
-import java.awt.*;
+import ij.process.*;
 
 /** Implements the conversion commands in the Image/Type submenu. */
 public class Converter implements PlugIn {

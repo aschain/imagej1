@@ -1,9 +1,8 @@
 package ij.plugin;
 import ij.*;
-import ij.process.*;
 import ij.gui.*;
-import ij.util.Tools;
 import ij.plugin.filter.Analyzer;
+import ij.util.Tools;
 import java.awt.*;
 import java.util.Vector;
 

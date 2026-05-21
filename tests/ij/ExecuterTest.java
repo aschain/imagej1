@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.awt.event.KeyEvent;
-
 import org.junit.Test;
 
 /**

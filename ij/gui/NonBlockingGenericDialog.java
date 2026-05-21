@@ -1,9 +1,7 @@
 package ij.gui;
 import ij.*;
-import java.awt.event.*;
 import java.awt.EventQueue;
-import java.awt.GraphicsEnvironment;
-import java.awt.Frame;
+import java.awt.event.*;
 
 /** This is an extension of GenericDialog that is non-modal.
  *	@author Johannes Schindelin

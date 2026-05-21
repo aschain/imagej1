@@ -1,8 +1,8 @@
 package ij.plugin.filter;
 import ij.*;
 import ij.gui.*;
-import ij.process.*;
 import ij.plugin.frame.ThresholdAdjuster;
+import ij.process.*;
 import java.awt.*;
 
 /** Implements the Erode, Dilate, Open, Close, Outline, Skeletonize

@@ -1,12 +1,11 @@
 package ij;
-import ij.process.*;
 import ij.io.*;
-import ij.gui.ImageCanvas;
-import ij.util.Tools;
 import ij.plugin.FolderOpener;
-import java.io.*;
+import ij.process.*;
+import ij.util.Tools;
 import java.awt.*;
 import java.awt.image.ColorModel;
+import java.io.*;
 import java.util.Properties;
 
 /** This class represents an array of disk-resident images. */

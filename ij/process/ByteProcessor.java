@@ -1,10 +1,9 @@
 package ij.process;
 
-import java.util.*;
+import ij.Prefs;
 import java.awt.*;
 import java.awt.image.*;
-import ij.gui.*;
-import ij.Prefs;
+import java.util.*;
 
 /**
 This is an 8-bit image and methods that operate on that image. Based on the ImageProcessor class

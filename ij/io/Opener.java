@@ -1,26 +1,24 @@
 package ij.io;
 import ij.*;
 import ij.gui.*;
-import ij.process.*;
-import ij.plugin.frame.*;
+import ij.macro.Interpreter;
+import ij.measure.ResultsTable;
 import ij.plugin.*;
+import ij.plugin.frame.*;
+import ij.process.*;
 import ij.text.TextWindow;
 import ij.util.Java2;
-import ij.measure.ResultsTable;
-import ij.macro.Interpreter;
-import ij.util.Tools;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.image.*;
 import java.io.*;
-import java.net.URL;
+import java.lang.reflect.Method;
 import java.net.*;
+import java.net.URL;
 import java.util.*;
 import java.util.zip.*;
-import javax.swing.*;
-import javax.swing.filechooser.*;
-import java.awt.event.KeyEvent;
 import javax.imageio.ImageIO;
-import java.lang.reflect.Method;
+import javax.swing.*;
 
 /** Opens tiff (and tiff stacks), dicom, fits, pgm, jpeg, bmp or
 	gif images, and look-up tables, using a file open dialog or a path.

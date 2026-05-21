@@ -1,24 +1,22 @@
 package ij.macro;
 import ij.*;
-import ij.process.*;
 import ij.gui.*;
+import ij.io.*;
 import ij.measure.*;
 import ij.plugin.*;
 import ij.plugin.filter.*;
 import ij.plugin.frame.*;
+import ij.process.*;
 import ij.text.*;
-import ij.io.*;
 import ij.util.*;
 import java.awt.*;
-import java.awt.image.*;
-import java.util.*;
-import java.io.*;
-import java.awt.event.KeyEvent;
-import java.lang.reflect.*;
-import java.net.URL;
 import java.awt.datatransfer.*;
+import java.awt.event.KeyEvent;
 import java.awt.geom.*;
-
+import java.awt.image.*;
+import java.io.*;
+import java.lang.reflect.*;
+import java.util.*;
 
 /** This class implements the built-in macro functions. */
 public class Functions implements MacroConstants, Measurements {

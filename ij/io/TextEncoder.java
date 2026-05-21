@@ -1,8 +1,8 @@
 package ij.io;
-import java.io.*;
 import ij.*;
-import ij.process.*;
 import ij.measure.*;
+import ij.process.*;
+import java.io.*;
 
 /** Saves an image described by an ImageProcessor object as a tab-delimited text file. */
 public class TextEncoder {

@@ -1,11 +1,10 @@
 package ij.plugin;
-import java.awt.*;
-import java.io.*;
-import java.util.zip.GZIPInputStream;
 import ij.*;
 import ij.io.*;
-import ij.process.*;
 import ij.measure.*;
+import ij.process.*;
+import java.io.*;
+import java.util.zip.GZIPInputStream;
 
 /** Opens and displays FITS images. The FITS format is 
  * described at "http://fits.gsfc.nasa.gov/fits_standard.html".

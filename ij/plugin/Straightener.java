@@ -1,8 +1,8 @@
 package ij.plugin;
 import ij.*;
 import ij.gui.*;
-import ij.process.*;
 import ij.measure.Calibration;
+import ij.process.*;
 import java.awt.*;
 
 /** This plugin implements the Edit/Selection/Straighten command. */

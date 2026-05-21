@@ -1,8 +1,6 @@
 package ij.plugin.filter;
 import ij.*;
-import ij.gui.*;
 import ij.process.*;
-import java.awt.*;
 
 /** Implements the commands in the Process/Shadows submenu. */
 public class Shadows implements PlugInFilter {

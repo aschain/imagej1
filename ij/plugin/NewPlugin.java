@@ -1,10 +1,9 @@
 package ij.plugin;
-import java.awt.*;
 import ij.*;
 import ij.gui.*;
+import ij.io.SaveDialog;
 import ij.plugin.frame.Editor;
 import ij.text.TextWindow;
-import ij.io.SaveDialog;
 import ij.util.Tools;
 
 /** This class creates a new macro or the Java source for a new plugin. */

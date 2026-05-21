@@ -1,13 +1,11 @@
 package ij.io;
 import ij.*;
 import ij.process.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.*;
-import java.awt.image.BufferedImage;
-import javax.imageio.ImageIO;
 import java.util.zip.Inflater;
-import java.util.zip.DataFormatException;
-
+import javax.imageio.ImageIO;
 
 /** Reads raw 8-bit, 16-bit or 32-bit (float or RGB)
 	images from a stream or URL. */

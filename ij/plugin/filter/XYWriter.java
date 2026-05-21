@@ -1,16 +1,12 @@
 package ij.plugin.filter;
 
-import java.awt.*;
-import java.awt.image.*;
-import java.util.Vector;
-import java.io.*;
 import ij.*;
-import ij.process.*;
-import ij.io.*;
 import ij.gui.*;
+import ij.io.*;
 import ij.measure.*;
-import java.awt.geom.*;
-
+import ij.process.*;
+import java.awt.*;
+import java.io.*;
 
 /** Saves the XY coordinates of the current ROI boundary. */
 public class XYWriter implements PlugInFilter {

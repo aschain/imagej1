@@ -1,12 +1,9 @@
 package ij.io;
-import ij.gui.*;
 import ij.ImagePlus;
-import ij.process.*;
-import java.io.*;
-import java.util.*;
-import java.net.*;
+import ij.gui.*;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.io.*;
 
 /** This class decodes an ImageJ .roi file. 
 	<p>

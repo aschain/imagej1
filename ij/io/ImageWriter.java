@@ -1,7 +1,7 @@
 package ij.io;
-import java.io.*;
-import ij.*;  //??
+import ij.*; //??
 import ij.process.ImageProcessor;
+import java.io.*;
 
 /** Writes a raw image described by a FileInfo object to an OutputStream. */
 public class ImageWriter {

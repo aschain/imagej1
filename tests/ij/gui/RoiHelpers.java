@@ -2,12 +2,12 @@ package ij.gui;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import ij.Assert;
 import ij.ImagePlus;
 import ij.measure.Calibration;
 import ij.process.ImageProcessor;
 import ij.process.ShortProcessor;
-
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.geom.PathIterator;

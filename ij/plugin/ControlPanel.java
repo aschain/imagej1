@@ -2,21 +2,15 @@ package ij.plugin;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
-import java.io.*;
 import java.util.*;
-import java.net.*;
-import java.net.URL;
+
 import javax.swing.*;
-import javax.swing.tree.*;
 import javax.swing.event.*;
+import javax.swing.tree.*;
+
 import ij.*;
-import ij.gui.*;
-import ij.io.*;
-import ij.plugin.*;
-import ij.plugin.filter.*;
-import ij.plugin.frame.PlugInFrame;
-import ij.util.*;
-import ij.text.TextWindow;
+import ij.gui.GUI;
+import ij.util.StringSorter;
 
 /**ControlPanel.
  * This plugin displays a panel with ImageJ commands in a hierarchical tree structure.

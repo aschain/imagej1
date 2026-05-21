@@ -6,11 +6,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import ij.Assert;
 import ij.IJInfo;
-
 import java.io.ByteArrayInputStream;
-
 import org.junit.Test;
 
 /**

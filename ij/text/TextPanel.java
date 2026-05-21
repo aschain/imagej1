@@ -1,19 +1,18 @@
 package ij.text;
-import java.awt.*;
-import java.io.*;
-import java.awt.event.*;
-import java.util.*;
-import java.awt.datatransfer.*;
 import ij.*;
-import ij.plugin.filter.Analyzer;
-import ij.plugin.Distribution;
-import ij.io.SaveDialog;
-import ij.measure.*;
-import ij.util.Tools;
-import ij.plugin.frame.Recorder;
 import ij.gui.*;
+import ij.io.SaveDialog;
 import ij.macro.Interpreter;
-
+import ij.measure.*;
+import ij.plugin.Distribution;
+import ij.plugin.filter.Analyzer;
+import ij.plugin.frame.Recorder;
+import ij.util.Tools;
+import java.awt.*;
+import java.awt.datatransfer.*;
+import java.awt.event.*;
+import java.io.*;
+import java.util.*;
 
 /**
 This is an unlimited size text panel with tab-delimited,

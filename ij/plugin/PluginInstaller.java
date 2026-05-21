@@ -1,11 +1,10 @@
 package ij.plugin;
 import ij.*;
-import ij.gui.*;
 import ij.io.*;
 import ij.macro.*;
 import java.io.*;
-import java.net.URL;
 import java.net.*;
+import java.net.URL;
 import java.util.*;
 
 /** Installs plugins dragged and dropped on the "ImageJ" window, or plugins,

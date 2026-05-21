@@ -1,12 +1,12 @@
 package ij.plugin.frame;
 import ij.*;
+import ij.gui.*;
 import ij.plugin.*;
+import ij.process.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Vector;
 import javax.swing.BoxLayout;
-import ij.process.*;
-import ij.gui.*;
 
 /** Implements the Image/Color/Color Picker command. */
 public class ColorPicker extends PlugInDialog {

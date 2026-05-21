@@ -1,10 +1,10 @@
 package ij.gui;
 
 import static org.junit.Assert.assertNotNull;
+
 import ij.IJInfo;
 import ij.ImagePlus;
 import ij.process.ByteProcessor;
-
 import org.junit.Test;
 
 /**

@@ -1,18 +1,15 @@
 package ij.gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.awt.datatransfer.*;
-import java.util.*;
 import ij.*;
+import ij.io.SaveDialog;
+import ij.measure.*;
 import ij.process.*;
 import ij.util.*;
-import ij.text.TextWindow;
-import ij.plugin.filter.Analyzer;
-import ij.plugin.filter.PlugInFilterRunner;
-import ij.measure.*;
-import ij.io.SaveDialog;
+import java.awt.*;
+import java.awt.datatransfer.*;
+import java.awt.event.*;
+import java.io.*;
+import java.util.*;
 
 /** This class implements the Analyze/Plot Profile command.
 * @author Michael Schmid

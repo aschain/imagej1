@@ -2,10 +2,10 @@ package ij.plugin;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
-import ij.process.*;
 import ij.gui.Roi;
 import ij.plugin.filter.ThresholdToSelection;
 import ij.plugin.frame.RoiManager;
+import ij.process.*;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 

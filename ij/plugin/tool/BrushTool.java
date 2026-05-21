@@ -1,9 +1,9 @@
 package ij.plugin.tool;
 import ij.*;
-import ij.process.*;
 import ij.gui.*;
 import ij.plugin.Colors;
 import ij.plugin.frame.Recorder;
+import ij.process.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Vector;

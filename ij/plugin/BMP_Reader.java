@@ -1,11 +1,10 @@
 package ij.plugin;
 
+import ij.*;
+import ij.io.*;
 import java.awt.*;
 import java.awt.image.*;
 import java.io.*;
-import ij.*;
-import ij.io.*;
-
 
 /** This plugin reads BMP files. If 'arg' is empty, it
         displays a file open dialog and opens and displays the 

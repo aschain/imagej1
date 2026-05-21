@@ -1,21 +1,17 @@
 package ij;
-import ij.util.Java2;
-import java.io.*;
-import java.util.*;
-import java.applet.*;
-import java.net.URL;
-import java.awt.*;
-import java.applet.Applet;
-import ij.io.*;
-import ij.util.Tools;
 import ij.gui.*;
-import ij.plugin.filter.*;
-import ij.process.ImageConverter;
+import ij.io.*;
 import ij.plugin.Animator;
-import ij.process.FloatBlitter;
-import ij.plugin.GelAnalyzer;
+import ij.plugin.filter.*;
 import ij.process.ColorProcessor;
+import ij.process.FloatBlitter;
 import ij.text.TextWindow;
+import ij.util.Tools;
+import java.applet.Applet;
+import java.awt.*;
+import java.io.*;
+import java.net.URL;
+import java.util.*;
 
 /**
 This class contains the ImageJ preferences, which are 

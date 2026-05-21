@@ -1,10 +1,10 @@
 package ij.process;
 
 import static org.junit.Assert.assertEquals;
+
 import ij.Assert;
 import ij.ImagePlus;
 import ij.io.Opener;
-
 import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
@@ -17,7 +17,6 @@ import java.awt.image.PixelGrabber;
 import java.awt.image.Raster;
 import java.awt.image.SampleModel;
 import java.util.Random;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 

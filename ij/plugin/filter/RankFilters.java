@@ -1,15 +1,12 @@
 package ij.plugin.filter;
 import ij.*;
 import ij.gui.*;
-import ij.process.*;
 import ij.plugin.ContrastEnhancer;
+import ij.process.*;
 import ij.util.ThreadUtil;
 import java.awt.*;
-import java.awt.event.*;
-import java.util.Arrays;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
-
 
 /** This plugin implements the Mean, Minimum, Maximum, Variance, Median,
  *	Remove Outliers, Remove NaNs and Despeckle commands.

@@ -4,16 +4,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
 import ij.Assert;
 import ij.ImagePlus;
 import ij.measure.Calibration;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import ij.process.ShortProcessor;
-
 import java.awt.Polygon;
 import java.awt.event.KeyEvent;
-
 import org.junit.Test;
 
 /**

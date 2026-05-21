@@ -1,8 +1,8 @@
 package ij.plugin.tool;
 import ij.ImagePlus;
-import ij.plugin.PlugIn;
-import ij.macro.Program;
 import ij.gui.Toolbar;
+import ij.macro.Program;
+import ij.plugin.PlugIn;
 import java.awt.event.*;
 
 public abstract class PlugInTool implements PlugIn {

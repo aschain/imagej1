@@ -1,15 +1,12 @@
 package ij.plugin;
 import ij.*;
-import ij.process.*;
 import ij.gui.*;
-import ij.plugin.frame.RoiManager;
-import ij.plugin.frame.Recorder;
-import ij.macro.Interpreter;
-import ij.io.RoiDecoder;
-import ij.plugin.filter.PlugInFilter;
 import ij.measure.*;
+import ij.plugin.filter.PlugInFilter;
+import ij.plugin.frame.Recorder;
+import ij.plugin.frame.RoiManager;
+import ij.process.*;
 import java.awt.*;
-import java.util.ArrayList;
 import java.awt.geom.Rectangle2D;
 
 /** This plugin implements the commands in the Image/Overlay menu. */

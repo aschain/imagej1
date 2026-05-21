@@ -4,7 +4,6 @@ import ij.process.*;
 import java.awt.*;
 import java.awt.geom.*;
 
-
 /** This is an Roi subclass for creating and displaying arrows. */
 public class Arrow extends Line {
 	public static final String STYLE_KEY = "arrow.style";

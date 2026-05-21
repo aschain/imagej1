@@ -4,10 +4,9 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
 import ij.Assert;
-
 import java.awt.Color;
-
 import org.junit.Test;
 
 /**

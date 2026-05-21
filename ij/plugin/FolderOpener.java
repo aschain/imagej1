@@ -1,16 +1,16 @@
 package ij.plugin;
+import ij.*;
+import ij.gui.*;
+import ij.io.*;
+import ij.measure.Calibration;
+import ij.plugin.frame.Recorder;
+import ij.process.*;
+import ij.util.*;
 import java.awt.*;
-import java.io.*;
 import java.awt.event.*;
 import java.awt.image.ColorModel;
+import java.io.*;
 import java.util.*;
-import ij.*;
-import ij.io.*;
-import ij.gui.*;
-import ij.process.*;
-import ij.measure.Calibration;
-import ij.util.*;
-import ij.plugin.frame.Recorder;
 
 /** Implements the File/Import/Image Sequence command, which
 	opens a folder of images as a stack. */

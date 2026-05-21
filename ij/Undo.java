@@ -1,11 +1,9 @@
 /**Implements the Edit/Undo command.*/
 
 package ij;
-import ij.process.*;
 import ij.gui.*;
 import ij.measure.Calibration;
-import java.awt.*;
-import java.awt.image.*;
+import ij.process.*;
 
 /** This class consists of static methods and
 	fields that implement ImageJ's Undo command. */

@@ -1,9 +1,8 @@
  package ij.process;
 
-import java.util.*;
 import java.awt.*;
 import java.awt.image.*;
-import ij.gui.*;
+import java.util.*;
 
 /** ShortProcessors contain a 16-bit unsigned image
 	and methods that operate on that image. */

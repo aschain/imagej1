@@ -7,7 +7,6 @@ import java.awt.event.*;
 import java.awt.geom.*;
 import java.util.*;
 
-
 /** This class "synchronizes" mouse input in multiple windows. Once
 	several windows are synchronized, mouse events in any one of the
 	synchronized windows are propagated to the others.

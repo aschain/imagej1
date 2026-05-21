@@ -1,12 +1,11 @@
 package ij.plugin;
 import ij.*;
-import ij.process.*;
 import ij.io.*;
-import java.net.*;
-import java.io.*;
-import java.util.*;
+import ij.process.*;
 import java.awt.*;
-import java.awt.image.*;
+import java.io.*;
+import java.net.*;
+import java.util.*;
 
 /** This plugin opens GIFs and Animated GIFs. */
 public class GIF_Reader extends ImagePlus implements PlugIn {

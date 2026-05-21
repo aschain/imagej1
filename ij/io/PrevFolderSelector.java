@@ -4,13 +4,12 @@
  */
  
 package ij.io;
- 
-import ij.IJ;
-import javax.swing.*;
-import java.beans.*;
+
 import java.awt.*;
+import java.beans.*;
 import java.io.File;
- 
+import javax.swing.*;
+
 /* PrevFolderSelector.java */
 public class PrevFolderSelector extends JComponent
                           implements PropertyChangeListener {

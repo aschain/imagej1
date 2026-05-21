@@ -1,13 +1,11 @@
 package ij.plugin;
-import ij.plugin.frame.Recorder;
 import ij.*;
 import ij.gui.*;
-import ij.process.*;
-import ij.measure.Calibration;
-import ij.macro.Interpreter;
 import ij.io.FileInfo;
+import ij.measure.Calibration;
+import ij.plugin.frame.Recorder;
+import ij.process.*;
 import java.awt.Color;
-
 
 /** Implements the Image/Stacks/Images to Stack" command. */
 public class ImagesToStack implements PlugIn {

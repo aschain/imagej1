@@ -1,8 +1,8 @@
 package ij.io;
 
 import static org.junit.Assert.assertEquals;
-import ij.IJInfo;
 
+import ij.IJInfo;
 import org.junit.Test;
 
 /**

@@ -1,18 +1,15 @@
 package ij.io;
-import java.awt.*;
-import java.io.*;
-import java.util.zip.*;
 import ij.*;
-import ij.process.*;
+import ij.gui.*;
 import ij.measure.Calibration;
-import ij.plugin.filter.Analyzer;
-import ij.plugin.frame.Recorder;
+import ij.measure.Measurements;
 import ij.plugin.JpegWriter;
 import ij.plugin.Orthogonal_Views;
-import ij.gui.*;
-import ij.measure.Measurements;
+import ij.plugin.filter.Analyzer;
+import ij.process.*;
 import ij.util.Tools;
-import javax.imageio.*;
+import java.io.*;
+import java.util.zip.*;
 
 /** Saves images in tiff, gif, jpeg, raw, zip and text format. */
 public class FileSaver {

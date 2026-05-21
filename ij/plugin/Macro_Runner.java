@@ -1,11 +1,9 @@
 package ij.plugin;
 import ij.*;
+import ij.gui.GenericDialog;
 import ij.io.*;
 import ij.macro.*;
-import ij.text.*;
-import ij.util.*;
 import ij.plugin.frame.*;
-import ij.gui.GenericDialog;
 import java.io.*;
 import java.lang.reflect.*;
 

@@ -1,11 +1,10 @@
 package ij.gui;
-import ij.ImageJ;
 import ij.IJ;
+import ij.ImageJ;
 import ij.Prefs;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
-
 
 /** This class, based on Joachim Walter's Image5D package, adds "c", "z" labels 
 	 and play-pause icons (T) to the stack and hyperstacks dimension sliders.

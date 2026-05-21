@@ -3,9 +3,9 @@ import ij.*;
 import ij.gui.GenericDialog;
 import ij.process.ImageProcessor;
 import ij.process.LUT;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
-import java.awt.Color;
 
 /**
  * This plugin is used by the Image/Stacks/Tools/Make Substack

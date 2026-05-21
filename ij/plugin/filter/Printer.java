@@ -1,10 +1,9 @@
 package ij.plugin.filter;
 import ij.*;
 import ij.gui.*;
-import ij.process.*;
 import ij.measure.Calibration;
+import ij.process.*;
 import java.awt.*;
-import java.util.Properties;
 import java.awt.print.*;
 
 /** This plugin implements the File/Page Setup and File/Print commands. */

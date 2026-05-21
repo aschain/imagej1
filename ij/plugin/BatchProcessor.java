@@ -1,11 +1,10 @@
 package ij.plugin;
 import ij.*;
-import ij.process.*;
 import ij.gui.*;
-import ij.util.Tools;
-import ij.util.StringSorter;
 import ij.io.*;
 import ij.macro.Interpreter;
+import ij.process.*;
+import ij.util.StringSorter;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;

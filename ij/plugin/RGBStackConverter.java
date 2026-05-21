@@ -1,8 +1,8 @@
 package ij.plugin;
-import java.awt.*;
 import ij.*;
-import ij.process.*;
 import ij.gui.*;
+import ij.process.*;
+import java.awt.*;
 
 /** Converts a 2 or 3 slice stack, or a hyperstack, to RGB. */
 public class RGBStackConverter implements PlugIn, DialogListener {

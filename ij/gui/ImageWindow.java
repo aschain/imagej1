@@ -1,16 +1,13 @@
 package ij.gui;
-import java.awt.*;
-import java.awt.image.*;
-import java.util.Properties;
-import java.awt.event.*;
 import ij.*;
-import ij.process.*;
 import ij.io.*;
-import ij.measure.*;
-import ij.plugin.frame.*;
-import ij.plugin.PointToolOptions;
 import ij.macro.Interpreter;
+import ij.measure.*;
+import ij.plugin.PointToolOptions;
+import ij.plugin.frame.*;
 import ij.util.*;
+import java.awt.*;
+import java.awt.event.*;
 
 /** A frame for displaying images. */
 public class ImageWindow extends Frame implements FocusListener, WindowListener, WindowStateListener, MouseWheelListener {

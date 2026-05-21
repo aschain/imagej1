@@ -1,18 +1,17 @@
 package ij.plugin;
 import ij.*;
 import ij.gui.*;
-import ij.process.*;
-import ij.measure.*;
 import ij.io.*;
-import ij.util.Tools;
-import ij.plugin.frame.Editor;
-import ij.plugin.filter.Analyzer;
-import ij.text.TextWindow;
 import ij.macro.Interpreter;
+import ij.measure.*;
+import ij.plugin.filter.Analyzer;
+import ij.process.*;
+import ij.text.TextWindow;
+import ij.util.Tools;
 import java.awt.*;
-import java.util.*;
-import java.lang.reflect.*;
 import java.awt.geom.Rectangle2D;
+import java.lang.reflect.*;
+import java.util.*;
 
 /** This plugin implements the Image/Show Info command. */
 public class ImageInfo implements PlugIn {

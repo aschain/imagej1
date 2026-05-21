@@ -1,12 +1,10 @@
 package ij.plugin;
 import ij.*;
-import ij.io.*;
 import ij.gui.*;
+import ij.io.*;
 import ij.process.*;
-import ij.plugin.*;
-import java.io.*;
-import java.awt.*;
 import java.awt.image.*;
+import java.io.*;
 import javax.imageio.ImageIO;
 
 /** Saves the active image in GIF format, or as an animated GIF if the image is a stack. */

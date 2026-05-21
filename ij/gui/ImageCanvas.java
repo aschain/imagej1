@@ -1,23 +1,19 @@
 package ij.gui;
 
-import java.awt.*;
-import java.awt.image.*;
-import ij.process.*;
+import ij.*;
+import ij.macro.*;
 import ij.measure.*;
 import ij.plugin.*;
 import ij.plugin.frame.Recorder;
 import ij.plugin.frame.RoiManager;
-import ij.plugin.filter.Analyzer;
 import ij.plugin.tool.PlugInTool;
-import ij.macro.*;
-import ij.*;
+import ij.process.*;
 import ij.util.*;
-import ij.text.*;
+import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.*;
 import java.util.*;
-import java.awt.geom.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-
 
 /** This is a Canvas used to display images in a Window. */
 public class ImageCanvas extends Canvas implements MouseListener, MouseMotionListener, Cloneable {

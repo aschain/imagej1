@@ -1,30 +1,26 @@
 package ij.plugin.frame;
+import ij.*;
+import ij.gui.*;
+import ij.io.*;
+import ij.macro.*;
+import ij.measure.*;
+import ij.plugin.*;
+import ij.plugin.OverlayCommands;
+import ij.plugin.filter.*;
+import ij.process.*;
+import ij.util.*;
 import java.awt.*;
+import java.awt.List;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
-import java.awt.List;
 import java.util.zip.*;
-import java.awt.geom.*;
-
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-
-import ij.*;
-import ij.process.*;
-import ij.gui.*;
-import ij.io.*;
-import ij.plugin.filter.*;
-import ij.plugin.*;
-import ij.util.*;
-import ij.macro.*;
-import ij.measure.*;
-import ij.plugin.OverlayCommands;
 
 /** This plugin implements the Analyze/Tools/ROI Manager command. */
 public class RoiManager extends PlugInFrame implements ActionListener, ItemListener, MouseListener, MouseWheelListener, ListSelectionListener, Iterable<Roi> {

@@ -1,14 +1,13 @@
 package ij.gui;
 import ij.*;
+import ij.macro.Interpreter;
+import ij.plugin.Colors;
+import ij.plugin.frame.Recorder;
 import ij.process.*;
 import ij.util.*;
-import ij.macro.Interpreter;
-import ij.plugin.frame.Recorder;
-import ij.plugin.Colors;
-import java.awt.geom.*;
 import java.awt.*;
+import java.awt.geom.*;
 import java.awt.image.BufferedImage;
-
 
 /** This class is a rectangular ROI containing text. */
 public class TextRoi extends Roi {

@@ -2,11 +2,10 @@ package ij.measure;
 import ij.*;
 import ij.gui.*;
 import ij.macro.*;
-import ij.util.Tools;
 import ij.util.IJMath;
-import java.util.Arrays;
-import java.util.Hashtable;
+import ij.util.Tools;
 import java.awt.Color;
+import java.util.Hashtable;
 
 /** Curve fitting class based on the Simplex method in the Minimizer class
  *

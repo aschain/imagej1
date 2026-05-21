@@ -1,16 +1,14 @@
 package ij.plugin;
-import java.awt.*;
-import java.io.*;
-import java.awt.event.*;
 import ij.*;
 import ij.gui.*;
-import ij.macro.*;
-import ij.text.*;
-import ij.util.Tools;
 import ij.io.*;
+import ij.macro.*;
 import ij.macro.MacroConstants;
 import ij.plugin.frame.*;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                import java.util.*;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+import java.util.*;
 
 /** This plugin implements the Plugins/Macros/Install Macros command. It is also used by the Editor
 	class to install macros in menus and by the ImageJ class to install macros at startup. */

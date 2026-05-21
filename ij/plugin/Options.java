@@ -1,12 +1,11 @@
 package ij.plugin;
 import ij.*;
 import ij.gui.*;
-import ij.process.*;
 import ij.io.*;
+import ij.measure.ResultsTable;
 import ij.plugin.filter.*;
 import ij.plugin.frame.*;
-import ij.measure.ResultsTable;
-import java.awt.*;
+import ij.process.*;
 
 /** This plugin implements most of the commands
 	in the Edit/Options sub-menu. */

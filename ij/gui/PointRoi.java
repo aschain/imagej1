@@ -1,18 +1,16 @@
 package ij.gui;
 import ij.*;
-import ij.process.*;
 import ij.measure.*;
 import ij.plugin.Colors;
 import ij.plugin.PointToolOptions;
 import ij.plugin.filter.Analyzer;
 import ij.plugin.frame.Recorder;
-import ij.util.Tools;
+import ij.process.*;
 import ij.util.Java2;
+import ij.util.Tools;
 import java.awt.*;
-import java.awt.image.*;
-import java.awt.event.KeyEvent;
-import java.util.*;
 import java.awt.geom.*;
+import java.util.*;
 
 /** This class represents a collection of points that can be associated 
  * with counters. Use the getPolygon() or getFloatPolygon() methods

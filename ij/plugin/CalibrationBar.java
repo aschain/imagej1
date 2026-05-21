@@ -1,17 +1,13 @@
 package ij.plugin;
 import ij.*;
-import static ij.IJ.createImage;
-import java.awt.*;
-import java.awt.image.*;
-import java.awt.event.*;
-import java.io.*;
-import java.awt.datatransfer.*;
 import ij.gui.*;
-import ij.process.*;
+import ij.measure.*;
 import ij.measure.Measurements;
 import ij.plugin.filter.Analyzer;
-import ij.text.TextWindow;
-import ij.measure.*;
+import ij.process.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.image.*;
 
 /** This plugin implements the Analyze/Tools/Calibration Bar command.
 	Bob Dougherty, OptiNav, Inc., 4/14/2002

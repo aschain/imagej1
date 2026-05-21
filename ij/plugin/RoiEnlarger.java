@@ -1,11 +1,11 @@
 package ij.plugin;
 import ij.*;
-import ij.process.*;
 import ij.gui.*;
 import ij.measure.Calibration;
 import ij.plugin.filter.EDM;
 import ij.plugin.filter.ThresholdToSelection;
 import ij.plugin.frame.Recorder;
+import ij.process.*;
 import java.awt.*;
 import java.util.Vector;
 

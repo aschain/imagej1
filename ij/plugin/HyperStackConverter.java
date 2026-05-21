@@ -1,18 +1,14 @@
 package ij.plugin;
 import ij.*;
 import ij.gui.*;
-import ij.process.*;
-import ij.measure.Calibration;
 import ij.macro.Interpreter;
-import ij.io.FileInfo;
+import ij.measure.Calibration;
 import ij.plugin.frame.Recorder;
-import ij.util.Tools;
+import ij.process.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.TextListener;
-import java.awt.image.ColorModel;
-
 
 /** Implements the "Stack to HyperStack", "RGB to HyperStack" 
 	and "HyperStack to Stack" commands. */

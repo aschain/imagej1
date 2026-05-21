@@ -1,16 +1,14 @@
 package ij.plugin;
 import ij.*;
-import ij.macro.Interpreter;
-import ij.process.*; 
 import ij.gui.*;
-import java.awt.*;
+import ij.macro.Interpreter;
 import ij.measure.*;
-import ij.plugin.filter.*;
 import ij.plugin.frame.Recorder;
+import ij.process.*;
+import java.awt.*;
 import java.awt.event.*;
-import java.util.*;
-import java.lang.*;
 import java.awt.image.ColorModel;
+import java.util.*;
 
 /** This plugin, which concatenates two or more images or stacks,
  *	implements the Image/Stacks/Tools/Concatenate command.

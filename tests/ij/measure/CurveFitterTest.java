@@ -3,9 +3,9 @@ package ij.measure;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
 import ij.Assert;
 import ij.IJInfo;
-
 import org.junit.Test;
 
 // note - fully testing this would be prohibitive (would need an independent curve fitter)

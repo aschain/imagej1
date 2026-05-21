@@ -1,14 +1,12 @@
 package ij.plugin;
 import ij.*;
+import ij.gui.*;
+import ij.measure.*;
 import ij.plugin.filter.*;
 import ij.process.*;
-import ij.gui.*;
 import java.awt.*;
 import java.awt.image.*;
-import java.math.*;
 import java.util.*;
-import ij.measure.*;
-
 
 public class SurfacePlotter implements PlugIn {
 

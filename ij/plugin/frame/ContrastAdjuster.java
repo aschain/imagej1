@@ -1,12 +1,11 @@
 package ij.plugin.frame;
+import ij.*;
+import ij.gui.*;
+import ij.measure.*;
+import ij.process.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
-import ij.*;
-import ij.plugin.*;
-import ij.process.*;
-import ij.gui.*;
-import ij.measure.*;
 
 /** This plugin implements the Brightness/Contrast, Window/level and
 	Color Balance commands, all in the Image/Adjust sub-menu. It

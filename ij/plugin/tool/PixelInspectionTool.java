@@ -1,15 +1,14 @@
 package ij.plugin.tool;
 import ij.*;
-import ij.plugin.frame.PlugInFrame;
-import ij.process.*;
+import ij.gui.*;
 import ij.measure.*;
 import ij.plugin.filter.Analyzer;
-import ij.gui.*;
+import ij.plugin.frame.PlugInFrame;
+import ij.process.*;
 import ij.util.Tools;
 import java.awt.*;
-import java.awt.event.*;
 import java.awt.datatransfer.*;
-import java.awt.geom.*;
+import java.awt.event.*;
 
 /**
  * This plugin continuously displays the pixel values of the cursor and

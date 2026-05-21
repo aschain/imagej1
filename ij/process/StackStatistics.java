@@ -4,7 +4,7 @@ import ij.gui.*;
 import ij.measure.*;
 import ij.plugin.filter.Analyzer;
 import java.awt.*;
- 
+
 /** Statistics, including the histogram, of a stack. */
 public class StackStatistics extends ImageStatistics {
 	

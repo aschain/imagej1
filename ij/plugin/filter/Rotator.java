@@ -5,7 +5,6 @@ import ij.process.*;
 import java.awt.*;
 import java.awt.geom.*;
 
-
 /** This plugin implements the Image/Rotate/Arbitrarily command. */
 public class Rotator implements ExtendedPlugInFilter, DialogListener {
 	public static final String GRID = "|GRID|";

@@ -1,13 +1,13 @@
 package ij.plugin;
+import ij.*;
+import ij.gui.*;
+import ij.measure.Calibration;
+import ij.plugin.frame.Recorder;
+import ij.process.*;
+import ij.util.Tools;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Vector;
-import ij.*;
-import ij.process.*;
-import ij.gui.*;
-import ij.util.Tools;
-import ij.plugin.frame.Recorder;
-import ij.measure.Calibration;
 
 /** This plugin implements the Image/Duplicate command.
 <pre>

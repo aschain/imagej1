@@ -1,11 +1,10 @@
 package ij.process;
 
 import static org.junit.Assert.assertEquals;
+
 import ij.ImagePlus;
 import ij.io.Opener;
-
 import java.awt.image.ColorModel;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 

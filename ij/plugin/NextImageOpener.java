@@ -11,8 +11,8 @@ This code was modified from Image_Browser by Albert Cardona
 
 package ij.plugin;
 import ij.*;
-import ij.io.*;
 import ij.gui.*;
+import ij.io.*;
 import java.io.File;
 
 public class NextImageOpener implements PlugIn {

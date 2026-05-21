@@ -1,13 +1,12 @@
 package ij.io;
+import ij.*;
 import ij.gui.GenericDialog;
+import ij.macro.Interpreter;
+import ij.plugin.frame.Recorder;
+import ij.util.Java2;
 import java.awt.*;
 import java.io.*;
 import javax.swing.*;
-import javax.swing.filechooser.*;
-import ij.*;
-import ij.plugin.frame.Recorder;
-import ij.util.Java2;
-import ij.macro.Interpreter;
 
 /** This class displays a dialog window from 
 	which the user can save a file. */ 

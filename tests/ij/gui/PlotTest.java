@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotNull;
 
 import java.awt.Color;
 import java.awt.Font;
-
 import org.junit.Test;
 
 /**

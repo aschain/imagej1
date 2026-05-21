@@ -1,17 +1,16 @@
 package ij.plugin.filter;
 import ij.*;
 import ij.gui.*;
-import ij.process.*;
-import ij.measure.*;
-import ij.util.*;
 import ij.io.*;
+import ij.measure.*;
 import ij.plugin.TextReader;
 import ij.plugin.frame.Fitter;
+import ij.process.*;
+import ij.util.*;
 import java.awt.*;
-import java.util.*;
 import java.awt.event.*;
 import java.io.*;
-
+import java.util.*;
 
 /** Implements the Analyze/Calibrate command. */
 public class Calibrator implements PlugInFilter, Measurements, ActionListener {

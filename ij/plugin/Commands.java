@@ -1,16 +1,14 @@
 package ij.plugin;
 import ij.*;
-import ij.process.*;
 import ij.gui.*;
 import ij.io.*;
+import ij.macro.Interpreter;
 import ij.plugin.frame.*;
 import ij.text.TextWindow;
-import ij.macro.Interpreter;
-import ij.plugin.Compiler;
+import java.applet.Applet;
 import java.awt.Window;
 import java.io.File;
-import java.applet.Applet;
-	
+
 /**	Runs miscellaneous File and Window menu commands. */
 public class Commands implements PlugIn {
 	

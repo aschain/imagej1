@@ -1,7 +1,7 @@
 package ij.plugin.filter;
 import ij.*;
-import ij.process.*;
 import ij.plugin.ChannelSplitter;
+import ij.process.*;
 
 /** Deprecated; replaced by ij.plugin.ChannelSplitter. */
 public class RGBStackSplitter implements PlugInFilter {

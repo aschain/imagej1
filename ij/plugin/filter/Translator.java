@@ -3,8 +3,6 @@ import ij.*;
 import ij.gui.*;
 import ij.process.*;
 import java.awt.*;
-import java.awt.geom.*;
-
 
 /** This plugin implements the Image/Translate command. */
 public class Translator implements ExtendedPlugInFilter, DialogListener {

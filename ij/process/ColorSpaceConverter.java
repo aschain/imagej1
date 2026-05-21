@@ -1,6 +1,5 @@
 package ij.process;
 import ij.*;
-import ij.process.*;
 import java.awt.Color;
 
 /**

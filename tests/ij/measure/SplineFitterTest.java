@@ -2,9 +2,9 @@ package ij.measure;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
 import ij.Assert;
 import ij.IJInfo;
-
 import org.junit.Test;
 
 /**

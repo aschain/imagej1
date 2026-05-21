@@ -1,16 +1,11 @@
 package ij.io;
 import ij.*;
-import ij.gui.*;
-import ij.plugin.frame.Recorder;
-import ij.util.Java2;
-import java.awt.*;
+import java.awt.datatransfer.*;
 import java.io.*;
-import java.util.ArrayList; //no  need to import java.util.List; it would be ambiguous because of java.awt.List
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList; //no  need to import java.util.List; it would be ambiguous because of java.awt.List
 import javax.swing.*;
-import javax.swing.filechooser.*;
-import java.awt.datatransfer.*;
 
 /** This class handles drag&drop onto JFileChoosers. */ 
  public class DragAndDropHandler extends TransferHandler {

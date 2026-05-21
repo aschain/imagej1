@@ -1,15 +1,13 @@
 package ij.plugin.frame;
 import ij.*;
-import ij.process.*;
 import ij.gui.*;
-import java.awt.*;
-import java.awt.image.*;
-import java.util.*;
-import java.awt.event.*;
 import ij.measure.*;
 import ij.plugin.*;
 import ij.plugin.filter.ThresholdToSelection;
-
+import ij.process.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.image.*;
 
 /*	This plugin isolates pixels in an RGB image or stack according to a range of Hue.
 	Original PassBand2 by Bob Dougherty. Some code borrowed from ThresholdAdjuster by Wayne Rasband.

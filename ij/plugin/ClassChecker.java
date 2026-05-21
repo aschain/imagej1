@@ -1,12 +1,11 @@
 package  ij.plugin;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import ij.IJ;
 import ij.Menus;
 import ij.Prefs;
 import ij.util.StringSorter;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /** Checks for duplicate class and JAR files in the plugins folders. */
 public class ClassChecker implements PlugIn {

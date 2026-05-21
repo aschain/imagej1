@@ -1,8 +1,8 @@
 package ij.process;
 
+import ij.*;
 import java.awt.*;
 import java.awt.image.*;
-import ij.*;
 
 /** Converts an RGB image to 8-bit index color using Heckbert's median-cut
     color quantization algorithm. Based on median.c by Anton Kruger from the

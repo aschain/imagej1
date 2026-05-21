@@ -1,18 +1,17 @@
 package ij.gui;
-import java.awt.*;
-import java.util.*;
-import java.io.*;
-import java.lang.reflect.Method;
-import java.awt.geom.Point2D;
 import ij.*;
-import ij.process.*;
-import ij.util.*;
-import ij.plugin.Colors;
-import ij.plugin.filter.Analyzer;
 import ij.macro.Interpreter;
 import ij.measure.Calibration;
 import ij.measure.Measurements;
 import ij.measure.ResultsTable;
+import ij.plugin.Colors;
+import ij.plugin.filter.Analyzer;
+import ij.process.*;
+import ij.util.*;
+import java.awt.*;
+import java.io.*;
+import java.lang.reflect.Method;
+import java.util.*;
 
 /** This class creates an image that line graphs, scatter plots and plots of vector fields
  *	(arrows) can be drawn on and displayed.

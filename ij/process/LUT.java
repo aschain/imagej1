@@ -1,10 +1,10 @@
 package ij.process;
 import ij.*;
 import ij.plugin.Colors;
-import java.awt.image.*;
 import java.awt.Color;
+import java.awt.image.*;
 
-	/** This is an indexed color model that allows an
+/** This is an indexed color model that allows an
 		lower and upper bound to be specified. */
     public class LUT extends IndexColorModel implements Cloneable {
 		public static final String nameKey = "CurrentLUT";

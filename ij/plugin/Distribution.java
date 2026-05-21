@@ -1,13 +1,12 @@
 package ij.plugin;
 import ij.*;
 import ij.gui.*;
-import ij.process.*;
-import ij.plugin.PlugIn;
 import ij.measure.*;
+import ij.process.*;
 import ij.util.Tools;
-import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 import java.util.Vector;
 
 /**

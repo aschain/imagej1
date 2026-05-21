@@ -1,7 +1,7 @@
 package ij.util;
 import ij.*;
-import ij.process.*;
 import ij.plugin.DICOM;
+import ij.process.*;
 
 /** DICOM utilities */
 public class DicomTools {

@@ -1,15 +1,12 @@
 package ij.plugin;
 
-import java.awt.*;
-import java.awt.image.*;
-import java.util.Vector;
-import java.io.*;
 import ij.*;
-import ij.process.*;
-import ij.io.*;
 import ij.gui.*;
+import ij.io.*;
 import ij.measure.ResultsTable;
-
+import ij.process.*;
+import java.awt.*;
+import java.io.*;
 
 /** Writes the XY coordinates and pixel values of all non-background 
 	pixels to a tab-delimited text file. Backround is assumed to be the 

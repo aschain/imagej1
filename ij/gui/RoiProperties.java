@@ -1,18 +1,16 @@
 package ij.gui;
 import ij.*;
-import ij.plugin.Colors;
-import ij.io.RoiDecoder;
-import ij.process.*;
 import ij.measure.*;
-import ij.util.Tools;
+import ij.plugin.Colors;
 import ij.plugin.filter.Analyzer;
+import ij.process.*;
 import ij.text.TextWindow;
+import ij.util.Tools;
 import java.awt.*;
-import java.util.*;
 import java.awt.event.*;
+import java.util.*;
 
-
- /** Displays a dialog that allows the user to specify ROI properties such as color and line width. */
+/** Displays a dialog that allows the user to specify ROI properties such as color and line width. */
 public class RoiProperties implements TextListener, WindowListener {
 	private ImagePlus imp;
 	private Roi roi;

@@ -7,6 +7,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import ij.gui.Line;
 import ij.gui.Overlay;
 import ij.gui.Roi;
@@ -22,7 +23,6 @@ import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import ij.process.ImageStatistics;
 import ij.process.ShortProcessor;
-
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Image;
@@ -33,7 +33,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.awt.image.IndexColorModel;
 import java.util.Arrays;
-
 import org.junit.Test;
 
 // note - in some places I refer to ImagePlus's protected instance var ip (via ip.ip) rather than getProcessor() (via

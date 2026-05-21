@@ -1,12 +1,10 @@
 package ij.plugin.filter;
 
-import java.awt.*;
-import java.awt.image.*;
-import java.io.*;
 import ij.*;
-import ij.process.*;
-import ij.io.*;
 import ij.gui.*;
+import ij.io.*;
+import ij.process.*;
+import java.io.*;
 
 /** Saves the current ROI outline to a file. RoiDecoder.java 
 	has a description of the file format.

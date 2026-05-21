@@ -1,9 +1,8 @@
 package ij.plugin;
 import ij.*;
-import ij.text.*;
-import ij.measure.ResultsTable;
 import ij.io.*;
-import java.io.*;
+import ij.measure.ResultsTable;
+import ij.text.*;
 import java.awt.Frame;
 
 /** Saves a table as a csv or tab-delimited text file. */

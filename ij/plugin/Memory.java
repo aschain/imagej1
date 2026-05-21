@@ -1,9 +1,8 @@
 package ij.plugin;
 import ij.*;
 import ij.gui.*;
-import java.io.*;
 import ij.util.Tools;
-
+import java.io.*;
 
 /** This plugin implements the Edit/Options/Memory command. */
 public class Memory implements PlugIn {

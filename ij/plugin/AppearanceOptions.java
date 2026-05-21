@@ -1,11 +1,9 @@
 package ij.plugin;
 import ij.*;
 import ij.gui.*;
-import ij.process.*;
-import ij.io.*;
-import ij.plugin.filter.*;
-import ij.plugin.frame.*;
 import ij.measure.Calibration;
+import ij.plugin.frame.*;
+import ij.process.*;
 import java.awt.*;
 
 /** This plugin implements the Edit/Options/Appearance command. */

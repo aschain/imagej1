@@ -1,11 +1,10 @@
 package ij.plugin.filter;
 import ij.*;
-import ij.process.*;
 import ij.gui.*;
-import ij.util.Tools;
 import ij.measure.Measurements;
+import ij.process.*;
+import ij.util.Tools;
 import java.awt.*;
-
 
 /** This plugin implements the Image/Stacks/Label command. */
 public class StackLabeler implements ExtendedPlugInFilter, DialogListener {

@@ -1,9 +1,8 @@
 package ij.plugin;
 import ij.*;
-import ij.process.*;
 import ij.gui.*;
 import ij.measure.Calibration;
-import java.awt.*;
+import ij.process.*;
 
 /** This plugin implements the Image/Stacks/Tools/Reduce command. */
 public class StackReducer implements PlugIn {

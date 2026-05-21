@@ -1,13 +1,12 @@
 package ij.plugin.filter;
 import ij.*;
-import ij.process.*;
 import ij.gui.*;
 import ij.io.*;
 import ij.plugin.Animator;
+import ij.process.*;
 import java.awt.*;
 import java.awt.image.*;
 import java.io.*;
-import java.util.*;
 import javax.imageio.ImageIO;
 
 /**

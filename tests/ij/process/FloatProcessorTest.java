@@ -1,9 +1,9 @@
 package ij.process;
 
 import static org.junit.Assert.assertEquals;
+
 import ij.ImagePlus;
 import ij.io.Opener;
-
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;

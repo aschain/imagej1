@@ -1,15 +1,15 @@
 package ij.gui;
 
-import java.awt.*;
-import java.awt.image.*;
-import java.awt.event.*;
-import java.io.*;
-import java.awt.datatransfer.*;
 import ij.*;
-import ij.process.*;
 import ij.measure.*;
 import ij.plugin.filter.Analyzer;
 import ij.plugin.frame.Recorder;
+import ij.process.*;
+import java.awt.*;
+import java.awt.datatransfer.*;
+import java.awt.event.*;
+import java.awt.image.*;
+import java.io.*;
 
 /** This class is an extended ImageWindow that displays histograms. */
 public class HistogramWindow extends ImageWindow implements Measurements, ActionListener, 

@@ -1,8 +1,8 @@
 package ij.plugin;
 import ij.*;
-import ij.process.*;
 import ij.gui.*;
 import ij.measure.ResultsTable;
+import ij.process.*;
 import ij.util.Tools;
 
 /** Implements the Plugins/Utilities/Run Benchmark command.

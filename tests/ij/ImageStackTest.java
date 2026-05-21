@@ -7,13 +7,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import ij.process.ByteProcessor;
 import ij.process.ImageProcessor;
-
 import java.awt.Rectangle;
 import java.awt.image.ColorModel;
 import java.awt.image.DirectColorModel;
-
 import org.junit.Test;
 
 /**

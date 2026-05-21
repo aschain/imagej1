@@ -1,11 +1,8 @@
 package ij.plugin;
 import ij.*;
 import ij.gui.*;
-import ij.process.*;
-import ij.text.*;
 import ij.measure.Calibration;
-import java.awt.*;
-import java.io.*;
+import ij.process.*;
 
 /** The class implements the Process/FFT/Math command. */
 public class FFTMath implements PlugIn {

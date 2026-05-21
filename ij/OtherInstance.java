@@ -1,12 +1,8 @@
 package ij;
 
-import ij.IJ;
-import ij.ImageJ;
-import ij.Prefs;
 
 import ij.io.OpenDialog;
 import ij.io.Opener;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,13 +11,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-
 import java.lang.reflect.Method;
-
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-
 import java.util.Properties;
 
 /*

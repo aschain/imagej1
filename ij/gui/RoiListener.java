@@ -1,7 +1,7 @@
 package ij.gui;
 import ij.ImagePlus;
-	
-	/** Plugins that implement this interface are notified when
+
+/** Plugins that implement this interface are notified when
 		an ROI is created, modified or deleted. The 
 		Plugins/Utilities/Monitor Events command uses this interface.
 	*/

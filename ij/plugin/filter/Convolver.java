@@ -1,13 +1,12 @@
 package ij.plugin.filter;
 import ij.*;
-import ij.process.*;
 import ij.gui.*;
 import ij.io.*;
 import ij.plugin.TextReader;
 import ij.plugin.frame.Recorder;
+import ij.process.*;
 import ij.util.Tools;
 import java.awt.*;
-import java.util.*;
 import java.awt.event.*;
 import java.io.*;
 

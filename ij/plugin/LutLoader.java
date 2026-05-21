@@ -2,10 +2,9 @@ package ij.plugin;
 import ij.*;
 import ij.io.*;
 import ij.process.*;
-import ij.gui.ImageWindow;
 import java.awt.*;
-import java.io.*;
 import java.awt.image.*;
+import java.io.*;
 import java.net.*;
 
 /** Opens NIH Image look-up tables (LUTs), 768 byte binary LUTs

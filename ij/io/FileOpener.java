@@ -1,15 +1,15 @@
 package ij.io;
+import ij.*;
+import ij.gui.*;
+import ij.measure.*;
+import ij.plugin.frame.*;
+import ij.process.*;
 import java.awt.*;
 import java.awt.image.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
-import ij.gui.*;
-import ij.process.*;
-import ij.measure.*;
-import ij.*;
-import ij.plugin.frame.*;
 
 /**
  * Opens or reverts an image specified by a FileInfo object. Images can

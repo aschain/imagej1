@@ -1,8 +1,8 @@
 package ij.plugin; 
-import ij.*; 
-import ij.gui.*; 
-import ij.process.*;
+import ij.*;
+import ij.gui.*;
 import ij.plugin.frame.Recorder;
+import ij.process.*;
 import java.util.Arrays;
 
 /** This plugin performs a z-projection of the input stack. Type of

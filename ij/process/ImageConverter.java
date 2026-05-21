@@ -1,11 +1,11 @@
 package ij.process;
 
-import java.awt.*;
-import java.awt.image.*;
 import ij.*;
 import ij.gui.*;
 import ij.measure.*;
 import ij.plugin.frame.Recorder;
+import java.awt.*;
+import java.awt.image.*;
 
 /** This class converts an ImagePlus object to a different type. */
 public class ImageConverter {

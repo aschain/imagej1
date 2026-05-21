@@ -1,22 +1,21 @@
 package ij.gui;
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.*;
-import java.awt.image.BufferedImage;
-import javax.imageio.ImageIO;
-import java.io.File;
-import java.util.Timer;
-import java.util.Hashtable;
-import java.util.TimerTask;
-import java.util.Arrays;
-import java.util.Locale;
 import ij.*;
-import ij.plugin.frame.*;
-import ij.plugin.MacroInstaller;
-import ij.plugin.RectToolOptions;
-import ij.plugin.tool.PlugInTool;
-import ij.plugin.tool.MacroToolRunner;
 import ij.macro.Program;
+import ij.plugin.MacroInstaller;
+import ij.plugin.frame.*;
+import ij.plugin.tool.MacroToolRunner;
+import ij.plugin.tool.PlugInTool;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
+import javax.imageio.ImageIO;
 
 /** The ImageJ toolbar. */
 public class Toolbar extends Canvas implements MouseListener, MouseMotionListener, ItemListener, ActionListener {

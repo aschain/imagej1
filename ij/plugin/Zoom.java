@@ -1,8 +1,6 @@
 package ij.plugin;
 import ij.*;
 import ij.gui.*;
-import ij.process.*;
-import ij.measure.*;
 import ij.plugin.frame.Recorder;
 import java.awt.*;
 

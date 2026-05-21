@@ -6,6 +6,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
 import ij.Assert;
 import ij.IJ;
 import ij.IJInfo;
@@ -15,12 +16,10 @@ import ij.process.Blitter;
 import ij.process.ByteProcessor;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
-
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
-
 import org.junit.Test;
 
 /**

@@ -6,12 +6,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import ij.Assert;
 import ij.ByteCreator;
 import ij.IJInfo;
-
 import java.awt.image.IndexColorModel;
-
 import org.junit.Test;
 
 /**

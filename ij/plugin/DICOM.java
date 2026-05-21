@@ -1,12 +1,12 @@
 package ij.plugin;
-import java.io.*;
-import java.util.*;
-import java.net.URL;
 import ij.*;
 import ij.io.*;
+import ij.measure.Calibration;
 import ij.process.*;
 import ij.util.Tools;
-import ij.measure.Calibration;
+import java.io.*;
+import java.net.URL;
+import java.util.*;
 
 /** This plugin decodes DICOM files. If 'arg' is empty, it
 	displays a file open dialog and opens and displays the 

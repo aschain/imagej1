@@ -1,17 +1,14 @@
 package ij.plugin; 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.datatransfer.*;
-import java.awt.image.*;
-import java.io.*;
 import ij.*;
-import ij.process.*;
 import ij.gui.*;
 import ij.plugin.frame.Editor;
 import ij.plugin.frame.Recorder;
-import ij.text.TextWindow;
+import ij.process.*;
 import ij.util.Tools;
-	
+import java.awt.*;
+import java.awt.datatransfer.*;
+import java.awt.image.*;
+
 /**	Copies/pastes images to/from the system clipboard. */
 public class Clipboard implements PlugIn, Transferable {
 	static java.awt.datatransfer.Clipboard clipboard;

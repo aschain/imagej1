@@ -3,13 +3,9 @@ package ij.gui;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import ij.process.ByteProcessor;
-import ij.process.ImageProcessor;
-import ij.process.ShortProcessor;
 
 import java.awt.Font;
 import java.awt.Rectangle;
-
 import org.junit.Test;
 
 /**

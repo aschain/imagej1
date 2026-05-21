@@ -1,8 +1,6 @@
 package ij.io;
-import ij.IJ;
 import java.io.*;
 import java.util.Vector;
-
 
 /** This class uses a memory cache to allow seeking within
 	an InputStream. Based on the JAI MemoryCacheSeekableStream class.

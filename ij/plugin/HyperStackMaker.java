@@ -1,8 +1,8 @@
 package ij.plugin;
 import ij.*;
 import ij.gui.*;
-import ij.util.Tools;
 import ij.process.*;
+import ij.util.Tools;
 import java.awt.*;
 
 /** This plugin implements the File/New/Hyperstack command. */

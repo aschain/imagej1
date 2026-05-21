@@ -1,11 +1,8 @@
 package ij.gui;
 
-import java.awt.*;
-import ij.process.*;
 import ij.*;
-import ij.util.*;
+import java.awt.*;
 import java.awt.event.*;
-
 
 /** This subclass of ImageCanvas has special provisions for plots:
  * - Zooming: sets the plot range

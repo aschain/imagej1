@@ -2,11 +2,9 @@ package ij.plugin;
 import ij.*;
 import ij.io.*;
 import ij.process.*;
-import java.awt.*;
-import java.io.*;
 import java.awt.image.*;
+import java.io.*;
 import javax.imageio.ImageIO;
-
 
 /** Saves in PNG format using the ImageIO classes.  RGB images are saved
  * as RGB PNGs. Other image types are saved as 8-bit PNGs, except for

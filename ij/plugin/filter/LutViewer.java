@@ -1,12 +1,11 @@
 package ij.plugin.filter;
 import ij.*;
-import ij.process.*;
 import ij.gui.*;
 import ij.measure.ResultsTable;
+import ij.process.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
-import java.util.ArrayList;
 
 /** Displays the active image's look-up table.
 * Implements the Image/Color/Show LUT command.

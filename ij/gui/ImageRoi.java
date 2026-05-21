@@ -1,7 +1,7 @@
 package ij.gui;
 import ij.ImagePlus;
-import ij.process.*;
 import ij.io.FileSaver;
+import ij.process.*;
 import java.awt.*;
 import java.awt.image.*;
 

@@ -1,20 +1,18 @@
 package ij.gui;
 import ij.*;
-import ij.process.*;
+import ij.macro.Interpreter;
 import ij.measure.*;
 import ij.plugin.*;
+import ij.plugin.filter.ThresholdToSelection;
 import ij.plugin.frame.Recorder;
 import ij.plugin.frame.RoiManager;
-import ij.plugin.filter.Analyzer;
-import ij.plugin.filter.ThresholdToSelection;
-import ij.macro.Interpreter;
-import ij.io.RoiDecoder;
+import ij.process.*;
 import java.awt.*;
-import java.util.*;
-import java.io.*;
-import java.awt.image.*;
 import java.awt.event.*;
 import java.awt.geom.*;
+import java.awt.image.*;
+import java.io.*;
+import java.util.*;
 
 /**
  * A rectangular region of interest and superclass for the other ROI classes.

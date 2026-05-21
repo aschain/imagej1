@@ -1,12 +1,12 @@
 package ij.gui;
 
-import java.awt.*;
-import java.util.ArrayList;
 import ij.*;
-import ij.process.*;
-import ij.util.*;
 import ij.measure.*;
 import ij.plugin.Straightener;
+import ij.process.*;
+import ij.util.*;
+import java.awt.*;
+import java.util.ArrayList;
 
 /** Creates a density profile plot of a line or rectangular selection. */
 public class ProfilePlot {

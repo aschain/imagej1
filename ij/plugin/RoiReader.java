@@ -1,10 +1,10 @@
 package ij.plugin;
 import ij.*;
-import ij.io.*;
 import ij.gui.*;
+import ij.io.*;
 import ij.process.*;
-import java.io.*;
 import java.awt.*;
+import java.io.*;
 
 /** Opens ImageJ, NIH Image and Scion Image for windows ROI outlines. 
 	RoiDecoder.java has a description of the file format.

@@ -11,7 +11,6 @@ import java.awt.image.DataBuffer;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 

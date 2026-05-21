@@ -5,14 +5,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
 import ij.IJInfo;
 import ij.ImagePlus;
 import ij.process.ImageProcessor;
 import ij.process.ShortProcessor;
-
 import java.awt.Polygon;
 import java.awt.Rectangle;
-
 import org.junit.Test;
 
 /**

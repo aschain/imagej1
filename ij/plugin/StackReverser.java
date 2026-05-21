@@ -1,8 +1,8 @@
 package ij.plugin;
 import ij.*;
 import ij.gui.GenericDialog;
-import ij.process.*;
 import ij.measure.Calibration;
+import ij.process.*;
 
 /** This plugin implements the Image/Transform/Flip Z and
 	Image/Stacks/Tools/Reverse commands. */

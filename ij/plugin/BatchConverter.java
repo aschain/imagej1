@@ -1,9 +1,8 @@
 package ij.plugin;
 import ij.*;
-import ij.process.*;
 import ij.gui.*;
-import ij.util.Tools;
 import ij.io.*;
+import ij.process.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;

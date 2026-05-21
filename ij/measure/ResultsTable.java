@@ -1,19 +1,17 @@
 package ij.measure;
 import ij.*;
-import ij.plugin.filter.Analyzer;
-import ij.plugin.frame.Editor;
-import ij.text.*;
-import ij.process.*;
 import ij.gui.Roi;
-import ij.util.Tools;
 import ij.io.*;
 import ij.macro.*;
+import ij.plugin.filter.Analyzer;
+import ij.process.*;
+import ij.text.*;
+import ij.util.Tools;
 import java.awt.*;
-import java.text.*;
-import java.util.*;
 import java.io.*;
 import java.math.RoundingMode;
-
+import java.text.*;
+import java.util.*;
 
 /** This is a table for storing measurement results and strings as columns of values. 
 	Call the static ResultsTable.getResultsTable() method to get a reference to the 

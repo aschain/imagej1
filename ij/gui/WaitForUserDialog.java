@@ -3,8 +3,6 @@ import ij.*;
 import ij.plugin.frame.RoiManager;
 import java.awt.*;
 import java.awt.event.*;
-import java.lang.reflect.*;
-
 
 /**
 * This is a non-modal dialog box used to ask the user to perform some task

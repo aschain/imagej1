@@ -2,13 +2,12 @@ package ij.plugin;
 import ij.*;
 import ij.gui.*;
 import ij.io.*;
-import ij.plugin.frame.Editor;
-import ij.plugin.Macro_Runner;
 import ij.plugin.filter.PlugInFilter;
 import ij.plugin.filter.PlugInFilterRunner;
+import ij.plugin.frame.Editor;
 import java.awt.Font;
-import java.lang.reflect.Method;
 import java.io.*;
+import java.lang.reflect.Method;
 import java.util.*;
 import javax.tools.*;
 

@@ -1,8 +1,8 @@
 package ij.plugin;
 
 import ij.*;
-import ij.process.*;
 import ij.gui.GenericDialog;
+import ij.process.*;
 import ij.util.ThreadUtil;
 import java.util.concurrent.atomic.AtomicInteger;
 

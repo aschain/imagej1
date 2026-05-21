@@ -1,9 +1,9 @@
 package ij.process;
 
 import static org.junit.Assert.assertEquals;
+
 import ij.gui.ProgressBar;
 import ij.gui.Roi;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -19,11 +19,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
-
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 

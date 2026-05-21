@@ -1,8 +1,6 @@
 package ij.process;
-import java.util.*;
 import java.awt.*;
 import java.awt.image.*;
-
 
 /** This is an extended ColorProcessor that supports signed 32-bit int images. */
 public class IntProcessor extends ColorProcessor {

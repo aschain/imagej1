@@ -1,14 +1,14 @@
 package ij.text;
 import ij.*;
-import ij.io.*;
 import ij.gui.*;
-import ij.plugin.filter.Analyzer;
-import ij.plugin.frame.Recorder;
+import ij.io.*;
 import ij.macro.Interpreter;
 import ij.measure.ResultsTable;
+import ij.plugin.filter.Analyzer;
+import ij.plugin.frame.Recorder;
 import java.awt.*;
-import java.io.*;
 import java.awt.event.*;
+import java.io.*;
 import java.util.ArrayList;
 
 /** Uses a TextPanel to displays text in a window.

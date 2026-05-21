@@ -1,8 +1,7 @@
 package ij.plugin.filter;
 import ij.*;
-import ij.process.*;
 import ij.io.*;
-
+import ij.process.*;
 
 /** Obsolete
 * @deprecated

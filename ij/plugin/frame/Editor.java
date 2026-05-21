@@ -1,19 +1,18 @@
 package ij.plugin.frame;
+import ij.*;
+import ij.gui.*;
+import ij.io.SaveDialog;
+import ij.macro.*;
+import ij.plugin.JavaScriptEvaluator;
+import ij.plugin.MacroInstaller;
+import ij.plugin.Macro_Runner;
+import ij.text.*;
+import ij.util.Tools;
 import java.awt.*;
+import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
-import java.awt.datatransfer.*;																																																																																													
-import ij.*;
-import ij.gui.*;
-import ij.util.Tools;
-import ij.text.*;
-import ij.macro.*;
-import ij.plugin.MacroInstaller;
-import ij.plugin.Commands;
-import ij.plugin.Macro_Runner;
-import ij.plugin.JavaScriptEvaluator;
-import ij.io.SaveDialog;
 
 /** This is a simple TextArea based editor for editing and compiling plugins. */
 public class Editor extends PlugInFrame implements ActionListener, ItemListener,

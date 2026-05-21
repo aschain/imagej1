@@ -3,14 +3,13 @@ package ij.io;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
 import ij.Assert;
 import ij.VirtualStack;
 import ij.process.DataConstants;
-
 import java.awt.image.ColorModel;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-
 import org.junit.Test;
 
 /**

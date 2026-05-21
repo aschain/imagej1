@@ -1,13 +1,12 @@
 package ij.gui;
 import ij.*;
-import ij.util.*;
 import ij.plugin.Colors;
+import ij.util.*;
 import java.awt.*;
-import java.util.Vector;
 import java.awt.event.*;
+import java.util.Vector;
 
-
- /** Displays a dialog that allows the user to select a color using three sliders. */
+/** Displays a dialog that allows the user to select a color using three sliders. */
 public class ColorChooser implements TextListener, AdjustmentListener {
 	Vector<TextField> colors;
 	Vector<Scrollbar> sliders;

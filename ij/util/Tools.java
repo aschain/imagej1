@@ -1,13 +1,12 @@
 package ij.util;
 import ij.process.*;
 import java.awt.Color;
-import java.util.*;
 import java.io.*;
-import java.util.Comparator;
 import java.nio.channels.FileChannel;
 import java.nio.file.*;
 import java.security.MessageDigest;
-
+import java.util.*;
+import java.util.Comparator;
 
 /** This class contains static utility methods. */
  public class Tools {

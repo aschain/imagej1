@@ -1,8 +1,8 @@
 package ij.gui;
 import ij.*;
-import ij.process.*;
-import ij.plugin.filter.Analyzer;
 import ij.measure.*;
+import ij.plugin.filter.Analyzer;
+import ij.process.*;
 import java.awt.*;
 import java.awt.image.*;
 

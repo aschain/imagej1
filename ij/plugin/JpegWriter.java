@@ -1,19 +1,18 @@
 package ij.plugin;
 import ij.*;
-import ij.process.*;
 import ij.io.FileSaver;
 import ij.io.SaveDialog;
-import java.awt.image.*;
+import ij.process.*;
 import java.awt.*;
+import java.awt.image.*;
 import java.io.*;
 import java.util.Iterator;
 import javax.imageio.*;
+import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.*;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import javax.imageio.metadata.IIOMetadata;
-
 
 /** The File/Save As/Jpeg command (FileSaver.saveAsJpeg() method) 
       uses this plugin to save images in JPEG format. */

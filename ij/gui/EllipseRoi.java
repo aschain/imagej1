@@ -1,10 +1,10 @@
 package ij.gui;
-import java.awt.*;
-import java.awt.event.*;
 import ij.*;
+import ij.measure.Calibration;
 import ij.plugin.frame.Recorder;
 import ij.process.FloatPolygon;
-import ij.measure.Calibration;
+import java.awt.*;
+import java.awt.event.*;
 
 /** This class implements the ellipse selection tool. */
 public class EllipseRoi extends PolygonRoi {

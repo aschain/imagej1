@@ -1,9 +1,9 @@
 package ij.plugin;
 import ij.*;
-import ij.process.*;
-import ij.plugin.filter.Analyzer;
-import ij.measure.*;
 import ij.gui.Roi;
+import ij.measure.*;
+import ij.plugin.filter.Analyzer;
+import ij.process.*;
 import java.awt.Rectangle;
 
 /** This plugin implements the Image/Stacks/Statistics command. */

@@ -1,16 +1,15 @@
 package ij.gui;
 import ij.*;
-import ij.process.*;
 import ij.measure.*;
+import ij.plugin.CalibrationBar;
 import ij.plugin.Straightener;
 import ij.plugin.frame.Recorder;
-import ij.plugin.CalibrationBar;
+import ij.process.*;
 import java.awt.*;
-import java.awt.image.*;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.awt.event.*;
 import java.awt.geom.*;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /** This class represents a straight line selection. */
 public class Line extends Roi {

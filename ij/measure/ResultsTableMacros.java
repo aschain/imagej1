@@ -1,13 +1,10 @@
 package ij.measure;
-import ij.plugin.filter.Analyzer;
-import ij.plugin.frame.Recorder;
-import ij.plugin.*;
 import ij.*;
 import ij.gui.*;
-import ij.text.*;
+import ij.plugin.filter.Analyzer;
+import ij.plugin.frame.Recorder;
 import java.awt.*;
 import java.awt.event.*;
-
 
 /** This class implements the Apply Macro command in tables.
 * @author Michael Schmid

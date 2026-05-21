@@ -1,12 +1,12 @@
 package ij.plugin;
+import ij.*;
+import ij.gui.*;
+import ij.io.*;
+import ij.plugin.frame.*;
 import java.awt.*;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
-import ij.*;
-import ij.io.*;
-import ij.gui.*;
-import ij.plugin.frame.*;
 
 /** Opens TIFFs, ZIP compressed TIFFs, DICOMs, GIFs and JPEGs using a URL. 
 	TIFF file names must end in ".tif", ZIP file names must end 

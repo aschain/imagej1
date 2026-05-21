@@ -6,12 +6,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import ij.Assert;
 import ij.CompositeImage;
 import ij.ImagePlus;
 import ij.process.DataConstants;
 import ij.process.ShortProcessor;
-
 import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
 import java.io.ByteArrayInputStream;
@@ -19,7 +19,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Properties;
 import java.util.zip.GZIPInputStream;
-
 import org.junit.Test;
 
 /**

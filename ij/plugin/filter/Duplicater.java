@@ -1,7 +1,7 @@
 package ij.plugin.filter;
 import ij.*;
-import ij.process.*;
 import ij.plugin.Duplicator;
+import ij.process.*;
 
 /**
 * @deprecated

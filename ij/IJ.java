@@ -1,32 +1,27 @@
 package ij;
 import ij.gui.*;
-import ij.process.*;
-import ij.text.*;
 import ij.io.*;
-import ij.plugin.*;
-import ij.plugin.filter.*;
-import ij.util.Tools;
-import ij.plugin.frame.Recorder;
-import ij.plugin.frame.ThresholdAdjuster;
 import ij.macro.Interpreter;
 import ij.macro.MacroRunner;
 import ij.measure.Calibration;
-import ij.measure.ResultsTable;
 import ij.measure.Measurements;
-import java.awt.event.*;
-import java.text.*;
-import java.util.*;	
-import java.awt.*;	
+import ij.measure.ResultsTable;
+import ij.plugin.*;
+import ij.plugin.filter.*;
+import ij.plugin.frame.Recorder;
+import ij.plugin.frame.ThresholdAdjuster;
+import ij.process.*;
+import ij.text.*;
+import ij.util.Tools;
 import java.applet.Applet;
+import java.awt.*;
+import java.awt.event.*;
 import java.io.*;
-import java.lang.reflect.*;
-import java.net.*;
-import javax.net.ssl.*;
-import java.security.cert.*;
-import java.security.KeyStore;
-import java.nio.ByteBuffer;
 import java.math.RoundingMode;
-
+import java.net.*;
+import java.nio.ByteBuffer;
+import java.text.*;
+import java.util.*;
 
 /** This class consists of static utility methods. */
 public class IJ {
@@ -63,7 +58,7 @@ public class IJ {
 	private static ProgressBar progressBar;
 	private static TextPanel textPanel;
 	private static String osname, osarch;
-	private static boolean isMac, isWin, isLinux, is64Bit;
+	private static boolean isMac, isWin, isLinux;
 	private static int javaVersion;
 	private static boolean controlDown, altDown, spaceDown, shiftDown;
 	private static boolean macroRunning;

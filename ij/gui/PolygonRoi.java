@@ -1,14 +1,11 @@
 package ij.gui;
 import ij.*;
-import ij.process.*;
 import ij.measure.*;
 import ij.plugin.frame.*;
-import ij.util.Tools;
-import ij.util.FloatArray;
+import ij.process.*;
 import java.awt.*;
-import java.awt.image.*;
-import java.awt.geom.*;
 import java.awt.event.*;
+import java.awt.geom.*;
 
 /** This class represents a polygon region of interest or polyline of interest. */
 public class PolygonRoi extends Roi {

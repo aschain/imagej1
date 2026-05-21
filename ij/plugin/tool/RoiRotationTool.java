@@ -9,7 +9,6 @@ package ij.plugin.tool;
 import ij.*;
 import ij.gui.*;
 import ij.plugin.RoiRotator;
-import ij.plugin.tool.PlugInTool;
 import ij.plugin.frame.Recorder;
 import java.awt.*;
 import java.awt.event.*;

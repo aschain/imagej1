@@ -2,10 +2,9 @@ package ij.gui;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+
 import ij.IJInfo;
-
 import java.awt.Rectangle;
-
 import org.junit.Test;
 
 /**

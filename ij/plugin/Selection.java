@@ -1,17 +1,14 @@
 package ij.plugin;
 import ij.*;
 import ij.gui.*;
-import ij.process.*;
-import ij.measure.*;
-import ij.plugin.frame.*;
 import ij.macro.Interpreter;
+import ij.measure.*;
 import ij.plugin.filter.*;
-import ij.util.Tools;
+import ij.plugin.frame.*;
+import ij.process.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.util.Vector;
 import java.awt.geom.*;
-
 
 /** This plugin implements the commands in the Edit/Selection submenu. */
 public class Selection implements PlugIn, Measurements {

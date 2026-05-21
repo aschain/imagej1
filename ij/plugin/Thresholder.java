@@ -1,11 +1,10 @@
 package ij.plugin;
 import ij.*;
 import ij.gui.*;
-import ij.process.*;
 import ij.measure.*;
 import ij.plugin.frame.Recorder;
-import ij.plugin.filter.PlugInFilter;
 import ij.plugin.frame.ThresholdAdjuster;
+import ij.process.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;

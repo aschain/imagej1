@@ -1,9 +1,8 @@
 package ij.plugin.frame;
-import java.awt.*;
-import java.awt.event.*;
-import ij.gui.ImageWindow;
 import ij.*;
 import ij.plugin.*;
+import java.awt.*;
+import java.awt.event.*;
 
 /**  This is a non-modal dialog that plugins can extend. */
 public class PlugInDialog extends Dialog implements PlugIn, WindowListener, FocusListener {

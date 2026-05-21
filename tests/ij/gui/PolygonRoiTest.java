@@ -8,14 +8,13 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import ij.Assert;
 import ij.IJInfo;
 import ij.process.ByteProcessor;
 import ij.process.FloatPolygon;
 import ij.process.ImageProcessor;
-
 import java.awt.Polygon;
-
 import org.junit.Test;
 
 /**

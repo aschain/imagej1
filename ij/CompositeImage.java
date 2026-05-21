@@ -1,11 +1,11 @@
 package ij;
-import ij.process.*;
 import ij.gui.PlotWindow;
-import ij.plugin.frame.*;
 import ij.io.FileInfo;
+import ij.measure.Calibration;
+import ij.plugin.frame.*;
+import ij.process.*;
 import java.awt.*;
 import java.awt.image.*;
-import ij.measure.Calibration;
 
 public class CompositeImage extends ImagePlus {
 

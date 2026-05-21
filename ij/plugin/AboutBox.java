@@ -1,13 +1,12 @@
 package ij.plugin;
 import ij.*;
-import ij.process.*;
 import ij.gui.*;
+import ij.process.*;
 import java.awt.*;
-import ij.io.*;
-import java.net.URL;
 import java.awt.image.*;
+import java.net.URL;
 
-	/** This plugin implements the Help/About ImageJ command by opening
+/** This plugin implements the Help/About ImageJ command by opening
 	 * about.jpg in ij.jar, scaling it 600% and adding text to an overlay.
 	*/
 	public class AboutBox implements PlugIn {

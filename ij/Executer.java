@@ -1,17 +1,16 @@
 package ij;
-import ij.util.Tools;
-import ij.text.TextWindow;
-import ij.plugin.MacroInstaller;
-import ij.plugin.Duplicator;
-import ij.plugin.frame.Recorder;
-import ij.plugin.frame.Editor;
 import ij.io.OpenDialog;
+import ij.plugin.Duplicator;
+import ij.plugin.MacroInstaller;
+import ij.plugin.frame.Editor;
+import ij.plugin.frame.Recorder;
+import ij.text.TextWindow;
+import ij.util.Tools;
+import java.awt.GraphicsEnvironment;
+import java.awt.Menu;
+import java.awt.event.KeyEvent;
 import java.io.*;
 import java.util.*;
-import java.awt.event.KeyEvent;
-import java.awt.Menu;
-import java.awt.GraphicsEnvironment;
-
 
 /** Runs ImageJ menu commands in a separate thread.*/
 public class Executer implements Runnable {

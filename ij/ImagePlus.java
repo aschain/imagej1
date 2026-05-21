@@ -1,19 +1,16 @@
 package ij;
+import ij.gui.*;
+import ij.io.*;
+import ij.macro.Interpreter;
+import ij.measure.*;
+import ij.plugin.*;
+import ij.plugin.filter.Analyzer;
+import ij.plugin.frame.*;
+import ij.process.*;
+import ij.util.*;
 import java.awt.*;
 import java.awt.image.*;
-import java.net.URL;
 import java.util.*;
-import ij.process.*;
-import ij.io.*;
-import ij.gui.*;
-
-import ij.measure.*;
-import ij.plugin.filter.Analyzer;
-import ij.util.*;
-import ij.macro.Interpreter;
-import ij.plugin.*;
-import ij.plugin.frame.*;
-
 
 /**
 An ImagePlus contain an ImageProcessor (2D image) or an ImageStack (3D, 4D or 5D image).

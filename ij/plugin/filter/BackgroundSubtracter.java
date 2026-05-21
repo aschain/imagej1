@@ -2,10 +2,8 @@ package ij.plugin.filter;
 import ij.*;
 import ij.gui.*;
 import ij.process.*;
-import ij.measure.*;
 import ij.util.Tools;
 import java.awt.*;
-
 
 /** Implements ImageJ's Subtract Background command. Based on the concept of the
 rolling ball algorithm described in Stanley Sternberg's article, "Biomedical Image

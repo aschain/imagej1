@@ -6,11 +6,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import ij.Assert;
 import ij.ImagePlus;
 import ij.gui.NewImage;
 import ij.plugin.filter.Analyzer;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

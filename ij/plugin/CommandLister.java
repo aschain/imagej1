@@ -1,10 +1,8 @@
 package ij.plugin;
 import ij.*;
 import ij.text.*;
-import ij.util.*;
-import java.util.*;
-import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 
 /** This class is used by the Plugins/Shortcuts/List Shortcuts 
 	command to display a list keyboard shortcuts. */

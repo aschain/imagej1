@@ -1,13 +1,12 @@
 package ij.gui;
-import java.awt.*;
-import java.util.Vector;
-import java.awt.geom.Rectangle2D;
-import java.util.*;
 import ij.*;
-import ij.process.ImageProcessor;
-import ij.plugin.filter.*;
-import ij.plugin.*;
 import ij.measure.ResultsTable;
+import ij.plugin.*;
+import ij.plugin.filter.*;
+import ij.process.ImageProcessor;
+import java.awt.*;
+import java.util.*;
+import java.util.Vector;
 
 /** An Overlay is a list of ROIs that can be drawn non-destructively on an Image. */
 public class Overlay implements Iterable<Roi> {

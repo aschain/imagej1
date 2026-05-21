@@ -1,18 +1,17 @@
 package ij.gui;
 import ij.*;
-import ij.plugin.frame.Recorder;
+import ij.io.OpenDialog;
+import ij.macro.*;
 import ij.plugin.ScreenGrabber;
 import ij.plugin.filter.PlugInFilterRunner;
+import ij.plugin.frame.Recorder;
 import ij.util.Tools;
-import ij.macro.*;
-import ij.io.OpenDialog;
 import java.awt.*;
-import java.io.*;
-import java.awt.event.*;
-import java.util.*;
 import java.awt.datatransfer.*;
 import java.awt.dnd.*;
-
+import java.awt.event.*;
+import java.io.*;
+import java.util.*;
 
 /**
  * This class is a customizable modal dialog box. Here is an example

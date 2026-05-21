@@ -1,8 +1,8 @@
 package ij.plugin.filter;
 import ij.*;
 import ij.gui.*;
-import ij.process.*;
 import ij.measure.*;
+import ij.process.*;
 import java.awt.*;
 
 /** This plugin implements ImageJ's Fill, Clear, Clear Outside and Draw commands. */

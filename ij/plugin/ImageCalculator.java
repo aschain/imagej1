@@ -1,11 +1,11 @@
 package ij.plugin;
 import ij.*;
 import ij.gui.*;
-import ij.process.*;
-import ij.plugin.filter.*;
-import ij.measure.Calibration;
-import ij.plugin.frame.Recorder;
 import ij.macro.Interpreter;
+import ij.measure.Calibration;
+import ij.plugin.filter.*;
+import ij.plugin.frame.Recorder;
+import ij.process.*;
 
 /** This plugin implements the Process/Image Calculator command.
 <pre>

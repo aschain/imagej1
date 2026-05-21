@@ -3,7 +3,6 @@ import ij.*;
 import ij.gui.*;
 import ij.process.*;
 import ij.util.ThreadUtil;
-
 import java.awt.AWTEvent;
 import java.awt.Rectangle;
 import java.util.concurrent.Callable;

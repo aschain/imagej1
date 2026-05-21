@@ -4,7 +4,6 @@ import ij.gui.*;
 import java.awt.*;
 import java.awt.event.*;
 
-
 /** This plugin implements the Plugins>Utiltiees>Recent Commands command. */
 public class Commands extends PlugInFrame implements ActionListener, ItemListener, CommandListener {
 	public static final String LOC_KEY = "commands.loc";

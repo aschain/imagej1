@@ -1,11 +1,10 @@
 package ij.plugin.tool;
 import ij.*;
-import ij.process.*;
 import ij.gui.*;
 import ij.plugin.Colors;
 import java.awt.*;
-import java.awt.event.*;
 import java.awt.BasicStroke;
+import java.awt.event.*;
 import java.awt.geom.*;
 import java.util.Vector;
 
