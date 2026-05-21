@@ -1,18 +1,23 @@
 package ij.gui;
+import java.awt.*;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.geom.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.*;
+
 import ij.*;
 import ij.macro.Interpreter;
-import ij.measure.*;
-import ij.plugin.*;
+import ij.measure.Calibration;
+import ij.plugin.LutLoader;
+import ij.plugin.RectToolOptions;
 import ij.plugin.filter.ThresholdToSelection;
 import ij.plugin.frame.Recorder;
 import ij.plugin.frame.RoiManager;
 import ij.process.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
-import java.awt.image.*;
-import java.io.*;
-import java.util.*;
 
 /**
  * A rectangular region of interest and superclass for the other ROI classes.
@@ -71,7 +76,7 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 	protected static int pasteMode = Blitter.COPY;
 	protected static int lineWidth = 1;
 	protected static Color defaultFillColor;
-	private static Vector listeners = new Vector();
+	private static Vector<RoiListener> listeners = new Vector<RoiListener>();
 	private static LUT glasbeyLut;
 	private static int defaultGroup; // zero is no specific group
 	private static Color groupColor;
@@ -116,7 +121,7 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 	private int channel, slice, frame;
 	private Overlay prototypeOverlay;
 	private boolean subPixel;
-	private boolean activeOverlayRoi;
+	//private boolean activeOverlayRoi;
 	private Properties props;
 	private boolean isCursor;
 	private double xcenter = Double.NaN;
@@ -743,7 +748,7 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 			roi = convertLineToArea(this);
 		ImageProcessor mask = roi.getMask();
 		Rectangle bounds = roi.getBounds();
-		ArrayList points = new ArrayList();
+		ArrayList<Point> points = new ArrayList<Point>();
 		for (int y=0; y<bounds.height; y++) {
 			for (int x=0; x<bounds.width; x++) {
 				if (mask==null || mask.getPixel(x,y)!=0)
@@ -945,7 +950,8 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 		int oy = ic.offScreenY2(sy);
 		if (ox<0) ox=0; if (oy<0) oy=0;
 		if (ox>xMax) ox=xMax; if (oy>yMax) oy=yMax;
-		int x1=x, y1=y, x2=x1+width, y2=y+height, xc=x+width/2, yc=y+height/2;
+		//int y1=y;
+		int x1=x, x2=x1+width, y2=y+height, xc=x+width/2, yc=y+height/2;
 		if (width > 7 && height > 7) {
 			asp = (double)width/(double)height;
 			asp_bk = asp;
@@ -1277,9 +1283,9 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 
 	protected void handleMouseDrag(int sx, int sy, int flags) {
 		if (ic==null) return;
-		constrain = (flags&Event.SHIFT_MASK)!=0;
-		center = (flags&Event.CTRL_MASK)!=0 || (IJ.isMacintosh()&&(flags&Event.META_MASK)!=0);
-		aspect = (flags&Event.ALT_MASK)!=0;
+		constrain = (flags&InputEvent.SHIFT_DOWN_MASK)!=0;
+		center = (flags&InputEvent.CTRL_DOWN_MASK)!=0 || (IJ.isMacintosh()&&(flags&InputEvent.META_DOWN_MASK)!=0);
+		aspect = (flags&InputEvent.ALT_DOWN_MASK)!=0;
 		switch(state) {
 			case CONSTRUCTING:
 				grow(sx, sy);
@@ -1557,7 +1563,7 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 		inside or near a handle, otherwise returns -1. */
 	public int isHandle(int sx, int sy) {
 		if (clipboard!=null || ic==null) return -1;
-		double mag = ic.getMagnification();
+		//double mag = ic.getMagnification();
 		int margin = IJ.getScreenSize().width>1280?5:3;
 		int size = getHandleSize()+margin;
 		int halfSize = size/2;
@@ -1606,7 +1612,7 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 		if (imp==null) return;
 		imp.draw(clipX-5, clipY-5, clipWidth+10, clipHeight+10);
 		if (IJ.recording()) {
-			String method;
+			//String method;
 			if (type==OVAL)
 				Recorder.record("makeOval", x, y, width, height);
 			else if (!(this instanceof TextRoi)) {
@@ -1774,7 +1780,7 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 			clipboard = null;
 			Undo.setup(Undo.FILTER, imp);
 		}
-		activeOverlayRoi = false;
+		//activeOverlayRoi = false;
 	}
 
 	public void abortPaste() {
@@ -2571,12 +2577,12 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 	public String getProperties() {
 		if (props==null)
 			return null;
-		Vector v = new Vector();
-		for (Enumeration en=props.keys(); en.hasMoreElements();)
-			v.addElement(en.nextElement());
+		Vector<String> v = new Vector<String>();
+		for (Enumeration<?> en=props.keys(); en.hasMoreElements();)
+			v.addElement((String)en.nextElement());
 		String[] keys = new String[v.size()];
 		for (int i=0; i<keys.length; i++)
-			keys[i] = (String)v.elementAt(i);
+			keys[i] = v.elementAt(i);
 		Arrays.sort(keys);
 		StringBuffer sb = new StringBuffer();
 		for (int i=0; i<keys.length; i++) {
@@ -2604,7 +2610,7 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 	}
 
 	public void mouseDragged(MouseEvent e) {
-		handleMouseDrag(e.getX(), e.getY(), e.getModifiers());
+		handleMouseDrag(e.getX(), e.getY(), e.getModifiersEx());
 	}
 
 	public void mouseMoved(MouseEvent e) {
@@ -2937,7 +2943,7 @@ public class Roi extends Object implements Cloneable, java.io.Serializable, Iter
 		listeners.removeElement(listener);
 	}
 
-	public static Vector getListeners() {
+	public static Vector<RoiListener> getListeners() {
 		return listeners;
 	}
 

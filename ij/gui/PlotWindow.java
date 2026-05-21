@@ -547,7 +547,7 @@ public class PlotWindow extends ImageWindow implements ActionListener, ItemListe
 			return;
 		if (e.getY() < plot.topMargin || e.getY() > plot.topMargin + plot.frameHeight)
 			return;
-		boolean ctrl = (e.getModifiers()&Event.CTRL_MASK)!=0;
+		boolean ctrl = (e.getModifiersEx()&InputEvent.CTRL_DOWN_MASK)!=0;
 		if (amount<1) amount=1;
 		if (rotation==0)
 			return;
@@ -674,6 +674,7 @@ public class PlotWindow extends ImageWindow implements ActionListener, ItemListe
 	}
 
 	/** creates the data that fills the showList() function values */
+	/* 
 	private String getValuesAsString(){
 		ResultsTable rt = getResultsTable();
 		StringBuffer sb = new StringBuffer();
@@ -683,6 +684,7 @@ public class PlotWindow extends ImageWindow implements ActionListener, ItemListe
 		}
 		return sb.toString();
 	}
+	*/
 
 	/** Saves the data of the plot in a text file */
 	void saveAsText() {
@@ -732,8 +734,8 @@ public class PlotWindow extends ImageWindow implements ActionListener, ItemListe
 		} else {
 			int xdigits = 0;
 			if (saveXValues)
-				xdigits = plot.getPrecision(xValues);
-			int ydigits = plot.getPrecision(yValues);
+				xdigits = Plot.getPrecision(xValues);
+			int ydigits = Plot.getPrecision(yValues);
 			for (int i=0; i<Math.min(xValues.length, yValues.length); i++) {
 				if (saveXValues)
 					pw.println(IJ.d2s(xValues[i],xdigits)+"\t"+IJ.d2s(yValues[i],ydigits));
@@ -773,8 +775,8 @@ public class PlotWindow extends ImageWindow implements ActionListener, ItemListe
 
 	/** Called once when ImageJ quits. */
 	public static void savePreferences(Properties prefs) {
-		double min = ProfilePlot.getFixedMin();
-		double max = ProfilePlot.getFixedMax();
+		//double min = ProfilePlot.getFixedMin();
+		//double max = ProfilePlot.getFixedMax();
 		prefs.put(PREFS_WIDTH, Integer.toString(plotWidth));
 		prefs.put(PREFS_HEIGHT, Integer.toString(plotHeight));
 		prefs.put(PREFS_FONT_SIZE, Integer.toString(defaultFontSize));

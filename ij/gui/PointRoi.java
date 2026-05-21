@@ -25,7 +25,7 @@ public class PointRoi extends PolygonRoi {
 	public static final int POINTWISE_POSITION = -2;
 	private static final String TYPE_KEY = "point.type";
 	private static final String SIZE_KEY = "point.size";
-	private static final String CROSS_COLOR_KEY = "point.cross.color";
+	//private static final String CROSS_COLOR_KEY = "point.cross.color";
 	private static final int TINY=1, SMALL=3, MEDIUM=5, LARGE=7, EXTRA_LARGE=11, XXL=17, XXXL=25;
 	private static final BasicStroke twoPixelsWide = new BasicStroke(2);
 	private static final BasicStroke threePixelsWide = new BasicStroke(3);
@@ -33,7 +33,7 @@ public class PointRoi extends PolygonRoi {
 	private static int defaultType = HYBRID;
 	private static int defaultSize = SMALL;
 	private static Font font;
-	private static Color defaultCrossColor = Color.white;
+	//private static Color defaultCrossColor = Color.white;
 	private static int fontSize = 9;
 	public static final int MAX_COUNTERS = 100;
 	private static String[] counterChoices;
@@ -1013,7 +1013,7 @@ public class PointRoi extends PolygonRoi {
 			this.type = p2.type;
 			this.size = p2.size;
 			this.showLabels = p2.showLabels;
-			this.fontSize = p2.fontSize;
+			//this.fontSize = p2.fontSize;
 		}
 	}
 

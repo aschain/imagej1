@@ -123,7 +123,7 @@ public class RoiProperties implements TextListener, WindowListener {
 		}
 		groupName = (Label)gd.getMessage();
 		if (showName && !IJ.isMacro()) {
-			Vector v = gd.getStringFields();
+			Vector<TextField> v = gd.getStringFields();
 			groupField = (TextField)v.elementAt(v.size()-2);
 			groupField.addTextListener(this);
 			colorField = (TextField)v.elementAt(v.size()-1);
@@ -258,7 +258,7 @@ public class RoiProperties implements TextListener, WindowListener {
 			Font font = troi.getCurrentFont();
 			if (strokeWidth2!=strokeWidth) {
 				font = new Font(font.getName(), font.getStyle(), (int)strokeWidth2);
-				troi.setCurrentFont(font);
+				troi.setFont(font);
 			}
 			troi.setAngle(angle);
 			if (justification!=troi.getJustification())
