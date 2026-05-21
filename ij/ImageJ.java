@@ -117,6 +117,7 @@ public class ImageJ extends Frame implements ActionListener,
 	private boolean exitWhenQuitting;
 	private boolean quitting;
 	private boolean quitMacro;
+	private Thread quitThread;
 	private long keyPressedTime, actionPerformedTime;
 	private String lastKeyCommand;
 	private boolean embedded;
@@ -707,9 +708,11 @@ public class ImageJ extends Frame implements ActionListener,
 		if (!IJ._hooks.quit())
 			return;
 		quitMacro = IJ.macroRunning();
-		Thread thread = new Thread(this, "Quit");
-		thread.setPriority(Thread.NORM_PRIORITY);
-		thread.start();
+		if (quitThread!=null && quitThread.isAlive())
+			return;
+		quitThread = new Thread(this, "Quit");
+		quitThread.setPriority(Thread.NORM_PRIORITY);
+		quitThread.start();
 		IJ.wait(10);
 	}
 	
@@ -830,6 +833,14 @@ public class ImageJ extends Frame implements ActionListener,
 	
 	/** Quit using a separate thread, hopefully avoiding thread deadlocks. */
 	public void run() {
+		if (Thread.currentThread()!=quitThread) {
+			if (quitThread!=null && quitThread.isAlive())
+				return;
+			quitThread = new Thread(this, "Quit");
+			quitThread.setPriority(Thread.NORM_PRIORITY);
+			quitThread.start();
+			return;
+		}
 		quitting = true;
 		boolean changes = false;
 		int[] wList = WindowManager.getIDList();
@@ -873,6 +884,7 @@ public class ImageJ extends Frame implements ActionListener,
 		}
 		IJ.cleanup();
 		dispose();
+		quitThread = null;
 		if (exitWhenQuitting)
 			System.exit(0);
 	}

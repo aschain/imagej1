@@ -49,7 +49,7 @@ public class IJ {
 
 	public static final int ALL_KEYS = -1;
 
-	public static LegacyHooks _hooks = new LegacyHooks();
+	public static net.imagej.patcher.LegacyHooks _hooks = new LegacyHooks();
 	
 	/** Use setDebugMode(boolean) to enable/disable debug mode. */
 	public static boolean debugMode;
@@ -127,8 +127,8 @@ public class IJ {
 		_hooks.installed();
 	}
 
-	public static LegacyHooks _hooks(LegacyHooks hooks) {
-		LegacyHooks previous = _hooks;
+	public static net.imagej.patcher.LegacyHooks _hooks(net.imagej.patcher.LegacyHooks hooks) {
+		net.imagej.patcher.LegacyHooks previous = _hooks;
 		if (previous!=null)
 			previous.dispose();
 		_hooks = hooks!=null?hooks:new LegacyHooks();
