@@ -1,9 +1,5 @@
 package ij;
 
-import ij.IJ;
-import ij.ImageJ;
-import ij.Prefs;
-
 import ij.io.OpenDialog;
 import ij.io.Opener;
 
@@ -91,13 +87,13 @@ public class OtherInstance {
 			file.deleteOnExit();
 
 			// File.setReadable() is Java 6
-			Class[] types = { boolean.class, boolean.class };
+			Class<?>[] types = { boolean.class, boolean.class };
 			Method m = File.class.getMethod("setReadable", types);
 			Object[] arguments = { Boolean.FALSE, Boolean.FALSE };
 			m.invoke(file, arguments);
 			arguments = new Object[] { Boolean.TRUE, Boolean.TRUE };
 			m.invoke(file, arguments);
-			types = new Class[] { boolean.class };
+			types = new Class<?>[] { boolean.class };
 			m = File.class.getMethod("setWritable", types);
 			arguments = new Object[] { Boolean.FALSE };
 			m.invoke(file, arguments);
@@ -126,7 +122,9 @@ public class OtherInstance {
 		String file = getStubPath();
 		try {
 			FileInputStream in = new FileInputStream(file);
-			ImageJInstance instance = (ImageJInstance) new ObjectInputStream(in).readObject();
+			ObjectInputStream oin = new ObjectInputStream(in);
+			ImageJInstance instance = (ImageJInstance) oin.readObject();
+			oin.close();
 			in.close();
 			if (instance==null)
 				return false;
@@ -184,7 +182,9 @@ public class OtherInstance {
 			String path = getStubPath();
 			FileOutputStream out = new FileOutputStream(path);
 			makeFilePrivate(path);
-			new ObjectOutputStream(out).writeObject(stub);
+			ObjectOutputStream oout = new ObjectOutputStream(out);
+			oout.writeObject(stub);
+			oout.close();
 			out.close();
 
 			if (IJ.debugMode)

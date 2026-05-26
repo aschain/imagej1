@@ -811,7 +811,7 @@ public class CompositeImage extends ImagePlus {
 		rgbPixels = null;
 		awtImage = null;
 		channelLuts = null;
-		boolean[] active = new boolean[MAX_CHANNELS];
+		//boolean[] active = new boolean[MAX_CHANNELS];
 	}
 
 }
