@@ -71,6 +71,11 @@ The following command line options are recognized by ImageJ:
 
   -debug
      Runs ImageJ in debug mode
+
+  -gui backend
+	  Selects the GUI backend. Supported values: awt, javafx
+	  Example 1: -gui awt
+	  Example 2: -gui=javafx
 </pre>
 @author Wayne Rasband (rasband@gmail.com)
 */
@@ -99,6 +104,12 @@ public class ImageJ extends Frame implements ActionListener,
 	
 	/** Run as the ImageJ application. */
 	public static final int IMAGEJ_APP = 3;
+	
+	/** AWT/Swing GUI backend identifier. */
+	public static final String GUI_BACKEND_AWT = "awt";
+	/** JavaFX GUI backend identifier. */
+	public static final String GUI_BACKEND_JAVAFX = "javafx";
+	private static final String GUI_BACKEND_KEY = "ui.backend";
 
 	/** Run ImageJ in debug mode. */
 	public static final int DEBUG = 256;
@@ -106,21 +117,22 @@ public class ImageJ extends Frame implements ActionListener,
 	private static final String IJ_X="ij.x",IJ_Y="ij.y";
 	private static int port = DEFAULT_PORT;
 	private static String[] arguments;
+	private static String guiBackend = GUI_BACKEND_JAVAFX;
 	
 	private Toolbar toolbar;
 	private Panel statusBar;
 	private ProgressBar progressBar;
 	private JLabel statusLine;
-	private boolean firstTime = true;
+	//private boolean firstTime = true;
 	private java.applet.Applet applet; // null if not running as an applet
-	private Vector classes = new Vector();
+	private Vector<Class<?>> classes = new Vector<Class<?>>();
 	private boolean exitWhenQuitting;
 	private boolean quitting;
 	private boolean quitMacro;
 	private Thread quitThread;
 	private long keyPressedTime, actionPerformedTime;
 	private String lastKeyCommand;
-	private boolean embedded;
+	//private boolean embedded;
 	private boolean windowClosed;
 	private static String commandName;
 	private static boolean batchMode;
@@ -156,7 +168,7 @@ public class ImageJ extends Frame implements ActionListener,
 			useExceptionHandler = true;
 		}
 		if (IJ.debugMode) IJ.log("ImageJ starting in debug mode: "+mode);
-		embedded = applet==null && (mode==EMBEDDED||mode==NO_SHOW);
+		//embedded = applet==null && (mode==EMBEDDED||mode==NO_SHOW);
 		this.applet = applet;
 		String err1 = Prefs.load(this, applet);
 		setBackground(backgroundColor);
@@ -194,7 +206,8 @@ public class ImageJ extends Frame implements ActionListener,
 		m.installStartupMacroSet(); //add custom tools
  		
 		Point loc = getPreferredLocation();
-		Dimension tbSize = toolbar.getPreferredSize();
+		//Dimension tbSize = 
+		toolbar.getPreferredSize();
 		setCursor(Cursor.getDefaultCursor()); // work-around for JDK 1.1.8 bug
 		if (mode!=NO_SHOW) {
 			if (IJ.isWindows()) try {setIcon();} catch(Exception e) {}
@@ -346,10 +359,10 @@ public class ImageJ extends Frame implements ActionListener,
 	public static String modifiers(int flags) { //?? needs to be moved
 		String s = " [ ";
 		if (flags == 0) return "";
-		if ((flags & Event.SHIFT_MASK) != 0) s += "Shift ";
-		if ((flags & Event.CTRL_MASK) != 0) s += "Control ";
-		if ((flags & Event.META_MASK) != 0) s += "Meta ";
-		if ((flags & Event.ALT_MASK) != 0) s += "Alt ";
+		if ((flags & InputEvent.SHIFT_DOWN_MASK) != 0) s += "Shift ";
+		if ((flags & InputEvent.CTRL_DOWN_MASK) != 0) s += "Control ";
+		if ((flags & InputEvent.META_DOWN_MASK) != 0) s += "Meta ";
+		if ((flags & InputEvent.ALT_DOWN_MASK) != 0) s += "Alt ";
 		s += "] ";
 		return s;
 	}
@@ -379,9 +392,9 @@ public class ImageJ extends Frame implements ActionListener,
 			actionPerformedTime = System.currentTimeMillis();
 			long ellapsedTime = actionPerformedTime-keyPressedTime;
 			if (cmd!=null && (ellapsedTime>=200L||!cmd.equals(lastKeyCommand))) {
-				if ((flags & Event.ALT_MASK)!=0)
+				if ((flags & InputEvent.ALT_DOWN_MASK)!=0)
 					IJ.setKeyDown(KeyEvent.VK_ALT);
-				if ((flags & Event.SHIFT_MASK)!=0)
+				if ((flags & InputEvent.SHIFT_DOWN_MASK)!=0)
 					IJ.setKeyDown(KeyEvent.VK_SHIFT);
 				new Executer(cmd, imp);
 			}
@@ -436,14 +449,14 @@ public class ImageJ extends Frame implements ActionListener,
 		if (keyCode==KeyEvent.VK_CONTROL || keyCode==KeyEvent.VK_SHIFT)
 			return;
 		char keyChar = e.getKeyChar();
-		int flags = e.getModifiers();
+		int flags = e.getModifiersEx();
 		if (IJ.debugMode) IJ.log("keyPressed: code=" + keyCode + " (" + KeyEvent.getKeyText(keyCode)
 			+ "), char=\"" + keyChar + "\" (" + (int)keyChar + "), flags="
 			+ KeyEvent.getKeyModifiersText(flags));
-		boolean shift = (flags & KeyEvent.SHIFT_MASK) != 0;
-		boolean control = (flags & KeyEvent.CTRL_MASK) != 0;
-		boolean alt = (flags & KeyEvent.ALT_MASK) != 0;
-		boolean meta = (flags & KeyEvent.META_MASK) != 0;
+		boolean shift = (flags & KeyEvent.SHIFT_DOWN_MASK) != 0;
+		boolean control = (flags & KeyEvent.CTRL_DOWN_MASK) != 0;
+		boolean alt = (flags & KeyEvent.ALT_DOWN_MASK) != 0;
+		boolean meta = (flags & KeyEvent.META_DOWN_MASK) != 0;
 		if (keyCode==KeyEvent.VK_H && meta && IJ.isMacOSX())
 			return; // Allow macOS to run ImageJ>Hide ImageJ command
 		String cmd = null;
@@ -458,7 +471,7 @@ public class ImageJ extends Frame implements ActionListener,
 					if (deleteOverlayRoi(imp))
 							return;
 				}
-				if ((flags & KeyEvent.META_MASK)!=0 && IJ.isMacOSX())
+				if ((flags & KeyEvent.META_DOWN_MASK)!=0 && IJ.isMacOSX())
 					return;
 				if (alt) {
 					switch (keyChar) {
@@ -698,7 +711,7 @@ public class ImageJ extends Frame implements ActionListener,
 	
 	/** Adds the specified class to a Vector to keep it from being
 		garbage collected, causing static fields to be reset. */
-	public void register(Class c) {
+	public void register(Class<?> c) {
 		if (!classes.contains(c))
 			classes.addElement(c);
 	}
@@ -739,9 +752,20 @@ public class ImageJ extends Frame implements ActionListener,
 		arguments = args;
 		int nArgs = args!=null?args.length:0;
 		boolean commandLine = false;
+		String backendFromArgs = null;
 		for (int i=0; i<nArgs; i++) {
 			String arg = args[i];
 			if (arg==null) continue;
+			if (arg.startsWith("-gui")) {
+				String value = null;
+				if (arg.startsWith("-gui="))
+					value = arg.substring(5);
+				else if ("-gui".equals(arg) && i+1<nArgs)
+					value = args[++i];
+				backendFromArgs = normalizeGuiBackend(value);
+				commandLine = true;
+				continue;
+			}
 			if (arg.startsWith("-batch")) {
 				noGUI = true;
 				batchMode = true;
@@ -763,6 +787,9 @@ public class ImageJ extends Frame implements ActionListener,
 					port = DEFAULT_PORT+delta;
 			} 
 		}
+		if (backendFromArgs==null)
+			Prefs.load(null, null);
+		guiBackend = backendFromArgs!=null?backendFromArgs:normalizeGuiBackend(Prefs.get(GUI_BACKEND_KEY, GUI_BACKEND_JAVAFX));
   		// If existing ImageJ instance, pass arguments to it and quit.
   		boolean passArgs = (mode==IMAGEJ_APP||mode==STANDALONE) && !noGUI;
 		if (IJ.isMacOSX() && !commandLine)
@@ -771,7 +798,7 @@ public class ImageJ extends Frame implements ActionListener,
   			return;
  		ImageJ ij = IJ.getInstance();    	
 		if (!noGUI && (ij==null || (ij!=null && !ij.isShowing()))) {
-			ij = new ImageJ(null, mode);
+			ij = launchWithSelectedBackend(mode);
 			ij.exitWhenQuitting = true;
 		} else if (batchMode && noGUI)
 			Prefs.load(null, null);
@@ -807,6 +834,41 @@ public class ImageJ extends Frame implements ActionListener,
 		if (IJ.debugMode && IJ.getInstance()==null && !GraphicsEnvironment.isHeadless())
 			new JavaProperties().run("");
 		if (noGUI) System.exit(0);
+	}
+
+	private static String normalizeGuiBackend(String backend) {
+		if (backend==null)
+			return GUI_BACKEND_JAVAFX;
+		backend = backend.trim().toLowerCase(Locale.US);
+		if (GUI_BACKEND_JAVAFX.equals(backend))
+			return GUI_BACKEND_JAVAFX;
+		return GUI_BACKEND_AWT;
+	}
+
+	private static ImageJ launchWithSelectedBackend(int mode) {
+		if (GUI_BACKEND_JAVAFX.equals(guiBackend)) {
+			ImageJ ij = launchJavaFxBackend(mode);
+			if (ij!=null)
+				return ij;
+			System.err.println("ImageJ: JavaFX backend unavailable; falling back to AWT");
+			System.err.println("ImageJ: JavaFX modules are not on the runtime module-path/classpath.");
+			System.err.println("ImageJ: On Windows, use run_javafx.bat to fetch OpenJFX and launch with -gui=javafx.");
+		}
+		return new ImageJ(null, mode);
+	}
+
+	private static ImageJ launchJavaFxBackend(int mode) {
+		try {
+			Class<?> c = Class.forName("ij.fx.ImageJFxLauncher");
+			java.lang.reflect.Method m = c.getMethod("launch", int.class);
+			Object result = m.invoke(null, Integer.valueOf(mode));
+			if (result instanceof ImageJ)
+				return (ImageJ)result;
+		} catch (Throwable t) {
+			if (IJ.debugMode)
+				IJ.log("JavaFX backend launch failed: "+t);
+		}
+		return null;
 	}
 		
 	// Is there another instance of ImageJ? If so, send it the arguments and quit.

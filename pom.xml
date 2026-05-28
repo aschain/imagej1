@@ -94,6 +94,7 @@
 
 		<!-- HACK: Work around 'String index out of bounds' javadoc error. -->
 		<maven-javadoc-plugin.version>3.0.1</maven-javadoc-plugin.version>
+		<javafx.version>21.0.4</javafx.version>
 
 		<!-- TEMP: Until unit tests errors are all resolved. -->
 		<maven.test.skip>true</maven.test.skip>
@@ -202,28 +203,6 @@
 					<includes>ij/**</includes>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<configuration><skip>${maven.exec.skip}</skip></configuration>
-				<executions>
-				  <execution>
-				  	<id>first-execution</id>
-				    <phase>install</phase>
-				    <goals>
-				       <goal>exec</goal>
-				    </goals>
-				    <configuration>
-				      <executable>bash</executable>
-				      <workingDirectory>${basedir}</workingDirectory>
-				      <arguments>
-				    	  <argument>-c</argument>
-				    	  <argument>../copyToFiji.sh jars ${project.artifactId} target/${project.build.finalName}.jar</argument>
-				      </arguments>
-				    </configuration>
-				  </execution>
-				</executions>
-			</plugin>
 		</plugins>
 	</build>
 
@@ -287,6 +266,100 @@
 					<url>${sonatype-oss-repository}/service/local/staging/deploy/maven2/</url>
 				</repository>
 			</distributionManagement>
+		</profile>
+		<profile>
+			<id>javafx-windows</id>
+			<activation>
+				<os>
+					<family>Windows</family>
+				</os>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-base</artifactId>
+					<version>${javafx.version}</version>
+					<classifier>win</classifier>
+					<scope>runtime</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-graphics</artifactId>
+					<version>${javafx.version}</version>
+					<classifier>win</classifier>
+					<scope>runtime</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-controls</artifactId>
+					<version>${javafx.version}</version>
+					<classifier>win</classifier>
+					<scope>runtime</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>javafx-linux</id>
+			<activation>
+				<os>
+					<family>unix</family>
+					<name>Linux</name>
+				</os>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-base</artifactId>
+					<version>${javafx.version}</version>
+					<classifier>linux</classifier>
+					<scope>runtime</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-graphics</artifactId>
+					<version>${javafx.version}</version>
+					<classifier>linux</classifier>
+					<scope>runtime</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-controls</artifactId>
+					<version>${javafx.version}</version>
+					<classifier>linux</classifier>
+					<scope>runtime</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>javafx-mac</id>
+			<activation>
+				<os>
+					<family>mac</family>
+				</os>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-base</artifactId>
+					<version>${javafx.version}</version>
+					<classifier>mac</classifier>
+					<scope>runtime</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-graphics</artifactId>
+					<version>${javafx.version}</version>
+					<classifier>mac</classifier>
+					<scope>runtime</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-controls</artifactId>
+					<version>${javafx.version}</version>
+					<classifier>mac</classifier>
+					<scope>runtime</scope>
+				</dependency>
+			</dependencies>
 		</profile>
 		<profile>
 			<id>patched-ij1</id>
