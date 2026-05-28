@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 /** This class is an extended ImageWindow that displays stacks and hyperstacks. */
+@SuppressWarnings("unused")
 public class StackWindow extends ImageWindow implements Runnable, AdjustmentListener, ActionListener, MouseWheelListener {
 
 	protected Scrollbar sliceSelector; // for backward compatibity with Image5D
@@ -34,7 +35,7 @@ public class StackWindow extends ImageWindow implements Runnable, AdjustmentList
 			ic.setMaxBounds();
 		if (IJ.isMacro() && !isVisible()) //'super' may have called show()
 			imp.setDeactivated(); //prepare for waitTillActivated (imp may have been activated before)
-		show();
+		setVisible(true);
 		if (IJ.isMacro())
 			imp.waitTillActivated();
 		int previousSlice = imp.getCurrentSlice();

@@ -16,8 +16,8 @@ import java.util.*;
 public class Executer implements Runnable {
 
 	private static String previousCommand;
-	private static CommandListener listener;
-	private static Vector listeners = new Vector();
+	//private static CommandListener listener;
+	private static Vector<CommandListener> listeners = new Vector<CommandListener>();
 
 	private String command;
 	private Thread thread;
@@ -122,8 +122,8 @@ public class Executer implements Runnable {
 	}
 
 	void runCommand(String cmd) {
-		Hashtable table = Menus.getCommands();
-		String className = (String)table.get(cmd);
+		Hashtable<String, String> table = Menus.getCommands();
+		String className = table.get(cmd);
 		if (className!=null) {
 			String arg = "";
 			if (className.endsWith("\")")) {

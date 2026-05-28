@@ -39,7 +39,11 @@ import javax.swing.*;
 			try {
 				java.util.List<File> fileList = null;
 				if (dataFlavor.isFlavorJavaFileListType()) {
-					fileList = (java.util.List<File>)t.getTransferData(DataFlavor.javaFileListFlavor);
+					java.util.List<?> droppedItems = (java.util.List<?>)t.getTransferData(DataFlavor.javaFileListFlavor);
+					fileList = new ArrayList<File>(droppedItems.size());
+					for (Object item : droppedItems)
+						if (item instanceof File)
+							fileList.add((File)item);
 					if (IJ.debugMode) IJ.log("dragAndDrop FileList size="+fileList.size()+" first: "+fileList.get(0));
 				} else if (isSupportedTransferFlavor(dataFlavor)) {
 					String str = (String)t.getTransferData(dataFlavor);

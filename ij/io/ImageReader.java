@@ -106,7 +106,7 @@ public class ImageReader {
 		short[] pixels = new short[nPixels];
 		long totalRead = 0L;
 		int base = 0;
-		int count, value;
+		int count;//, value;
 		int bufferCount;
 		
 		while (totalRead<byteCount) {
@@ -204,7 +204,7 @@ public class ImageReader {
 		float[] pixels = new float[nPixels];
 		long totalRead = 0L;
 		int base = 0;
-		int count, value;
+		int count;//, value;
 		int bufferCount;
 		int tmp;
 		
@@ -319,7 +319,7 @@ public class ImageReader {
 		float[] pixels = new float[nPixels];
 		long totalRead = 0L;
 		int base = 0;
-		int count, value;
+		int count;//, value;
 		int bufferCount;
 		long tmp;
 		long b1, b2, b3, b4, b5, b6, b7, b8;
@@ -368,7 +368,7 @@ public class ImageReader {
 		int[] pixels = new int[nPixels];
 		long totalRead = 0L;
 		int base = 0;
-		int count, value;
+		int count;//, value;
 		int bufferCount;
 		int r, g, b, a;
 		
@@ -437,8 +437,8 @@ public class ImageReader {
 	int[] readCompressedChunkyRGB(InputStream in) throws IOException {
 		int[] pixels = new int[nPixels];
 		int base = 0;
-		int lastRed=0, lastGreen=0, lastBlue=0;
-		int nextByte;
+		//int lastRed=0, lastGreen=0, lastBlue=0;
+		//int nextByte;
 		int red=0, green=0, blue=0, alpha = 0;
 		boolean bgr = fi.fileType==FileInfo.BGR;
 		boolean cmyk = fi.fileType==FileInfo.CMYK;

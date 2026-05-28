@@ -235,7 +235,7 @@ public class ImportDialog {
 			return null;
 		String imageType = types[choiceSelection];
 		FileInfo fi = new FileInfo();
-		fi.fileFormat = fi.RAW;
+		fi.fileFormat = FileInfo.RAW;
 		fi.fileName = fileName;
 		directory = IJ.addSeparator(directory);
 		fi.directory = directory;

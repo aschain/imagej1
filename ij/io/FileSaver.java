@@ -20,7 +20,7 @@ public class FileSaver {
 	
     static {setJpegQuality(ij.Prefs.getInt(ij.Prefs.JPEG, DEFAULT_JPEG_QUALITY));}
 
-	private static String defaultDirectory = null;
+	//private static String defaultDirectory = null;
 	private ImagePlus imp;
 	private FileInfo fi;
 	private String name;
@@ -517,7 +517,7 @@ public class FileSaver {
 			for (int i=0; i<n; i++)
 			pixels[i] = (short)(pixels[i]+32768);
 		}
-		updateImp(fi, fi.RAW);
+		updateImp(fi, FileInfo.RAW);
 		return true;
 	}
 
@@ -564,7 +564,7 @@ public class FileSaver {
 					pixels[i] = (short)(pixels[i]+32768);
 			}
 		}
-		updateImp(fi, fi.RAW);
+		updateImp(fi, FileInfo.RAW);
 		return true;
 	}
 

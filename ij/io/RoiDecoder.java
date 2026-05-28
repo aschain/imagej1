@@ -112,7 +112,7 @@ public class RoiDecoder {
 	public static final int SCALE_STROKE_WIDTH = 8192;
 	
 	// types
-	private final int polygon=0, rect=1, oval=2, line=3, freeline=4, polyline=5, noRoi=6,
+	private final int polygon=0, rect=1, oval=2, line=3, freeline=4, polyline=5,// noRoi=6,
 		freehand=7, traced=8, angle=9, point=10;
 	
 	private byte[] data;
@@ -183,7 +183,7 @@ public class RoiDecoder {
 		int imageOpacity=0;
 		int imageSize=0;
 		boolean subPixelResolution = (options&SUB_PIXEL_RESOLUTION)!=0 &&  version>=222;
-		boolean drawOffset = subPixelResolution && (options&DRAW_OFFSET)!=0;
+		//boolean drawOffset = subPixelResolution && (options&DRAW_OFFSET)!=0;
 		boolean scaleStrokeWidth = true;
 		if (version>=228)
 			scaleStrokeWidth = (options&SCALE_STROKE_WIDTH)!=0;
@@ -268,7 +268,7 @@ public class RoiDecoder {
 						((Arrow)roi).setHeadSize(headSize);
 				} else {
 					roi = new Line(x1, y1, x2, y2);
-					roi.setDrawOffset(drawOffset);
+					//roi.setDrawOffset(drawOffset);
 				}
 				break;
 			case polygon: case freehand: case traced: case polyline: case freeline: case angle: case point:
@@ -345,7 +345,7 @@ public class RoiDecoder {
 						roiType = Roi.FREEROI;
 					if (subPixelResolution) {
 						roi = new PolygonRoi(xf, yf, n, roiType);
-						roi.setDrawOffset(drawOffset);
+						//roi.setDrawOffset(drawOffset);
 					} else
 						roi = new PolygonRoi(x, y, n, roiType);
 					break;
@@ -440,12 +440,12 @@ public class RoiDecoder {
 		int type = getByte(TYPE);
 		if (type!=rect)
 			throw new IllegalArgumentException("Invalid composite ROI type");
-		int top= getShort(TOP);
-		int left = getShort(LEFT);
-		int bottom = getShort(BOTTOM);
-		int right = getShort(RIGHT);
-		int width = right-left;
-		int height = bottom-top;
+		//int top= getShort(TOP);
+		//int left = getShort(LEFT);
+		//int bottom = getShort(BOTTOM);
+		//int right = getShort(RIGHT);
+		//int width = right-left;
+		//int height = bottom-top;
 		int n = getInt(SHAPE_ROI_SIZE);
 
 		ShapeRoi roi = null;

@@ -84,7 +84,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 	private boolean ignoreFlush;
 	private boolean errorLoadingImage;
 	private static ImagePlus clipboard;
-	private static Vector listeners = new Vector();
+	private static Vector<ImageListener> listeners = new Vector<ImageListener>();
 	private boolean openAsHyperStack;
 	private int[] position = {1,1,1};
 	private boolean noUpdateMode;
@@ -820,7 +820,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 		the display. Set 'title' to null to leave the title unchanged. */
     public void setStack(String title, ImageStack newStack) {
 		int bitDepth1 = getBitDepth();
-		int previousStackSize = getStackSize();
+		//int previousStackSize = getStackSize();
 		int newStackSize = newStack.getSize();
 		if (newStackSize==0)
 			throw new IllegalArgumentException("Stack is empty");		
@@ -1579,7 +1579,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 			return null;
 		String props[] = new String[imageProperties.size()*2];
 		int index = 0;
-		for (Enumeration en=imageProperties.keys(); en.hasMoreElements();) {
+		for (Enumeration<?> en=imageProperties.keys(); en.hasMoreElements();) {
 			String key = (String)en.nextElement();
 			String value = imageProperties.getProperty(key);
 			props[index++] = key;
@@ -1593,7 +1593,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 		if (imageProperties==null || imageProperties.size()==0)
 			return "0";
 		String info2 = "";
-		for (Enumeration en=imageProperties.keys(); en.hasMoreElements();) {
+		for (Enumeration<?> en=imageProperties.keys(); en.hasMoreElements();) {
 			String key = (String)en.nextElement();
 			if (info2.length()>50) {
 				info2 += "...";
@@ -2062,10 +2062,10 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 				roi = newRoi;
 				return;
 			}
-			if (newRoi==null) {
-				deleteRoi();
-				return;
-			}
+			//if (newRoi==null) {
+			//	deleteRoi();
+			//	return;
+			//}
 			ImagePlus imp = newRoi.getImage();
 			if (imp!=null && imp.getID()!=getID())
 				newRoi = (Roi)newRoi.clone();
@@ -2420,11 +2420,11 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 	    	case GRAY16:
 	    		if (compositeImage && fi.nImages==3) {
 	    			if ("Red".equals(getStack().getSliceLabel(1)))
-						fi.fileType = fi.RGB48;
+						fi.fileType = FileInfo.RGB48;
 					else
-						fi.fileType = fi.GRAY16_UNSIGNED;
+						fi.fileType = FileInfo.GRAY16_UNSIGNED;
 				} else
-					fi.fileType = fi.GRAY16_UNSIGNED;
+					fi.fileType = FileInfo.GRAY16_UNSIGNED;
 				if (!compositeImage) {
     				lut = createLut();
     				if (!lut.isGrayscale() || (ip!=null&&!ip.isDefaultLut()))
@@ -2432,7 +2432,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 				}
 				break;
 	    	case GRAY32:
-				fi.fileType = fi.GRAY32_FLOAT;
+				fi.fileType = FileInfo.GRAY32_FLOAT;
 				if (!compositeImage) {
     				lut = createLut();
     				if (!lut.isGrayscale() || (ip!=null&&!ip.isDefaultLut()))
@@ -2440,7 +2440,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 				}
 				break;
 	    	case COLOR_RGB:
-				fi.fileType = fi.RGB;
+				fi.fileType = FileInfo.RGB;
 				break;
 			default:
     	}
@@ -2940,8 +2940,8 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 	 public void paste() {
 		if (clipboard==null)
 			return;
-		int cType = clipboard.getType();
-		int iType = getType();
+		//int cType = clipboard.getType();
+		//int iType = getType();
         int w = clipboard.getWidth();
         int h = clipboard.getHeight();
 		Roi cRoi = clipboard.getRoi();
@@ -3078,7 +3078,7 @@ public class ImagePlus implements ImageObserver, Measurements, Cloneable {
 		listeners.removeElement(listener);
 	}
 	
-	public static Vector getListeners() {
+	public static Vector<ImageListener> getListeners() {
 		return listeners;
 	}
 	

@@ -16,7 +16,7 @@ public final class RandomAccessStream extends InputStream {
     private InputStream src;
     private RandomAccessFile ras;
     private long pointer;
-    private Vector data;
+    private Vector<byte[]> data;
     private long length;
     private boolean foundEOS;
     
@@ -24,7 +24,7 @@ public final class RandomAccessStream extends InputStream {
 		backwards is supported using a memory cache. */
 	public RandomAccessStream(InputStream inputstream) {
         pointer = 0L;
-        data = new Vector();
+        data = new Vector<byte[]>();
         length = 0L;
         foundEOS = false;
         src = inputstream;
@@ -55,7 +55,7 @@ public final class RandomAccessStream extends InputStream {
         long l = pointer + 1L;
         long l1 = readUntil(l);
         if (l1>=l) {
-            byte abyte0[] = (byte[])data.elementAt((int)(pointer>>BLOCK_SHIFT));
+            byte abyte0[] = data.elementAt((int)(pointer>>BLOCK_SHIFT));
             return abyte0[(int)(pointer++ & BLOCK_MASK)] & 0xff;
         } else
             return -1;
@@ -74,7 +74,7 @@ public final class RandomAccessStream extends InputStream {
         if (l<=pointer)
             return -1;
         else {
-            byte abyte1[] = (byte[])data.elementAt((int)(pointer >> BLOCK_SHIFT));
+            byte abyte1[] = data.elementAt((int)(pointer >> BLOCK_SHIFT));
             int k = Math.min(len, BLOCK_SIZE - (int)(pointer & BLOCK_MASK));
             System.arraycopy(abyte1, (int)(pointer & BLOCK_MASK), bytes, off, k);
             pointer += k;

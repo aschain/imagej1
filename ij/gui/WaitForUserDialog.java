@@ -67,7 +67,7 @@ public class WaitForUserDialog extends Dialog implements ActionListener, KeyList
 	}
 
 	public void show() {
-		super.show();
+		super.setVisible(true);
 		if (EventQueue.isDispatchThread())
 			throw new RuntimeException("To avoid a deadlock, WaitForUserDialog must not be called from the Event Queue");
 		synchronized(this) {  //wait for OK

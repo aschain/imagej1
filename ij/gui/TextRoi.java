@@ -28,7 +28,7 @@ public class TextRoi extends Roi {
 	private static int globalJustification = LEFT;
 	private static Color defaultFillColor;
 	private int justification = LEFT;
-	private double previousMag;
+	//private double previousMag;
 	private boolean firstChar = true;
 	private boolean firstMouseUp = true;
 	private double angle;  // degrees
@@ -216,7 +216,7 @@ public class TextRoi extends Roi {
 		ip.setAntialiasedText(getAntiAlias());
 		FontMetrics metrics = ip.getFontMetrics();
 		int fontHeight = metrics.getHeight();
-		int descent = metrics.getDescent();
+		//int descent = metrics.getDescent();
 		int i = 0;
 		int yy = 0;
 		int xi = (int)Math.round(getXBase());
@@ -243,7 +243,7 @@ public class TextRoi extends Roi {
 	/** Draws the text on the screen, clipped to the ROI. */
 	public void draw(Graphics g) {
 		if (IJ.debugMode) IJ.log("draw: "+theText[0]+"  "+this.width+","+this.height);
-		if (Interpreter.isBatchMode() && ic!=null && ic.getDisplayList()!=null)
+		if (Interpreter.isBatchMode() && ic!=null && ic.getOverlay()!=null)
 			return;
 		Color c = getStrokeColor();
 		setStrokeColor(getColor());
@@ -273,7 +273,7 @@ public class TextRoi extends Roi {
 	void drawText(Graphics g) {
 		g.setColor( strokeColor!=null? strokeColor:ROIColor);
 		Java2.setAntialiasedText(g, getAntiAlias());
-		double mag = getMagnification();
+		//double mag = getMagnification();
 		int xi = (int)Math.round(getXBase());
 		int yi = (int)Math.round(getYBase());
 		double widthd = bounds!=null?bounds.width:this.width;
@@ -300,7 +300,7 @@ public class TextRoi extends Roi {
 		int i = 0;
 		if (fillColor!=null) {
 			Color c = g.getColor();
-			int alpha = fillColor.getAlpha();
+			//int alpha = fillColor.getAlpha();
  			g.setColor(fillColor);
 			g.fillRect(sx, sy, sw, sh);
 			g.setColor(c);
@@ -488,7 +488,7 @@ public class TextRoi extends Roi {
 	private void updateBounds() {
 		if (firstChar )
 			return;
-		double lineHeight = 0;
+		//double lineHeight = 0;
 		double mag = getMagnification();
 		Font font = getScaledFont();
 		Graphics g = getFontGraphics(font);

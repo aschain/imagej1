@@ -112,7 +112,7 @@ public class ImageWriter {
 		short[] r = (short[])stack[0];
 		short[] g = (short[])stack[1];
 		short[] b = (short[])stack[2];
-		int size = fi.width*fi.height;
+		//int size = fi.width*fi.height;
 		int count = fi.width*6;
 		byte[] buffer = new byte[count];
 		for (int line=0; line<fi.height; line++) {

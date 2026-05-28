@@ -150,7 +150,7 @@ public class ScrollbarWithLabel extends Panel implements Adjustable, AdjustmentL
 		private final int HEIGHT= (int)(14*SCALE);
 		private BasicStroke stroke = new BasicStroke((float)(2*SCALE));
 		private char type;
-		private Image image;
+		//private Image image;
 		
 		public Icon(char type) {
 			addMouseListener(this);
@@ -215,8 +215,8 @@ public class ScrollbarWithLabel extends Panel implements Adjustable, AdjustmentL
 		
 		public void mousePressed(MouseEvent e) {
 			if (type!='t') return;
-			int flags = e.getModifiers();
-			if ((flags&(Event.ALT_MASK|Event.META_MASK|Event.CTRL_MASK))!=0)
+			int flags = e.getModifiersEx();
+			if ((flags&(InputEvent.ALT_DOWN_MASK|InputEvent.META_DOWN_MASK|InputEvent.CTRL_DOWN_MASK))!=0)
 				IJ.doCommand("Animation Options...");
 			else
 				IJ.doCommand("Start Animation [\\]");

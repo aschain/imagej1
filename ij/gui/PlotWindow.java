@@ -149,7 +149,8 @@ public class PlotWindow extends ImageWindow implements ActionListener, ItemListe
 	/** Called by the constructor to generate the image the plot will be drawn on.
 		This is a static method because constructors cannot call instance methods. */
 	static ImagePlus createImage(String title, String xLabel, String yLabel, float[] xValues, float[] yValues) {
-		staticPlot = new Plot(title, xLabel, yLabel, xValues, yValues);
+		staticPlot = new Plot(title,xLabel,yLabel);
+		staticPlot.addPoints(xValues,yValues,null,Plot.LINE,null);
 		return new ImagePlus(title, staticPlot.getBlankProcessor());
 	}
 

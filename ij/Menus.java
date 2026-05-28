@@ -51,27 +51,27 @@ public class Menus {
 
 	private static ImageJ ij;
 	private static Applet applet;
-	private Hashtable demoImagesTable = new Hashtable();
+	//private Hashtable<String, String> demoImagesTable = new Hashtable<String, String>();
 	private static String ImageJPath, pluginsPath, macrosPath;
 	private static Properties menus;
 	private static Properties menuSeparators;
 	private static Menu pluginsMenu, saveAsMenu, shortcutsMenu, utilitiesMenu, macrosMenu;
 	static Menu window, openRecentMenu;
-	private static Hashtable pluginsTable;
+	private static Hashtable<String, String> pluginsTable;
 	
 	private static int nPlugins, nMacros;
-	private static Hashtable shortcuts;
-	private static Hashtable macroShortcuts;
-	private static Vector pluginsPrefs; // commands saved in IJ_Prefs
+	private static Hashtable<Integer, String> shortcuts;
+	private static Hashtable<Integer, String> macroShortcuts;
+	private static Vector<String> pluginsPrefs; // commands saved in IJ_Prefs
 	static int windowMenuItems2; // non-image windows listed in Window menu + separator
 	private String error;
 	private String jarError;
 	private String pluginError;
     private boolean isJarErrorHeading;
 	private static boolean installingJars, duplicateCommand;
-	private static Vector jarFiles;  // JAR files in plugins folder with "_" in their name
-	private Map menuEntry2jarFile = new HashMap();
-	private static Vector macroFiles;  // Macros and scripts in the plugins folder
+	private static Vector<String> jarFiles;  // JAR files in plugins folder with "_" in their name
+	private Map<String, String> menuEntry2jarFile = new HashMap<String, String>();
+	private static Vector<String> macroFiles;  // Macros and scripts in the plugins folder
 	private static int userPluginsIndex; // First user plugin or submenu in Plugins menu
 	private static boolean addSorted;
 	private static int defaultFontSize = IJ.isWindows()?15:0;
@@ -84,7 +84,7 @@ public class Menus {
 		
 	Menus(ImageJ ijInstance, Applet appletInstance) {
 		ij = ijInstance;
-		String title = ij!=null?ij.getTitle():null;
+		//String title = ij!=null?ij.getTitle():null;
 		applet = appletInstance;
 		instance = this;
 		fontSize = Prefs.getInt(Prefs.MENU_SIZE, defaultFontSize);
@@ -99,20 +99,22 @@ public class Menus {
 		error = null;
 		mbar = null;
 		menus = new Properties();
-		pluginsTable = new Hashtable();
-		shortcuts = new Hashtable();
-		pluginsPrefs = new Vector();
+		pluginsTable = new Hashtable<String, String>();
+		shortcuts = new Hashtable<Integer, String>();
+		pluginsPrefs = new Vector<String>();
 		macroShortcuts = null;
 		setupPluginsAndMacrosPaths();
 		Menu file = getMenu("File");
-		Menu newMenu = getMenu("File>New", true);
+		//Menu newMenu = 
+		getMenu("File>New", true);
 		addPlugInItem(file, "Open...", "ij.plugin.Commands(\"open\")", KeyEvent.VK_O, false);
 		addPlugInItem(file, "Open Next", "ij.plugin.NextImageOpener", KeyEvent.VK_O, true);
 		Menu openSamples = getMenu("File>Open Samples", true);
 		openSamples.addSeparator();
 		addPlugInItem(openSamples, "Cache Sample Images ", "ij.plugin.URLOpener(\"cache\")", 0, false);
 		addOpenRecentSubMenu(file);
-		Menu importMenu = getMenu("File>Import", true);		
+		//Menu importMenu = 
+		getMenu("File>Import", true);		
 		Menu showFolderMenu = new Menu("Show Folder");
 		fixFontSize(showFolderMenu);
 		file.add(showFolderMenu);
@@ -149,7 +151,8 @@ public class Menus {
 		addPlugInItem(edit, "Invert", "ij.plugin.filter.Filters(\"invert\")", KeyEvent.VK_I, true);
 		edit.addSeparator();
 		getMenu("Edit>Selection", true);
-		Menu optionsMenu = getMenu("Edit>Options", true);
+		//Menu optionsMenu = 
+		getMenu("Edit>Options", true);
 		
 		Menu image = getMenu("Image");
 		Menu imageType = getMenu("Image>Type");
@@ -173,7 +176,8 @@ public class Menus {
 		getMenu("Image>Stacks", true);
 		getMenu("Image>Stacks>Animation_", true);
 		getMenu("Image>Stacks>Tools_", true);
-		Menu hyperstacksMenu = getMenu("Image>Hyperstacks", true);
+		//Menu hyperstacksMenu = 
+		getMenu("Image>Hyperstacks", true);
 		image.addSeparator();
 		addPlugInItem(image, "Crop", "ij.plugin.Resizer(\"crop\")", KeyEvent.VK_X, true);
 		addPlugInItem(image, "Duplicate...", "ij.plugin.Duplicator", KeyEvent.VK_D, true);
@@ -196,7 +200,8 @@ public class Menus {
 		getMenu("Process>Binary", true);
 		getMenu("Process>Math", true);
 		getMenu("Process>FFT", true);
-		Menu filtersMenu = getMenu("Process>Filters", true);
+		//Menu filtersMenu = 
+		getMenu("Process>Filters", true);
 		process.addSeparator();
 		getMenu("Process>Batch", true);
 		addPlugInItem(process, "Image Calculator...", "ij.plugin.ImageCalculator", 0, false);
@@ -222,7 +227,8 @@ public class Menus {
 		addPlugInItem(analyzeMenu, "Plot Profile", "ij.plugin.Profiler(\"plot\")", KeyEvent.VK_K, false);
 		addPlugInItem(analyzeMenu, "Surface Plot...", "ij.plugin.SurfacePlotter", 0, false);
 		getMenu("Analyze>Gels", true);
-		Menu toolsMenu = getMenu("Analyze>Tools", true);
+		//Menu toolsMenu = 
+		getMenu("Analyze>Tools", true);
 
 		// the plugins will be added later, after a separator
 		addPluginsMenu();
@@ -249,7 +255,8 @@ public class Menus {
 		addPlugInItem(help, "Release Notes...", "ij.plugin.BrowserLauncher(\"https://wsr.imagej.net/notes.html\")", 0, false);
 		addPlugInItem(help, "Refresh Menus", "ij.plugin.ImageJ_Updater(\"menus\")", 0, false);
 		help.addSeparator();
-		Menu aboutMenu = getMenu("Help>About Plugins", true);
+		//Menu aboutMenu = 
+		getMenu("Help>About Plugins", true);
 		addPlugInItem(help, "About ImageJ...", "ij.plugin.AboutBox", 0, false);
 				
 		if (applet==null) {
@@ -559,8 +566,8 @@ public class Menus {
 	}
 	
 	void addPluginsMenu() {
-		String value,label,className;
-		int index;
+		String value;//,label,className;
+		//int index;
 		//pluginsMenu = new Menu("Plugins");
 		pluginsMenu = getMenu("Plugins");
 		for (int count=1; count<100; count++) {
@@ -597,7 +604,7 @@ public class Menus {
 		Menu menu;
 		String[] pluginList = getPlugins();
 		String[] pluginsList2 = null;
-		Hashtable skipList = new Hashtable();
+		Hashtable<String, String> skipList = new Hashtable<String, String>();
  		for (int index=0; index<100; index++) {
 			value = Prefs.getString("plugin" + (index/10)%10 + index%10);
 			if (value==null)
@@ -739,7 +746,7 @@ public class Menus {
 			String jar = (String)jarFiles.elementAt(i);
 			InputStream is = getConfigurationFile(jar);
             if (is==null) continue;
-            ArrayList entries = new ArrayList(20);
+            ArrayList<String> entries = new ArrayList<String>(20);
             LineNumberReader lnr = new LineNumberReader(new InputStreamReader(is));
             try {
                 while(true) {
@@ -935,7 +942,7 @@ public class Menus {
 	InputStream getConfigurationFile(String jar) {
 		try {
 			ZipFile jarFile = new ZipFile(jar);
-			Enumeration entries = jarFile.entries();
+			Enumeration<?> entries = jarFile.entries();
 			while (entries.hasMoreElements()) {
 				ZipEntry entry = (ZipEntry) entries.nextElement();
         		if (entry.getName().endsWith("plugins.config"))
@@ -954,7 +961,7 @@ public class Menus {
 		StringBuffer sb = null;
 		try {
 			ZipFile jarFile = new ZipFile(jar);
-			Enumeration entries = jarFile.entries();
+			Enumeration<?> entries = jarFile.entries();
 			while (entries.hasMoreElements()) {
 				ZipEntry entry = (ZipEntry) entries.nextElement();
 				String name = entry.getName();
@@ -1069,7 +1076,7 @@ public class Menus {
 		String[] list = f.list();
 		if (list==null)
 			return null;
-		Vector v = new Vector();
+		Vector<String> v = new Vector<String>();
 		jarFiles = null;
 		macroFiles = null;
 		for (int i=0; i<list.length; i++) {
@@ -1080,10 +1087,10 @@ public class Menus {
 				name = name.substring(0, name.length()-6); // remove ".class"
 				v.addElement(name);
 			} else if (hasUnderscore && (name.endsWith(".jar") || name.endsWith(".zip"))) {
-				if (jarFiles==null) jarFiles = new Vector();
+				if (jarFiles==null) jarFiles = new Vector<String>();
 				jarFiles.addElement(pluginsPath + name);
 			} else if (validMacroName(name,hasUnderscore)) {
-				if (macroFiles==null) macroFiles = new Vector();
+				if (macroFiles==null) macroFiles = new Vector<String>();
 				macroFiles.addElement(name);
 			} else {
 				if (!isClassFile)
@@ -1097,7 +1104,7 @@ public class Menus {
 	}
 	
 	/** Looks for plugins and jar files in a subdirectory of the plugins directory. */
-	private static void checkSubdirectory(String path, String dir, Vector v) {
+	private static void checkSubdirectory(String path, String dir, Vector<String> v) {
 		if (dir.endsWith(".java"))
 			return;
 		File f = new File(path, dir);
@@ -1118,11 +1125,11 @@ public class Menus {
 				classCount++;
 				className = name;
 			} else if (hasUnderscore && (name.endsWith(".jar") || name.endsWith(".zip"))) {
-				if (jarFiles==null) jarFiles = new Vector();
+				if (jarFiles==null) jarFiles = new Vector<String>();
 				jarFiles.addElement(f.getPath() + File.separator + name);
 				otherCount++;
 			} else if (validMacroName(name,hasUnderscore)) {
-				if (macroFiles==null) macroFiles = new Vector();
+				if (macroFiles==null) macroFiles = new Vector<String>();
 				macroFiles.addElement(dir + name);
 				otherCount++;
 			} else {
@@ -1144,7 +1151,7 @@ public class Menus {
 			String name = list[i];
 			boolean hasUnderscore = name.indexOf('_')>=0;
 			if (validMacroName(name,hasUnderscore)) {
-				if (macroFiles==null) macroFiles = new Vector();
+				if (macroFiles==null) macroFiles = new Vector<String>();
 				macroFiles.addElement(dir+"/"+name);
 			}
 		}
@@ -1341,7 +1348,7 @@ public class Menus {
 	}
         
 	/** Returns the hashtable that associates commands with plugins. */
-	public static Hashtable getCommands() {
+	public static Hashtable<String, String> getCommands() {
 		if (pluginsTable==null && !GraphicsEnvironment.isHeadless())
 			IJ.init();
 		return pluginsTable;
@@ -1349,15 +1356,15 @@ public class Menus {
         
 	/** Returns the hashtable that associates shortcuts with commands. The keys
 		in the hashtable are Integer keycodes, or keycode+200 for uppercase. */
-	public static Hashtable getShortcuts() {
+	public static Hashtable<Integer, String> getShortcuts() {
 		return shortcuts;
 	}
         
 	/** Returns the hashtable that associates keyboard shortcuts with macros. The keys
 		in the hashtable are Integer keycodes, or keycode+200 for uppercase. */
-	public static Hashtable getMacroShortcuts() {
+	public static Hashtable<Integer, String> getMacroShortcuts() {
 		if (macroShortcuts==null)
-			macroShortcuts = new Hashtable();
+			macroShortcuts = new Hashtable<Integer, String>();
 		return macroShortcuts;
 	}
         
@@ -1530,10 +1537,11 @@ public class Menus {
 	/** Deletes a command installed by Plugins/Shortcuts/Add Shortcut. */
 	public static int uninstallPlugin(String command) {
 		boolean found = false;
-		for (Enumeration en=pluginsPrefs.elements(); en.hasMoreElements();) {
+		for (Enumeration<?> en=pluginsPrefs.elements(); en.hasMoreElements();) {
 			String cmd = (String)en.nextElement();
 			if (cmd.contains(command)) {
-				boolean ok = pluginsPrefs.removeElement((Object)cmd);
+				//boolean ok = 
+				pluginsPrefs.removeElement((Object)cmd);
 				found = true;
 				break;
 			}
@@ -1668,7 +1676,7 @@ public class Menus {
 			size = 7;
 		if (scale>1.0 && !checkSize)
 			size = 13;
-		int size0 = size;
+		//int size0 = size;
 		size = (int)Math.round(size*scale);
 		//if (cachedFont==null) System.out.println("getFont: "+size0+" "+size+" "+fontSize+" "+scale+" "+checkSize);
 		if (checkSize && IJ.isWindows() && size>17)
@@ -1688,7 +1696,7 @@ public class Menus {
 		if (pluginsPrefs==null)
 			return;
 		int index = 0;
-		for (Enumeration en=pluginsPrefs.elements(); en.hasMoreElements();) {
+		for (Enumeration<?> en=pluginsPrefs.elements(); en.hasMoreElements();) {
 			String key = "plugin" + (index/10)%10 + index%10;
 			String value = (String)en.nextElement();
 			prefs.put(key, value);
@@ -1712,7 +1720,7 @@ public class Menus {
 		m.installStartupMacroSet();
 		IJ.resetClassLoader();
 		//IJ.runPlugIn("ij.plugin.ClassChecker", "");
-		IJ.showStatus("Menus updated: "+m.nPlugins + " commands, " + m.nMacros + " macros");
+		IJ.showStatus("Menus updated: "+Menus.nPlugins + " commands, " + Menus.nMacros + " macros");
 	}
 	
 	public static void updateFont() {

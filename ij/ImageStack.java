@@ -462,7 +462,7 @@ public class ImageStack {
 		if (voxels==null || voxels.length!=w*h*d)
 			voxels = new float[w*h*d];
 		int i = 0;
-		int offset;
+		//int offset;
 		for (int z=z0; z<z0+d; z++) {
 			for (int y=y0; y<y0+h; y++) {
 				if (inBounds) {

@@ -203,7 +203,7 @@ public class SaveDialog {
 			}
 			fd.setDirectory(defaultDir);
 		}
-		fd.show();
+		fd.setVisible(true);
 		name = fd.getFile();
 		String origName = name;
 		if (noExtension(name)) {

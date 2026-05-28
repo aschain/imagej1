@@ -218,16 +218,16 @@ public class Tokenizer implements MacroConstants {
 		try {
 			int next = st.nextToken();
 			String sval2 = st.sval;
-			if (st.ttype == st.TT_WORD && (sval2.startsWith("e")||sval2.startsWith("E"))) {
+			if (st.ttype == StreamTokenizer.TT_WORD && (sval2.startsWith("e")||sval2.startsWith("E"))) {
 				// Usually we would just append the sval, but "-" is special...
 				if (sval2.equalsIgnoreCase("e")) {
-					//if (st.nextToken() != st.TT_WORD || !st.sval.equals("-"))
+					//if (st.nextToken() != StreamTokenizer.TT_WORD || !st.sval.equals("-"))
 					next = st.nextToken();
 					if (next == '-')
 						sval2 += "-";
 					else if (next != '+')
 						throw new Exception();
-					if (st.nextToken() != st.TT_NUMBER)
+					if (st.nextToken() != StreamTokenizer.TT_NUMBER)
 						throw new Exception();
 					sval2 += st.nval;
 				}

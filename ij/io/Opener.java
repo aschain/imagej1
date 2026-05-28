@@ -30,7 +30,7 @@ public class Opener {
 		TIFF_AND_DICOM=14,CUSTOM=15, AVI=16, OJJ=17, TABLE=18, RAW=19; // don't forget to also update 'types'
 	public static final String[] types = {"unknown","tif","dcm","fits","pgm",
 		"jpg","gif","lut","bmp","zip","java/txt","roi","txt","png","t&d","custom","ojj","table","raw"};
-	private static String defaultDirectory = null;
+	//private static String defaultDirectory = null;
 	private int fileType;
 	private boolean error;
 	private boolean isRGB48;
@@ -44,7 +44,7 @@ public class Opener {
 	private boolean doNotUseBioFormats;
 
 	static {
-		Hashtable commands = Menus.getCommands();
+		Hashtable<String, String> commands = Menus.getCommands();
 		bioformats = commands!=null && commands.get("Bio-Formats Importer")!=null;
 	}
 
@@ -485,7 +485,7 @@ public class Opener {
 	}
 	
 	private String getUrlName(String url) {
-		String origUrl = url;
+		//String origUrl = url;
 		String name = "";
 		int ndx = url.lastIndexOf(".jpeg?");
 		if (ndx>0)
@@ -625,12 +625,12 @@ public class Opener {
 			if (name.endsWith(".dcm")) {
 				ByteArrayOutputStream out = new ByteArrayOutputStream();
 				byte[] buf = new byte[4096];
-				int len, byteCount=0, progress=0;
+				int len;//, byteCount=0, progress=0;
 				while (true) {
 					len = zis.read(buf);
 					if (len<0) break;
 					out.write(buf, 0, len);
-					byteCount += len;
+					//byteCount += len;
 					//IJ.showProgress((double)(byteCount%fileSize)/fileSize);
 				}
 				byte[] bytes = out.toByteArray();
@@ -706,7 +706,7 @@ ImagePlus openJpegOrGifUsingURL(String title, URL url) {
 			if (imp.getType()==ImagePlus.COLOR_RGB)
 				convertGrayJpegTo8Bits(imp);
 			FileInfo fi = new FileInfo();
-			fi.fileFormat = fi.GIF_OR_JPG;
+			fi.fileFormat = FileInfo.GIF_OR_JPG;
 			fi.fileName = name;
 			fi.directory = dir;
 			imp.setFileInfo(fi);
@@ -771,7 +771,7 @@ ImagePlus openJpegOrGifUsingURL(String title, URL url) {
 		if (imp.getBitDepth()==16 && imp.getStackSize()>1)
 			imp = new CompositeImage(imp, IJ.COMPOSITE);
 		FileInfo fi = new FileInfo();
-		fi.fileFormat = fi.IMAGEIO;
+		fi.fileFormat = FileInfo.IMAGEIO;
 		fi.fileName = f.getName();
 		String parent = f.getParent();
 		if (parent!=null)
@@ -1194,10 +1194,10 @@ ImagePlus openJpegOrGifUsingURL(String title, URL url) {
 		String className = "loci.plugins.BF";
 		String methodName = "openImagePlus";
 		try {
-			Class c = IJ.getClassLoader().loadClass(className);
+			Class<?> c = IJ.getClassLoader().loadClass(className);
 			if (c==null)
 				return null;
-			Class[] argClasses = new Class[1];
+			Class<?>[] argClasses = new Class[1];
 			argClasses[0] = methodName.getClass();
 			Method m = c.getMethod(methodName, argClasses);
 			Object[] args = new Object[1];

@@ -54,6 +54,7 @@ public class IJ {
     public static final char degreeSymbol = '\u00B0';
 
 	private static ImageJ ij;
+	@SuppressWarnings("deprecation")
 	private static java.applet.Applet applet;
 	private static ProgressBar progressBar;
 	private static TextPanel textPanel;
@@ -70,13 +71,13 @@ public class IJ {
 	private static boolean escapePressed;
 	private static boolean redirectErrorMessages;
 	private static boolean suppressPluginNotFoundError;
-	private static Hashtable commandTable;
-	private static Vector eventListeners = new Vector();
+	private static Hashtable<String, String> commandTable;
+	private static Vector<IJEventListener> eventListeners = new Vector<IJEventListener>();
 	private static String lastErrorMessage;
 	private static Properties properties;	private static DecimalFormat[] df;
 	private static DecimalFormat[] sf;
 	private static DecimalFormatSymbols dfs;
-	private static boolean trustManagerCreated;
+	//private static boolean trustManagerCreated;
 	private static String smoothMacro;
 	private static Interpreter macroInterpreter;
 	private static boolean protectStatusBar;
@@ -118,7 +119,8 @@ public class IJ {
 		df[9] = new DecimalFormat("0.000000000", dfs);
 		df[0].setRoundingMode(RoundingMode.HALF_UP);
 	}
-			
+
+	@SuppressWarnings("deprecation")
 	static void init(ImageJ imagej, Applet theApplet) {
 		ij = imagej;
 		applet = theApplet;
@@ -205,8 +207,8 @@ public class IJ {
 			return runUserPlugIn(commandName, className, arg, false);
 		Object thePlugIn=null;
 		try {
-			Class c = Class.forName(className);
- 			thePlugIn = c.newInstance();
+			Class<?> c = Class.forName(className);
+ 			thePlugIn = c.getDeclaredConstructor().newInstance();
  			if (thePlugIn instanceof PlugIn)
 				((PlugIn)thePlugIn).run(arg);
  			else
@@ -221,6 +223,8 @@ public class IJ {
 		}
 		catch (InstantiationException e) {log("Unable to load plugin (ins)");}
 		catch (IllegalAccessException e) {log("Unable to load plugin, possibly \nbecause it is not public.");}
+		catch (java.lang.reflect.InvocationTargetException e) {log("Unable to load plugin (ite): "+e.getCause());}
+		catch (NoSuchMethodException e) {log("Unable to load plugin (nsm): "+e);}
 		redirectErrorMessages = false;
 		return thePlugIn;
 	}
@@ -234,7 +238,7 @@ public class IJ {
 		ClassLoader loader = getClassLoader();
 		Object thePlugIn = null;
 		try { 
-			thePlugIn = (loader.loadClass(className)).newInstance(); 
+			thePlugIn = (loader.loadClass(className)).getDeclaredConstructor().newInstance();
 			if (thePlugIn instanceof PlugIn)
  				((PlugIn)thePlugIn).run(arg);
  			else if (thePlugIn instanceof PlugInFilter)
@@ -258,6 +262,8 @@ public class IJ {
 		}
 		catch (InstantiationException e) {error("Unable to load plugin (ins)");}
 		catch (IllegalAccessException e) {error("Unable to load plugin, possibly \nbecause it is not public.");}
+		catch (java.lang.reflect.InvocationTargetException e) {log("Unable to load plugin (ite): "+e.getCause());}
+		catch (NoSuchMethodException e) {log("Unable to load plugin (nsm): "+e);}
 		if (thePlugIn!=null && !"HandleExtraFileTypes".equals(className))
  			redirectErrorMessages = false;
 		suppressPluginNotFoundError = false;
@@ -337,7 +343,7 @@ public class IJ {
 		macros using the old names continue to work. */
 	private static String convert(String command) {
 		if (commandTable==null) {
-			commandTable = new Hashtable(30);
+			commandTable = new Hashtable<String, String>(30);
 			commandTable.put("New...", "Image...");
 			commandTable.put("Threshold", "Make Binary");
 			commandTable.put("Display...", "Appearance...");
@@ -437,6 +443,7 @@ public class IJ {
 	}
 
 	/**Returns the Applet that created this ImageJ or null if running as an application.*/
+	@SuppressWarnings("deprecation")
 	public static java.applet.Applet getApplet() {
 		return applet;
 	}
@@ -509,7 +516,7 @@ public class IJ {
 		int delay = (int)Tools.parseDouble(options, defaultDelay);
 		if (delay>8000)
 			delay = 8000;
-		String colorString = null;
+		//String colorString = null;
 		ImageJ ij = IJ.getInstance();
 		if (flashImage) {
 			Color previousColor = imp.getWindow().getBackground();
@@ -521,7 +528,7 @@ public class IJ {
 		} else if (ij!=null) {
 			ij.getStatusBar().setBackground(color);
 			wait(delay);
-			ij.getStatusBar().setBackground(ij.backgroundColor);
+			ij.getStatusBar().setBackground(ImageJ.backgroundColor);
 		}
 	}
 	
@@ -997,8 +1004,8 @@ public class IJ {
 			return ""+n;
 		if (n==Float.MAX_VALUE) // divide by 0 in FloatProcessor
 			return "3.4e38";
-		double np = n;
-		if (n<0.0) np = -n;
+		//double np = n;
+		//if (n<0.0) np = -n;
 		if (decimalPlaces<0) synchronized(IJ.class) {
 			decimalPlaces = -decimalPlaces;
 			if (decimalPlaces>9) decimalPlaces=9;
@@ -1061,7 +1068,7 @@ public class IJ {
 	}
 
 	/** Obsolete */
-	public static void register(Class c) {
+	public static void register(Class<?> c) {
 		if (ij!=null) ij.register(c);
 	}
 	
@@ -1108,7 +1115,7 @@ public class IJ {
 				break;
 			case KeyEvent.VK_SPACE: {
 				spaceDown=true;
-				ImageWindow win = WindowManager.getCurrentWindow();
+				//ImageWindow win = WindowManager.getCurrentWindow();
 				//if (win!=null) win.getCanvas().setCursor(-1,-1,-1, -1);
 				break;
 			}
@@ -1132,7 +1139,7 @@ public class IJ {
 			case KeyEvent.VK_SHIFT: shiftDown=false; if (debugMode) beep(); break;
 			case KeyEvent.VK_SPACE:
 				spaceDown=false;
-				ImageWindow win = WindowManager.getCurrentWindow();
+				//ImageWindow win = WindowManager.getCurrentWindow();
 				//if (win!=null) win.getCanvas().setCursor(-1,-1,-1,-1);
 				break;
 			case ALL_KEYS:
@@ -1997,6 +2004,7 @@ public class IJ {
 	/** Opens a URL and returns the contents as a string.
 		Returns "<Error: message>" if there an error, including
 		host or file not found. */
+	@SuppressWarnings("unused")
 	public static String openUrlAsString(String url) {
 		//if (!trustManagerCreated && url.contains("nih.gov")) trustAllCerts();
 		url = Opener.updateUrl(url);
@@ -2022,8 +2030,7 @@ public class IJ {
 		}
 		if (sb!=null)
 			return new String(sb);
-		else
-			return "";
+		return "";
 	}	
 
 	/** Saves the current image, lookup table, selection or text window to the specified file path. 
@@ -2448,8 +2455,8 @@ public class IJ {
 	 * and Image/Color/Display LUTs
 	*/
 	public static String[] getLuts() {
-		ArrayList list = new ArrayList();
-		Hashtable commands = Menus.getCommands();
+		ArrayList<String> list = new ArrayList<String>();
+		Hashtable<String, String> commands = Menus.getCommands();
 		Menu lutsMenu = Menus.getImageJMenu("Image>Lookup Tables");
 		if (commands==null || lutsMenu==null)
 			return new String[0];

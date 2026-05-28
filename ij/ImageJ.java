@@ -107,15 +107,16 @@ public class ImageJ extends Frame implements ActionListener,
 	private Panel statusBar;
 	private ProgressBar progressBar;
 	private JLabel statusLine;
-	private boolean firstTime = true;
+	//private boolean firstTime = true;
+	@SuppressWarnings("deprecation")
 	private java.applet.Applet applet; // null if not running as an applet
-	private Vector classes = new Vector();
+	private Vector<Class<?>> classes = new Vector<Class<?>>();
 	private boolean exitWhenQuitting;
 	private boolean quitting;
 	private boolean quitMacro;
 	private long keyPressedTime, actionPerformedTime;
 	private String lastKeyCommand;
-	private boolean embedded;
+	//private boolean embedded;
 	private boolean windowClosed;
 	private static String commandName;
 	private static boolean batchMode;
@@ -133,6 +134,7 @@ public class ImageJ extends Frame implements ActionListener,
 	}
 
 	/** Creates a new ImageJ frame that runs as an applet. */
+	@SuppressWarnings("deprecation")
 	public ImageJ(java.applet.Applet applet) {
 		this(applet, STANDALONE);
 	}
@@ -140,6 +142,7 @@ public class ImageJ extends Frame implements ActionListener,
 	/** If 'applet' is not null, creates a new ImageJ frame that runs as an applet.
 		If  'mode' is ImageJ.EMBEDDED and 'applet is null, creates an embedded 
 		(non-standalone) version of ImageJ. */
+	@SuppressWarnings("deprecation")
 	public ImageJ(java.applet.Applet applet, int mode) {
 		super("ImageJ");
 		if ((mode&DEBUG)!=0)
@@ -151,7 +154,7 @@ public class ImageJ extends Frame implements ActionListener,
 			useExceptionHandler = true;
 		}
 		if (IJ.debugMode) IJ.log("ImageJ starting in debug mode: "+mode);
-		embedded = applet==null && (mode==EMBEDDED||mode==NO_SHOW);
+		//embedded = applet==null && (mode==EMBEDDED||mode==NO_SHOW);
 		this.applet = applet;
 		String err1 = Prefs.load(this, applet);
 		setBackground(backgroundColor);
@@ -189,7 +192,7 @@ public class ImageJ extends Frame implements ActionListener,
 		m.installStartupMacroSet(); //add custom tools
  		
 		Point loc = getPreferredLocation();
-		Dimension tbSize = toolbar.getPreferredSize();
+		//Dimension tbSize = toolbar.getPreferredSize();
 		setCursor(Cursor.getDefaultCursor()); // work-around for JDK 1.1.8 bug
 		if (mode!=NO_SHOW) {
 			if (IJ.isWindows()) try {setIcon();} catch(Exception e) {}
@@ -339,10 +342,10 @@ public class ImageJ extends Frame implements ActionListener,
 	public static String modifiers(int flags) { //?? needs to be moved
 		String s = " [ ";
 		if (flags == 0) return "";
-		if ((flags & Event.SHIFT_MASK) != 0) s += "Shift ";
-		if ((flags & Event.CTRL_MASK) != 0) s += "Control ";
-		if ((flags & Event.META_MASK) != 0) s += "Meta ";
-		if ((flags & Event.ALT_MASK) != 0) s += "Alt ";
+		if ((flags & InputEvent.SHIFT_DOWN_MASK) != 0) s += "Shift ";
+		if ((flags & InputEvent.CTRL_DOWN_MASK) != 0) s += "Control ";
+		if ((flags & InputEvent.META_DOWN_MASK) != 0) s += "Meta ";
+		if ((flags & InputEvent.ALT_DOWN_MASK) != 0) s += "Alt ";
 		s += "] ";
 		return s;
 	}
@@ -372,9 +375,9 @@ public class ImageJ extends Frame implements ActionListener,
 			actionPerformedTime = System.currentTimeMillis();
 			long ellapsedTime = actionPerformedTime-keyPressedTime;
 			if (cmd!=null && (ellapsedTime>=200L||!cmd.equals(lastKeyCommand))) {
-				if ((flags & Event.ALT_MASK)!=0)
+				if ((flags & InputEvent.ALT_DOWN_MASK)!=0)
 					IJ.setKeyDown(KeyEvent.VK_ALT);
-				if ((flags & Event.SHIFT_MASK)!=0)
+				if ((flags & InputEvent.SHIFT_DOWN_MASK)!=0)
 					IJ.setKeyDown(KeyEvent.VK_SHIFT);
 				new Executer(cmd, imp);
 			}
@@ -427,14 +430,14 @@ public class ImageJ extends Frame implements ActionListener,
 		if (keyCode==KeyEvent.VK_CONTROL || keyCode==KeyEvent.VK_SHIFT)
 			return;
 		char keyChar = e.getKeyChar();
-		int flags = e.getModifiers();
+		int flags = e.getModifiersEx();
 		if (IJ.debugMode) IJ.log("keyPressed: code=" + keyCode + " (" + KeyEvent.getKeyText(keyCode)
 			+ "), char=\"" + keyChar + "\" (" + (int)keyChar + "), flags="
-			+ KeyEvent.getKeyModifiersText(flags));
-		boolean shift = (flags & KeyEvent.SHIFT_MASK) != 0;
-		boolean control = (flags & KeyEvent.CTRL_MASK) != 0;
-		boolean alt = (flags & KeyEvent.ALT_MASK) != 0;
-		boolean meta = (flags & KeyEvent.META_MASK) != 0;
+			+ InputEvent.getModifiersExText(flags));
+		boolean shift = (flags & InputEvent.SHIFT_DOWN_MASK) != 0;
+		boolean control = (flags & InputEvent.CTRL_DOWN_MASK) != 0;
+		boolean alt = (flags & InputEvent.ALT_DOWN_MASK) != 0;
+		boolean meta = (flags & InputEvent.META_DOWN_MASK) != 0;
 		if (keyCode==KeyEvent.VK_H && meta && IJ.isMacOSX())
 			return; // Allow macOS to run ImageJ>Hide ImageJ command
 		String cmd = null;
@@ -449,7 +452,7 @@ public class ImageJ extends Frame implements ActionListener,
 					if (deleteOverlayRoi(imp))
 							return;
 				}
-				if ((flags & KeyEvent.META_MASK)!=0 && IJ.isMacOSX())
+				if ((flags & InputEvent.META_DOWN_MASK)!=0 && IJ.isMacOSX())
 					return;
 				if (alt) {
 					switch (keyChar) {
@@ -465,7 +468,7 @@ public class ImageJ extends Frame implements ActionListener,
         		
 		// Handle one character macro shortcuts
 		if (!control && !meta) {
-			Hashtable macroShortcuts = Menus.getMacroShortcuts();
+			Hashtable<Integer, String> macroShortcuts = Menus.getMacroShortcuts();
 			if (macroShortcuts.size()>0) {
 				if (shift)
 					cmd = (String)macroShortcuts.get(Integer.valueOf(keyCode+200));
@@ -486,7 +489,7 @@ public class ImageJ extends Frame implements ActionListener,
 			|| keyCode==KeyEvent.VK_DECIMAL
 			|| (keyCode>=KeyEvent.VK_NUMPAD0 && keyCode<=KeyEvent.VK_NUMPAD9);			
 		if ((!Prefs.requireControlKey||control||meta||functionKey||numPad) && keyChar!='+') {
-			Hashtable shortcuts = Menus.getShortcuts();
+			Hashtable<Integer, String> shortcuts = Menus.getShortcuts();
 			if (shift && !functionKey)
 				cmd = (String)shortcuts.get(Integer.valueOf(keyCode+200));
 			else
@@ -545,7 +548,7 @@ public class ImageJ extends Frame implements ActionListener,
 					else if (zoomKey && keyCode==KeyEvent.VK_UP && !ignoreArrowKeys(imp,control) && Toolbar.getToolId()<Toolbar.SPARE6)
 							cmd="In [+]";
 					else if (roi!=null) {
-						if ((flags & KeyEvent.ALT_MASK)!=0 || (flags & KeyEvent.CTRL_MASK)!=0)
+						if ((flags & InputEvent.ALT_DOWN_MASK)!=0 || (flags & InputEvent.CTRL_DOWN_MASK)!=0)
 							roi.nudgeCorner(keyCode);
 						else
 							roi.nudge(keyCode);
@@ -624,11 +627,11 @@ public class ImageJ extends Frame implements ActionListener,
 	
 	public void keyTyped(KeyEvent e) {
 		char keyChar = e.getKeyChar();
-		int flags = e.getModifiers();
+		int flags = e.getModifiersEx();
 		//if (IJ.debugMode) IJ.log("keyTyped: char=\"" + keyChar + "\" (" + (int)keyChar 
 		//	+ "), flags= "+Integer.toHexString(flags)+ " ("+KeyEvent.getKeyModifiersText(flags)+")");
 		if (keyChar=='\\' || keyChar==171 || keyChar==223) {
-			if (((flags&Event.ALT_MASK)!=0))
+			if (((flags&InputEvent.ALT_DOWN_MASK)!=0))
 				doCommand("Animation Options...");
 			else
 				doCommand("Start Animation [\\]");
@@ -689,7 +692,7 @@ public class ImageJ extends Frame implements ActionListener,
 	
 	/** Adds the specified class to a Vector to keep it from being
 		garbage collected, causing static fields to be reset. */
-	public void register(Class c) {
+	public void register(Class<?> c) {
 		if (!classes.contains(c))
 			classes.addElement(c);
 	}

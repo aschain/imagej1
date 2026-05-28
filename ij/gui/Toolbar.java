@@ -7,7 +7,6 @@ import ij.plugin.tool.MacroToolRunner;
 import ij.plugin.tool.PlugInTool;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Arrays;
@@ -59,7 +58,7 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 	private static final int NUM_BUTTONS = 21;
 	private static final int BUTTON_WIDTH = 30;
 	private static final int BUTTON_HEIGHT = 31;
-	private static final int SIZE = 28;  // no longer used
+	//private static final int SIZE = 28;  // no longer used
 	private static final int GAP_SIZE = 9;
 	private static final int OFFSET = 7;
 	private static final String BRUSH_SIZE = "toolbar.brush.size";
@@ -87,7 +86,7 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 	private boolean doNotSavePrefs;
 	private int pc;
 	private String icon;
-	private int startupTime;
+	//private int startupTime;
 	private PopupMenu rectPopup, ovalPopup, pointPopup, linePopup, zoomPopup, pickerPopup, switchPopup;
 	private CheckboxMenuItem rectItem, roundRectItem, rotatedRectItem;
 	private CheckboxMenuItem ovalItem, ellipseItem, brushItem;
@@ -496,7 +495,8 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 		if (null==g) return;
 		icon = icons[tool];
 		if (icon==null) return;
-		int x1, y1, x2, y2;
+		//int x1, y1, 
+		int x2, y2;
 		pc = 0;
 		if (icon.trim().startsWith("icon:")) {
 			String path = IJ.getDir("macros")+"toolsets/icons/"+icon.substring(icon.indexOf(":")+1);
@@ -882,7 +882,7 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 		setStrokeWidth(g2d);
 		drawButton(g, previousTool);
 		drawButton(g, current);
-		if (null==g) return;
+		//if (null==g) return;
 		g.dispose();
 		showMessage(current);
 		if (IJ.recording()) {
@@ -1218,8 +1218,8 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
             menus[newTool].show(e.getComponent(), e.getX(), e.getY());
 			return;
 		}
-		int flags = e.getModifiers();
-		boolean isRightClick = e.isPopupTrigger()||(!IJ.isMacintosh()&&(flags&Event.META_MASK)!=0);
+		int flags = e.getModifiersEx();
+		boolean isRightClick = e.isPopupTrigger()||(!IJ.isMacintosh()&&(flags&InputEvent.META_DOWN_MASK)!=0);
 		boolean doubleClick = newTool==current && (System.currentTimeMillis()-mouseDownTime)<=DOUBLE_CLICK_THRESHOLD;
  		mouseDownTime = System.currentTimeMillis();
 		if (!doubleClick || isRightClick) {
@@ -1304,9 +1304,10 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 	}
 	
 	void showSwitchPopupMenu(MouseEvent e) {
-		String path = IJ.getDir("macros")+"toolsets/";
+		String path = IJ.getDir("macros");
 		if (path==null)
 			return;
+		path=path+"toolsets/";
 		boolean applet = IJ.getApplet()!=null;
 		File f = new File(path);
 		String[] list;
@@ -1596,7 +1597,7 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 	public static void restoreTools() {
 		Toolbar tb = Toolbar.getInstance();
 		if (tb!=null) {
-			if (tb.getToolId()>=UNUSED)
+			if (getToolId()>=UNUSED)
 				tb.setTool(RECTANGLE);
 			tb.installStartupMacros();
 		}
@@ -1786,9 +1787,9 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
     
     void installMenu(int tool) {
         Program pgm = macroInstaller.getProgram();
-        Hashtable h = pgm.getMenus();
+        Hashtable<String, String[]> h = pgm.getMenus();
         if (h==null) return;
-        String[] commands = (String[])h.get(names[tool]);
+        String[] commands = h.get(names[tool]);
         if (commands==null)
         	return;
 		if (menus[tool]==null) {
@@ -1829,7 +1830,7 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 			doNotSavePrefs = true;
 			boolean ok = installBuiltinTool(name);
 			if (!ok) {
-				Hashtable commands = Menus.getCommands();
+				Hashtable<String, String> commands = Menus.getCommands();
 				if (commands!=null && commands.get(name)!=null)
 					IJ.run(name);
 			}
@@ -1908,7 +1909,7 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 
 	public static void removeMacroTools() {
 		if (instance!=null) {
-			if (instance.getToolId()>=CUSTOM1)
+			if (getToolId()>=CUSTOM1)
 				instance.setTool(RECTANGLE);
 			instance.resetTools();
 			instance.repaint();
@@ -1927,7 +1928,7 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 			instance.tools[id] = tool;
 			if (instance.menus[id]!=null)
 				instance.menus[id].removeAll();
-			instance.repaintTool(id);	
+			repaintTool(id);	
 			if (!instance.installingStartupTool)
 				instance.setTool(id);
 			else
@@ -1991,7 +1992,7 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 				if (!ok) {  // install tool in plugins/Tools
 					if (name.endsWith("Menu Tool"))
 						name = name.substring(0, name.length()-5);
-					Hashtable commands = Menus.getCommands();
+					Hashtable<String, String> commands = Menus.getCommands();
 					if (commands!=null && commands.get(name)!=null)
 						IJ.run(name);
 				}
@@ -2084,17 +2085,17 @@ public class Toolbar extends Canvas implements MouseListener, MouseMotionListene
 		IJ.setKeyUp(KeyEvent.VK_SHIFT);
 	}
 	
-	private boolean isMacroSet(int id) {
-		if (tools[id]==null)
-			return false;
-		if (!(tools[id] instanceof MacroToolRunner))
-			return false;
-		boolean rtn = ((MacroToolRunner)tools[id]).getMacroCount()>2;
-		return rtn;
-	}
+	//private boolean isMacroSet(int id) {
+	//	if (tools[id]==null)
+	//		return false;
+	//	if (!(tools[id] instanceof MacroToolRunner))
+	//		return false;
+	//	boolean rtn = ((MacroToolRunner)tools[id]).getMacroCount()>2;
+	//	return rtn;
+	//}
 	
 	public static boolean installStartupMacrosTools() {
-		String customTool0 = Prefs.get(Toolbar.TOOL_KEY+"00", "");
+		String customTool0 = Prefs.get(TOOL_KEY+"00", "");
 		return customTool0.equals("") || Character.isDigit(customTool0.charAt(0));
 	}
 	

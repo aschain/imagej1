@@ -62,7 +62,7 @@ public class YesNoCancelDialog extends Dialog implements ActionListener, KeyList
 		pack();
 		yesB.requestFocusInWindow();
 		GUI.centerOnImageJScreen(this);
-		show();
+		setVisible(true);
 	}
     
 	public void actionPerformed(ActionEvent e) {

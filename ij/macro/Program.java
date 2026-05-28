@@ -18,10 +18,10 @@ public class Program implements MacroConstants {
 	Variable[] globals;
 	boolean hasVars, hasFunctions;
 	int macroCount;
-    Hashtable menus;
+    Hashtable<String, String[]> menus;
     // run keyboard shortcut macros on event dispatch thread?
 	boolean queueCommands; 
-	Hashtable extensionRegistry;
+	Hashtable<String, ExtensionDescriptor> extensionRegistry;
 			
 	public Program() {
 		if (systemTable!=null) {
@@ -115,7 +115,7 @@ public class Program implements MacroConstants {
 	/** Looks up a word in the symbol table. Returns null if the word is not found. */
 	Symbol lookupWord(String str) {
 		Symbol symbol;
-		String symStr;
+		//String symStr;
 		for (int i=0; i<=stLoc; i++) {
 			symbol = table[i];
 			if (symbol.type!=STRING_CONSTANT && str.equals(symbol.str)) {
@@ -149,8 +149,8 @@ public class Program implements MacroConstants {
 	public void dumpProgram() {
 		IJ.log("");
 		IJ.log("Tokenized Program");
-		String str;
-		int token, address;
+		//String str;
+		//int token, address;
 		for (int i=0; i<=pc; i++) 
 			IJ.log(i+"	 "+lineNumbers[i]+"   "+(code[i]&TOK_MASK)+"   "+decodeToken(code[i]));
 	}
@@ -257,7 +257,7 @@ public class Program implements MacroConstants {
 		return str;
 	}
     
-    public Hashtable getMenus() {
+    public Hashtable<String, String[]> getMenus() {
         return menus;
     }
 

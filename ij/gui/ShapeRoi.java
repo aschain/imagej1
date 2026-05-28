@@ -56,7 +56,7 @@ public class ShapeRoi extends Roi {
 	private double flatness = ShapeRoi.FLATNESS;
 	
 	/**The instance value of MAXPOLY.*/
-	private int maxPoly = ShapeRoi.MAXPOLY;
+	//private int maxPoly = ShapeRoi.MAXPOLY;
     
 	/**If <strong></code>true</code></strong> then methods that manipulate this ROI's shape will work on
 	 * a flattened version of the shape. */
@@ -74,7 +74,7 @@ public class ShapeRoi extends Roi {
 	 * else, into a {@link ij.gui.Roi#POLYLINE}. */
 	private boolean forceAngle = false;
 	
-	private Vector savedRois; //not really used any more
+	private Vector<Roi> savedRois; //not really used any more
 	private static Stroke defaultStroke = new BasicStroke();
 
 
@@ -120,7 +120,7 @@ public class ShapeRoi extends Roi {
 		this.maxerror = maxerror;
 		this.forceAngle = forceAngle;
 		this.forceTrace = forceTrace;
-		this.maxPoly= maxPoly;
+		//this.maxPoly= maxPoly;
 		this.flatten = flatten;
 		shape = roiToShape((Roi)r.clone());
 	}
@@ -143,7 +143,7 @@ public class ShapeRoi extends Roi {
 		shape = new GeneralPath(at.createTransformedShape(shape));
 		flatness = ShapeRoi.FLATNESS;
 		maxerror = ShapeRoi.MAXERROR;
-		maxPoly = ShapeRoi.MAXPOLY;
+		//maxPoly = ShapeRoi.MAXPOLY;
 		flatten = false;
 		type = COMPOSITE;
 	}
@@ -416,7 +416,7 @@ public class ShapeRoi extends Roi {
 	 * @deprecated  Use ShapeRoi(Roi) creator and merge with <code>or(ShapeRoi)</code>. */
 	void saveRoi(Roi roi) {
 		if (savedRois==null)
-			savedRois = new Vector();
+			savedRois = new Vector<Roi>();
 		savedRois.addElement(roi);
 	}
 
@@ -466,7 +466,7 @@ public class ShapeRoi extends Roi {
 			return new Roi[0];
 		if (savedRois!=null)
 			return (Roi[])savedRois.toArray(new Roi[savedRois.size()]);
-		ArrayList rois = new ArrayList();
+		ArrayList<Roi> rois = new ArrayList<Roi>();
 		if (shape instanceof Rectangle2D.Double) {
 			Roi r = new Roi((int)((Rectangle2D.Double)shape).getX(), (int)((Rectangle2D.Double)shape).getY(), (int)((Rectangle2D.Double)shape).getWidth(), (int)((Rectangle2D.Double)shape).getHeight());
 			rois.add(r);
@@ -498,7 +498,7 @@ public class ShapeRoi extends Roi {
 		if (shape==null || !(shape instanceof GeneralPath))
 			return null;
 		PathIterator pIter = shape.getPathIterator(new AffineTransform());
-		ArrayList rois = new ArrayList();
+		ArrayList<Roi> rois = new ArrayList<Roi>();
 		parsePath(pIter, ONE_ROI, rois);
 		if (rois.size() == 1)
 			return (Roi)rois.get(0);
@@ -786,7 +786,7 @@ public class ShapeRoi extends Roi {
 	 *        may be null only when <code>task = GET_LENGTH</code>
 	 * (see @link #shapeToRois()} for details;
 	 * @return Total length if task = GET_LENGTH.*/
-	double parsePath(PathIterator pIter, int task, ArrayList rois) {
+	double parsePath(PathIterator pIter, int task, ArrayList<Roi> rois) {
 		if (pIter==null || pIter.isDone())
 			return 0.0;
 		double pw = 1.0, ph = 1.0;
@@ -1068,7 +1068,7 @@ public class ShapeRoi extends Roi {
 	 * @return <strong><code>false</code></strong> if the argument is null.
 	 */
 	boolean setShape(Shape rhs) {
-		boolean result = true;
+		//boolean result = true;
 		if (rhs==null) return false;
 		if (shape.equals(rhs)) return false;
 		shape = rhs;
@@ -1080,18 +1080,18 @@ public class ShapeRoi extends Roi {
 	}
 
 	/**Returns the element with the smallest value in the array argument.*/
-	private int min(int[] array) {
-		int val = array[0];
-		for (int i=1; i<array.length; i++) val = Math.min(val,array[i]);
-		return val;
-	}
+	//private int min(int[] array) {
+	//	int val = array[0];
+	//	for (int i=1; i<array.length; i++) val = Math.min(val,array[i]);
+	//	return val;
+	//}
 
 	/**Returns the element with the largest value in the array argument.*/
-	private int max(int[] array) {
-		int val = array[0];
-		for (int i=1; i<array.length; i++) val = Math.max(val,array[i]);
-		return val;
-	}
+	//private int max(int[] array) {
+	//	int val = array[0];
+	//	for (int i=1; i<array.length; i++) val = Math.max(val,array[i]);
+	//	return val;
+	//}
 	
 	static ShapeRoi getCircularRoi(int x, int y, int width) {
 		return new ShapeRoi(new OvalRoi(x - width / 2, y - width / 2, width, width));

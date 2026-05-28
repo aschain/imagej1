@@ -30,14 +30,14 @@ public class RotatedRectRoi extends PolygonRoi {
 		if (IJ.debugMode) IJ.log("RotatedRectRoi: "+(int)rectWidth+" "+pixels);
 		if (rectWidth>pixels)
 			rectWidth = pixels/3;
-		setDrawOffset(false);
+		//setDrawOffset(false);
 		bounds = null;
 	}
 
 	public void draw(Graphics g) {	
 		super.draw(g);
 		if (!overlay && ic!=null) {
-			double mag = ic.getMagnification();
+			//double mag = ic.getMagnification();
 			for (int i=0; i<4; i++) {
 			if (i==3) //mark starting point
 				handleColor = strokeColor!=null?strokeColor:ROIColor;

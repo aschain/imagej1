@@ -129,7 +129,8 @@ public class ProfilePlot {
         for (int i=0; i<n; i++)
         	yValues[i] = (float)profile[i];
 		boolean fixedYScale = fixedMin!=0.0 || fixedMax!=0.0;
-		Plot plot = new Plot("Plot of "+getShortTitle(imp), xLabel, yLabel, xValues, yValues);
+		Plot plot = new Plot("Plot of "+getShortTitle(imp), xLabel, yLabel);
+		plot.addPoints(xValues, yValues, null, Plot.LINE, null);
 		if (fixedYScale) {
 			double[] a = Tools.getMinMax(xValues);
 			plot.setLimits(a[0],a[1],fixedMin,fixedMax);

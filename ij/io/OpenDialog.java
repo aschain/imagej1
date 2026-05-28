@@ -177,7 +177,7 @@ public class OpenDialog {
 		}
 		if (fileName!=null)
 			fd.setFile(fileName);
-		fd.show();
+		fd.setVisible(true);
 		name = fd.getFile();
 		if (name==null) {
 			if (IJ.isMacOSX())

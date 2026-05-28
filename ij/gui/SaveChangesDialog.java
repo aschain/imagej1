@@ -52,7 +52,7 @@ public class SaveChangesDialog extends Dialog implements ActionListener, KeyList
 			setResizable(false);
 		pack();
 		GUI.centerOnImageJScreen(this);
-		show();
+		setVisible(true);
 	}
     
 	public void actionPerformed(ActionEvent e) {

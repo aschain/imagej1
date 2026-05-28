@@ -20,6 +20,8 @@ import java.applet.Applet;
 	Macros contained in a file named "StartupMacros.txt", in the same directory as the HTML file
 	containing the applet tag, will be installed on startup.
 */
+
+@SuppressWarnings("deprecation")
 public class ImageJApplet extends Applet {
 
 	/** Starts ImageJ if it's not already running. */
