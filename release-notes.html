@@ -5,16 +5,62 @@
 </head>
 <body>
 
-<li> <u>1.54t4 16 April 2026</u>
+<li> <u>1.54u8 22 July 2026</u>
 <ul>
+<li> Thanks to Gabriel Messaoudi, added custom LUT support for ROI group colors.
+<li> Thanks to Mustufa Merchant, added the
+   <i>Analyze&gt;Tools&gt;Compare Images</i> command. It measures
+	how similar two images of the same size are, using metrics that are widely
+	used to evaluate denoising, compression, reconstruction and registration:
+	<ul>
+	<li>MSE  - mean squared error</li>
+	<li>RMSE - root mean squared error</li>
+	<li>MAE  - mean absolute error</li>
+	<li>Max  - maximum absolute difference</li>
+	<li>PSNR - peak signal-to-noise ratio, in decibels (higher is more similar)</li>
+	<li>SSIM - mean structural similarity index, in the range -1..1 (1 is identical)</li>
+	</ul>
+<li> Thanks to Mustufa Merchant, added the
+<i>Plugins&gt;Utilities&gt;DICOM Metadata</i> command.
+The <i>Image&gt;Show Info</i> command displays the same
+DICOM metadata summary as this new command.
+<li> Added support for the ternary operato
+(<i>condition?expression1:expression2</i>)
+to the macro language. DOC
+<li> Fixed bug where <i>Array.fourier()</i> returned an incorrect first value
+(<a href="https://github.com/imagej/ImageJ/issues/262">Github</a>).
+</ul>
+
+<li> <u>1.54t 16 May 2026</u>
+<ul>
+<li> Added the <i>Help&gt;Examples&gt;Games</i> menu, with "2048",
+"Asteroids", "Breakout", "Life", "Pong", "Snake" and "Tetris" entries.
+Each entry is a macro or JavaScript that implements a video game.
+They demonstrate how to use AI to create macros and scripts, how
+to use the arrow keys, how to get flicker free animation in macros
+and how to use the Roi.create() methods to avoid the dreaded
+"Can't unambiguously select between fixed arity signatures..."
+JavaScript error.
+<li> Thanks to Jerome Mutterer, added the <i>Process&gt;Binary&gt;Dither</i>
+command, with support for "Floyd-Steinberg", "Bayer 2x2", "Bayer 4x4",
+"Random noise" and "Halftone" dithering.
+<li> The up and down arrow keys no longer zoom images in and out.
+Use the "+" and"-" keys instead.
+<li> The restoreSettings() macro function is automatically called when
+a macro terminates and saveSettings() was called.
+<li>Added the setOption("requireControlKey",boolean) macro function.
 <li> The arrow keys, when used to move selections or to zoom in
 and out, now require the control (or command) key when the
 <i>Edit&gt;Options&gt;Misc&gt;Require control key for shortcuts</i>
 option is enabled
 (<a href="http://wsr.imagej.net/macros/js/Asteroids.js">example</a>).
+<li> The getCursorLoc() macro function no longer displays an
+error message when no windows are open.
 <li> Thanks to Michael Schmid, fixed bug with the "Sliding paraboloid"
 option of the BackgroundSubtracter that caused an endless loop with
-some images containing NaNs. 
+some images containing NaNs.
+<li> Thanks to Albert Cardona, fixed bug where RGB stacks lost their 
+calibration when converted to composite.
 </ul>
 
 <li> <u>1.54s 26 March 2026</u>

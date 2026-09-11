@@ -18,6 +18,7 @@ public class Interpreter implements MacroConstants {
 
 	static final int STACK_SIZE = 1000;
 	static final int MAX_ARGS = 20;
+	static final int TERNARY_STRING = 999;
 
 	int pc;
 	int token;
@@ -188,6 +189,7 @@ public class Interpreter implements MacroConstants {
 		else
 			doBlock(); 
 		finishUp();
+		setInstance(previousInstance);
 		Recorder.recordInMacros = false;
 	}
 	
@@ -234,7 +236,6 @@ public class Interpreter implements MacroConstants {
 	final void getToken() {
 		if (done) return;
 		token = pgm.code[++pc];
-		//IJ.log(pc+" "+pgm.decodeToken(token));
 		if (token<=127)
 			return;
 		tokenAddress = token>>TOK_SHIFT;
@@ -834,6 +835,7 @@ public class Interpreter implements MacroConstants {
 			case Variable.ARRAY: doArrayAssignment(); break;
 			case USER_FUNCTION: doUserFunctionAssignment(); break;
 			case STRING_FUNCTION: doNumericStringAssignment(); break;
+			case TERNARY_STRING: doTernaryStringAssignment(); break;
 			default:
 				putTokenBack();
 				double value = getAssignmentExpression();
@@ -844,8 +846,10 @@ public class Interpreter implements MacroConstants {
 	int getExpressionType() {
 		int rightSideToken = pgm.code[pc+2];
 		int tok = rightSideToken&0xff;
+				
 		if (tok==STRING_CONSTANT)
 			return Variable.STRING;
+			
 		if (tok==STRING_FUNCTION) {
 			int address = rightSideToken>>TOK_SHIFT;
 			int type = pgm.table[address].type;
@@ -868,10 +872,13 @@ public class Interpreter implements MacroConstants {
 				return Variable.VALUE;
 			return Variable.STRING;
 		}
+		
 		if (tok==ARRAY_FUNCTION)
 			return Variable.ARRAY;
+			
 		if (tok==USER_FUNCTION)
 			return USER_FUNCTION;
+			
 		if (tok==VARIABLE_FUNCTION) {
 			int address = rightSideToken>>TOK_SHIFT;
 			int type = pgm.table[address].type;
@@ -882,8 +889,28 @@ public class Interpreter implements MacroConstants {
 			if (name.equals("getColumn")||name.equals("toArray"))
 				return Variable.ARRAY;			
 		}
+		
 		if (tok!=WORD)
 			return Variable.VALUE;
+			
+		if (pgm.hasQuestionMark) {
+			int savePC = pc;
+			lineNumber = pgm.lineNumbers[pc];
+			while (!done && lineNumber==pgm.lineNumbers[pc]) {
+				//IJ.log(pgm.decodeToken(token, tokenAddress));
+				getToken();
+				if (token==';')
+					break;
+				if (token=='?' && nextToken()==STRING_CONSTANT) {
+					pc = savePC-1;
+					getToken();
+					return TERNARY_STRING;
+				}
+			}
+			pc = savePC-1;
+			getToken();
+		}
+
 		Variable v = lookupVariable(rightSideToken>>TOK_SHIFT);
 		if (v==null)
 			return Variable.VALUE;
@@ -1108,6 +1135,39 @@ public class Interpreter implements MacroConstants {
 			error("Array expected");
 	}
 
+	final void doTernaryStringAssignment() {
+		Variable v = lookupLocalVariable(tokenAddress);
+		if (v==null) {
+			if (nextToken()=='=')
+				v = push(tokenAddress, 0.0, null, this);
+			else
+				error("Undefined identifier");
+		}
+		getToken();
+		if (token!='=')
+			error("'=' expected");
+		double value = getLogicalExpression2();
+		getToken(); // Consume '?'
+		if (token!='?')
+			error("'?' expected");
+		boolean condition = (value!=0.0); // ImageJ macro treats non-zero as true
+		String string;		
+		if (condition) { // True branch
+			string = getString();
+			getToken(); // skip ':'
+			if (token!=':')
+				error("':' expected");
+			getString(); // Skip the false expression
+		} else { // False branch
+			getString(); // Skip the true expression
+			getToken(); // skip ':'
+			if (token!=':')
+				error("':' expected");
+			string = getString();
+		}
+		v.setString(string);
+	}
+
 	final void doIf() {
 		looseSyntax = false;
 		boolean b = getBoolean();
@@ -1138,6 +1198,14 @@ public class Interpreter implements MacroConstants {
 	}
 
 	final double getLogicalExpression() {
+		double value = getLogicalExpression2();
+		if (nextToken()=='?')
+			return ternaryOperatorValue(value);
+		else
+			return value;
+	}
+	
+	final double getLogicalExpression2() {
 		double v1 = getBooleanExpression();
 		int next = nextToken();
 		if (!(next==LOGICAL_AND || next==LOGICAL_OR))
@@ -1152,6 +1220,29 @@ public class Interpreter implements MacroConstants {
 		else if (op==LOGICAL_OR)
 			return (int)v1 | (int)v2;
 		return v1;
+	}
+
+	// Handle ternary operator
+	// condition ? true-expression : false-expression;
+	private double ternaryOperatorValue(double value) {
+		getToken(); // Consume '?'
+		if (nextToken()==STRING_CONSTANT)
+			error("String operands not supported");
+		boolean condition = (value!=0.0); // ImageJ macro treats non-zero as true		
+		if (condition) { // True branch
+			value = getExpression();
+			getToken(); // skip ':'
+			if (token!=':')
+				error("':' expected");
+			getExpression(); // Skip the false expression
+		} else { // False branch
+			getExpression(); // Skip the true expression
+			getToken(); // skip ':'
+			if (token!=':')
+				error("':' expected");
+			value = getExpression();
+		}
+		return value;
 	}
 
 	final double getBooleanExpression() {
@@ -1609,7 +1700,7 @@ public class Interpreter implements MacroConstants {
 		}
 		return value;
 	}
-
+		
 	final double getTerm() {
 		double value = getFactor();
 		boolean done = false;
@@ -2110,6 +2201,10 @@ public class Interpreter implements MacroConstants {
 		}
 		if (func.unUpdatedTable!=null)
 			func.unUpdatedTable.show(func.unUpdatedTable.getTitle());
+		if (func.saveSettingsCalled){
+			func.saveSettingsCalled = false;
+			func.restoreSettings();
+		}
 	}
 	
 	/** Aborts currently running macro. */
