@@ -1,6 +1,7 @@
 package ij.plugin; 
 import ij.*;
 import ij.gui.*;
+import ij.plugin.ZProjector.RayFunction;
 import ij.plugin.frame.Recorder;
 import ij.process.*;
 import java.util.Arrays;
@@ -527,8 +528,10 @@ public class ZProjector implements PlugIn {
 
  	private RayFunction getRayFunction(int method, FloatProcessor fp) {
  		switch (method) {
- 			case AVG_METHOD: case SUM_METHOD:
+ 			case AVG_METHOD:
 	    		return new AverageIntensity(fp, sliceCount); 
+			 case SUM_METHOD:
+	    		return new SumIntensity(fp);
 			case MAX_METHOD:
 	    		return new MaxIntensity(fp);
 	    	case MIN_METHOD:
@@ -732,6 +735,38 @@ public class ZProjector implements PlugIn {
 
     } // end AverageIntensity
 
+	 /** Compute average intensity projection. */
+    class SumIntensity extends RayFunction {
+     	private float[] fpixels;
+ 		private int len; 
+
+		/** Constructor requires number of slices to be
+	    	projected. This is used to determine average at each
+	    	pixel. */
+		public SumIntensity(FloatProcessor fp) {
+			fpixels = (float[])fp.getPixels();
+			len = fpixels.length;
+		}
+
+		public void projectSlice(byte[] pixels) {
+	    	for(int i=0; i<len; i++)
+				fpixels[i] += (pixels[i]&0xff); 
+		}
+
+		public void projectSlice(short[] pixels) {
+	    	for(int i=0; i<len; i++)
+				fpixels[i] += pixels[i]&0xffff;
+		}
+
+		public void projectSlice(float[] pixels) {
+	    	for(int i=0; i<len; i++)
+				fpixels[i] += pixels[i]; 
+		}
+
+		public void postProcess() {
+		}
+
+    } 
 
      /** Compute max intensity projection. */
     class MaxIntensity extends RayFunction {
